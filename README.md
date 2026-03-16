@@ -1,0 +1,636 @@
+# Claude Code Starter Kit
+
+Claude Code の導入を検討しているチームや個人に向けたスターターキットです。
+Skills、カスタムコマンド、サブエージェント、エージェントチームなど、Claude Code の主要機能をすぐに導入・使用できるテンプレートとサンプルを提供します。
+
+## 目次
+
+- [前提条件](#前提条件)
+- [セットアップ](#セットアップ)
+- [リポジトリ構成](#リポジトリ構成)
+- [主要機能](#主要機能)
+  - [CLAUDE.md（プロジェクト指示書）](#claudemdプロジェクト指示書)
+  - [Skills（スキル）](#skillsスキル)
+  - [Sub-agents（サブエージェント）](#sub-agentsサブエージェント)
+  - [Agent Teams（エージェントチーム）](#agent-teamsエージェントチーム)
+  - [Hooks（フック）](#hooksフック)
+  - [MCP Servers](#mcp-servers)
+  - [Settings（設定）](#settings設定)
+  - [Keybindings（キーバインド）](#keybindingsキーバインド)
+- [カスタマイズガイド](#カスタマイズガイド)
+- [参考リンク](#参考リンク)
+
+## 前提条件
+
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) がインストール済みであること
+- Node.js 18 以上
+- Git
+
+```bash
+# Claude Code のインストール
+npm install -g @anthropic-ai/claude-code
+
+# インストール確認
+claude --version
+```
+
+## セットアップ
+
+```bash
+# リポジトリのクローン
+git clone https://github.com/sas-dx/claude-code-starter-kit.git
+cd claude-code-starter-kit
+
+# Claude Code の起動
+claude
+```
+
+起動後、CLAUDE.md が自動的に読み込まれ、プロジェクト固有の指示が適用されます。
+
+## リポジトリ構成（暫定）
+
+> **Note:** 以下は想定構成です。各ファイルは今後順次作成・更新していきます。
+
+```
+claude-code-starter-kit/
+├── CLAUDE.md                        # プロジェクト指示書（メイン）
+├── README.md                        # 本ファイル
+├── .claude/
+│   ├── settings.json                # プロジェクト設定（チーム共有）
+│   ├── settings.local.json          # ローカル設定（gitignore対象）
+│   ├── agents/                      # サブエージェント定義
+│   │   ├── code-reviewer.md         # コードレビュー用エージェント
+│   │   ├── test-runner.md           # テスト実行用エージェント
+│   │   └── doc-writer.md           # ドキュメント作成用エージェント
+│   ├── skills/                      # スキル定義
+│   │   ├── commit/
+│   │   │   └── SKILL.md            # コミットスキル
+│   │   ├── review-pr/
+│   │   │   └── SKILL.md            # PRレビュースキル
+│   │   └── refactor/
+│   │       └── SKILL.md            # リファクタリングスキル
+│   ├── rules/                       # パス別ルール定義
+│   │   └── example-rule.md
+│   └── hooks/                       # フックスクリプト
+│       └── protect-files.sh         # ファイル保護スクリプト
+├── .mcp.json                        # MCP サーバー設定（チーム共有）
+└── .gitignore
+```
+
+## 主要機能
+
+---
+
+### CLAUDE.md（プロジェクト指示書）
+
+セッション開始時に自動で読み込まれる永続的な指示書です。プロジェクトのコンテキスト、コーディング規約、ビルドコマンドなどを記載します。
+
+**配置場所と優先度：**
+
+| 配置場所 | スコープ | 用途 |
+|---------|---------|------|
+| `./CLAUDE.md` | プロジェクト | プロジェクト固有の指示（チーム共有） |
+| `./.claude/CLAUDE.md` | プロジェクト | 同上（`.claude/` 配下にまとめたい場合） |
+| `~/.claude/CLAUDE.md` | ユーザー | 全プロジェクト共通の個人設定 |
+
+**記述例：**
+
+```markdown
+# プロジェクト概要
+本プロジェクトは React + Node.js の Web アプリケーションです。
+
+# ビルド・テスト
+- ビルド: npm run build
+- テスト: npm test
+- 開発サーバー: npm run dev
+
+# コーディング規約
+- インデント: 2スペース
+- 言語: TypeScript を使用
+- コミットメッセージ: Conventional Commits 形式
+
+# プロジェクト構造
+- src/components/ - React コンポーネント
+- src/api/ - API 呼び出し
+- server/ - バックエンドコード
+```
+
+**ベストプラクティス：**
+- 1ファイルあたり 200行以内に収める
+- 具体的で明確な指示を記述する
+- 外部ファイルの参照には `@path/to/file` 構文を使用する
+- `/init` コマンドで自動生成も可能
+
+**パス別ルール（`.claude/rules/`）：**
+
+特定のファイルパスに対してのみ適用されるルールを定義できます。
+
+```markdown
+---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API 開発ルール
+- 入力バリデーションを必ず含める
+- 標準エラーレスポンス形式を使用する
+- OpenAPI ドキュメントコメントを追加する
+```
+
+---
+
+### Skills（スキル）
+
+再利用可能なワークフローを定義し、`/skill-name` で呼び出せる機能です。
+
+**ディレクトリ構成：**
+
+```
+.claude/skills/
+└── skill-name/
+    ├── SKILL.md          # メイン指示ファイル（必須）
+    ├── template.md       # テンプレート（任意）
+    └── scripts/
+        └── helper.sh     # ヘルパースクリプト（任意）
+```
+
+**SKILL.md のフォーマット：**
+
+```yaml
+---
+name: skill-name
+description: このスキルが自動で呼び出される条件の説明
+disable-model-invocation: false  # true で手動呼び出しのみに制限
+allowed-tools: Read, Grep, Bash  # 使用可能なツールを制限（任意）
+model: sonnet                     # 使用モデルの指定（任意）
+context: fork                     # 隔離コンテキストで実行（任意）
+---
+
+スキルの指示内容をここに記述...
+```
+
+**主なフロントマターフィールド：**
+
+| フィールド | 説明 |
+|-----------|------|
+| `name` | スキル名（`/name` で呼び出し） |
+| `description` | 自動呼び出しの判定に使用される説明文 |
+| `disable-model-invocation` | `true` でユーザー手動呼び出しのみ |
+| `allowed-tools` | 使用可能なツールのリスト |
+| `model` | 使用するモデル（sonnet, opus, haiku） |
+| `context` | `fork` で隔離コンテキスト実行 |
+
+**作成例（PRレビュースキル）：**
+
+```yaml
+---
+name: review-pr
+description: Pull Request のコードレビューを実行
+allowed-tools: Read, Grep, Glob, Bash
+---
+
+以下の観点で PR をレビューしてください:
+
+1. コードの正確性と潜在的なバグ
+2. セキュリティ上の懸念
+3. パフォーマンスへの影響
+4. テストカバレッジ
+5. コーディング規約への準拠
+
+問題が見つかった場合は、具体的な修正提案を含めてください。
+```
+
+**引数の受け渡し：**
+
+- `$ARGUMENTS` - 全引数
+- `$ARGUMENTS[0]`, `$ARGUMENTS[1]` - 位置引数
+- `$1`, `$2` - 位置引数（短縮形）
+- `${CLAUDE_SKILL_DIR}` - スキルディレクトリのパス
+- `${CLAUDE_SESSION_ID}` - セッション ID
+
+---
+
+### Sub-agents（サブエージェント）
+
+特定のタスクに特化した AI アシスタントを定義します。隔離されたコンテキストで、独自のシステムプロンプトとツール制限を持って自律的に動作します。
+
+**ディレクトリ構成：**
+
+```
+.claude/agents/         # プロジェクトレベル（チーム共有）
+├── code-reviewer.md
+├── test-runner.md
+└── doc-writer.md
+
+~/.claude/agents/       # ユーザーレベル（全プロジェクト共通）
+└── my-agent.md
+```
+
+**エージェント定義ファイルのフォーマット：**
+
+```yaml
+---
+name: code-reviewer
+description: コードレビューの依頼があった場合に使用
+tools: Read, Grep, Glob, Bash
+disallowedTools: Write, Edit
+model: sonnet
+permissionMode: default
+maxTurns: 10
+---
+
+あなたは経験豊富なコードレビュアーです。
+以下の観点でコードをレビューしてください:
+
+1. バグの可能性
+2. セキュリティリスク
+3. パフォーマンス問題
+4. 可読性と保守性
+```
+
+**主なフロントマターフィールド：**
+
+| フィールド | 説明 |
+|-----------|------|
+| `name` | エージェント名（必須） |
+| `description` | Claude がこのエージェントに委譲する判断基準（必須） |
+| `tools` | 許可するツール（省略時は全ツール継承） |
+| `disallowedTools` | 禁止するツール |
+| `model` | 使用モデル（sonnet, opus, haiku, inherit） |
+| `permissionMode` | 権限モード（default, acceptEdits, dontAsk, plan） |
+| `skills` | プリロードするスキル |
+| `mcpServers` | 利用可能な MCP サーバー |
+| `maxTurns` | 最大ターン数 |
+| `background` | バックグラウンド実行（true/false） |
+| `isolation` | `worktree` で隔離された git worktree で実行 |
+| `memory` | 永続メモリのスコープ（user, project, local） |
+| `hooks` | ライフサイクルフック |
+
+---
+
+### Agent Teams（エージェントチーム）
+
+> **Warning:** Agent Teams は実験的機能であり、デフォルトで無効です。Claude Code v2.1.32 以降が必要です。
+
+複数の Claude Code インスタンスが並列で協調作業を行う機能です。1つのセッションがチームリードとなり、独立したチームメイトに作業を分配・調整します。サブエージェントとは異なり、チームメイト同士が直接メッセージをやり取りでき、共有タスクリストを通じて自律的に協調します。
+
+**サブエージェントとの比較：**
+
+|                    | Sub-agents                               | Agent Teams                                  |
+| :----------------- | :--------------------------------------- | :------------------------------------------- |
+| **コンテキスト**    | 独自のコンテキスト。結果は呼び出し元に返却 | 独自のコンテキスト。完全に独立                   |
+| **コミュニケーション** | メインエージェントへの結果報告のみ         | チームメイト同士が直接メッセージをやり取り        |
+| **コーディネーション** | メインエージェントが全作業を管理           | 共有タスクリストによる自己調整                    |
+| **適したケース**    | 結果だけが必要な集中タスク                 | 議論・協調が必要な複雑な作業                     |
+| **トークンコスト**  | 低い（結果がメインに要約される）            | 高い（各チームメイトが独立した Claude インスタンス） |
+
+**有効化：**
+
+`settings.json` に以下を追加：
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+**活用シーン：**
+
+- **リサーチ・レビュー** - 複数のチームメイトが問題の異なる側面を同時に調査し、発見を共有・議論
+- **新規モジュール・機能** - 各チームメイトが別々のモジュールを担当し、干渉なく並行開発
+- **競合仮説によるデバッグ** - 複数の仮説を並列でテストし、互いの理論に反証を試みる
+- **レイヤー横断の変更** - フロントエンド・バックエンド・テストを各チームメイトが担当
+
+**チームの起動：**
+
+自然言語でチーム構成を指示します：
+
+```text
+CLI ツールの設計を複数の観点から検討してください。エージェントチームを作成して:
+- UX 担当のチームメイト
+- 技術アーキテクチャ担当のチームメイト
+- 反対意見を出す役割のチームメイト
+```
+
+**表示モード：**
+
+| モード | 説明 | 要件 |
+|-------|------|------|
+| `auto`（デフォルト） | tmux セッション内なら分割ペイン、それ以外はインプロセス | なし |
+| `in-process` | 全チームメイトがメインターミナル内で動作。`Shift+Down` で切り替え | なし |
+| `tmux` | 各チームメイトが独自のペインで表示。tmux または iTerm2 が必要 | tmux / iTerm2 |
+
+```json
+{
+  "teammateMode": "in-process"
+}
+```
+
+CLI フラグでも指定可能：
+
+```bash
+claude --teammate-mode in-process
+```
+
+**チームメイトとの対話：**
+
+- **インプロセスモード**: `Shift+Down` でチームメイト間を移動、直接メッセージを送信。`Enter` でセッション表示、`Escape` で割り込み、`Ctrl+T` でタスクリスト表示
+- **分割ペインモード**: チームメイトのペインをクリックして直接対話
+
+**タスク管理：**
+
+共有タスクリストでチーム全体の作業を調整します。タスクには pending / in progress / completed の3つの状態があり、タスク間の依存関係も設定可能です。
+
+- **リードが割り当て** - 特定のタスクを特定のチームメイトに割り振り
+- **自己クレーム** - タスク完了後、チームメイトが次の未割り当て・未ブロックタスクを自動取得
+
+**プラン承認の要求：**
+
+チームメイトに実装前のプラン承認を義務付けられます：
+
+```text
+認証モジュールのリファクタリング用のアーキテクトチームメイトを起動してください。
+変更を加える前にプラン承認を必須にしてください。
+```
+
+リードがプランを審査し、承認または差し戻しフィードバックを行います。
+
+**品質ゲートの強制（Hooks）：**
+
+| フックイベント | タイミング | 用途 |
+|--------------|----------|------|
+| `TeammateIdle` | チームメイトがアイドルになる直前 | exit 2 でフィードバックを送り作業を継続させる |
+| `TaskCompleted` | タスクが完了マークされる時 | exit 2 で完了を阻止しフィードバックを返す |
+
+**ベストプラクティス：**
+
+- チームサイズは **3〜5名** を推奨。トークンコストとコーディネーションのバランスが最適
+- チームメイト1名あたり **5〜6タスク** が適切な粒度
+- 同一ファイルの並行編集は避ける（上書きの原因になる）
+- 初めて使う場合は、コードを書かないタスク（PRレビュー、調査）から始める
+- リードが自分で実装を始めた場合は「チームメイトの完了を待ってください」と指示する
+
+**制限事項：**
+
+- `/resume` でインプロセスチームメイトは復元されない
+- セッションあたり1チームのみ
+- チームメイトは自身のチームを作成できない（ネスト不可）
+- リードの変更や移譲は不可
+- 権限はスポーン時にリードの設定を継承（個別設定はスポーン後に変更可能）
+- 分割ペインモードは VS Code 統合ターミナル、Windows Terminal、Ghostty では非対応
+
+---
+
+### Hooks（フック）
+
+Claude Code のライフサイクルの特定のポイントで実行される確定的なシェルコマンドです。ルールの強制、アクションの検証、ワークフローの自動化に使用します。
+
+**フックタイプ：**
+
+| タイプ | 説明 |
+|-------|------|
+| `command` | シェルスクリプトを実行 |
+| `http` | HTTP エンドポイントに POST |
+| `prompt` | 単発の LLM 評価呼び出し |
+| `agent` | マルチターンのエージェント検証 |
+
+**主要なフックイベント：**
+
+| イベント | タイミング |
+|---------|----------|
+| `SessionStart` | セッション開始・再開時 |
+| `PreToolUse` | ツール実行前（ブロック可能） |
+| `PostToolUse` | ツール正常実行後 |
+| `UserPromptSubmit` | プロンプト送信時 |
+| `Stop` | Claude の応答完了時 |
+| `SubagentStart` / `SubagentStop` | サブエージェントのライフサイクル |
+| `SessionEnd` | セッション終了時 |
+
+**設定場所：**
+
+```
+~/.claude/settings.json        # グローバル（全プロジェクト）
+.claude/settings.json          # プロジェクトレベル
+.claude/settings.local.json    # ローカル（共有しない）
+```
+
+**設定例（保護ファイルへの編集をブロック）：**
+
+`.claude/settings.json`:
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+`.claude/hooks/protect-files.sh`:
+```bash
+#!/bin/bash
+INPUT=$(cat)
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+
+if [[ "$FILE_PATH" == *".env"* ]] || [[ "$FILE_PATH" == *".git/"* ]]; then
+  echo "Blocked: Protected file" >&2
+  exit 2  # exit 2 でアクションをブロック
+fi
+exit 0    # exit 0 で許可
+```
+
+**終了コードの意味：**
+
+| 終了コード | 動作 |
+|-----------|------|
+| `0` | アクションを許可（stdout でコンテキスト注入可能） |
+| `2` | アクションをブロック（stderr がフィードバックとして Claude に送信） |
+
+---
+
+### MCP Servers
+
+Model Context Protocol (MCP) を通じて、外部ツール・データベース・API・サービスへのアクセスを提供します。
+
+**追加方法：**
+
+```bash
+# HTTP サーバー（リモート推奨）
+claude mcp add --transport http github https://api.githubcopilot.com/mcp/
+
+# stdio サーバー（ローカル、サブプロセスとして実行）
+claude mcp add --transport stdio my-server -- npx -y my-mcp-server
+
+# スコープを指定して追加
+claude mcp add --transport http --scope project github https://api.githubcopilot.com/mcp/
+```
+
+**設定ファイル（`.mcp.json`）：**
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "database": {
+      "type": "stdio",
+      "command": "/usr/local/bin/db-server",
+      "args": ["--config", "/etc/db.json"],
+      "env": {
+        "DB_URL": "postgresql://localhost:5432/mydb"
+      }
+    }
+  }
+}
+```
+
+**設定スコープ：**
+
+| スコープ | ファイル | 共有 |
+|---------|---------|------|
+| `local`（デフォルト） | `~/.claude.json` | 個人のみ |
+| `project` | `.mcp.json` | チーム共有（バージョン管理対象） |
+| `user` | `~/.claude.json` | 個人・全プロジェクト共通 |
+
+---
+
+### Settings（設定）
+
+Claude Code の動作、権限、フック、環境変数を設定するファイルです。
+
+**設定ファイルと優先度：**
+
+```
+優先度: 高 → 低
+1. /etc/claude-code/settings.json       # 管理者ポリシー（組織全体）
+2. ~/.claude/settings.json              # ユーザーレベル（全プロジェクト）
+3. .claude/settings.json                # プロジェクトレベル（チーム共有）
+4. .claude/settings.local.json          # ローカル（gitignore対象）
+```
+
+**設定例（`.claude/settings.json`）：**
+
+```json
+{
+  "permissions": {
+    "allow": ["Bash", "Read", "Edit", "Write", "Glob", "Grep"],
+    "deny": ["Bash(rm -rf *)"]
+  },
+  "hooks": {
+    "PreToolUse": []
+  },
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
+```
+
+**主な設定項目：**
+
+| 項目 | 説明 |
+|-----|------|
+| `permissions.allow` / `deny` | ツールのアクセス制御 |
+| `hooks` | ライフサイクルフック設定 |
+| `env` | 環境変数 |
+| `disallowedTools` | 使用禁止ツール |
+| `sandbox.enabled` | ファイルシステムのサンドボックス化 |
+
+---
+
+### Keybindings（キーバインド）
+
+Claude Code のキーボードショートカットをカスタマイズできます。
+
+**設定ファイル：** `~/.claude/keybindings.json`
+
+`/keybindings` コマンドで設定ファイルを開けます。
+
+```json
+{
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "ctrl+j": "chat:submit",
+        "ctrl+u": "chat:undo",
+        "ctrl+g": "chat:externalEditor"
+      }
+    }
+  ]
+}
+```
+
+**主なコンテキスト：**
+
+| コンテキスト | 適用範囲 |
+|------------|---------|
+| `Global` | すべての画面 |
+| `Chat` | メイン入力エリア |
+| `Autocomplete` | 自動補完メニュー |
+| `Confirmation` | 権限ダイアログ |
+| `Transcript` | トランスクリプトビューア |
+
+**主なアクション：**
+
+| アクション | 説明 |
+|-----------|------|
+| `chat:submit` | メッセージ送信 |
+| `chat:cancel` | 入力キャンセル |
+| `chat:externalEditor` | 外部エディタで開く |
+| `app:exit` | Claude Code を終了 |
+
+---
+
+## カスタマイズガイド
+
+### 1. プロジェクトに合わせた CLAUDE.md の作成
+
+```bash
+# 自動生成
+claude /init
+
+# または手動で作成
+# CLAUDE.md にプロジェクト固有の指示を記述
+```
+
+### 2. チーム共通スキルの追加
+
+`.claude/skills/` 配下に SKILL.md を作成し、チームで共有したいワークフローを定義します。
+
+### 3. サブエージェントのカスタマイズ
+
+`.claude/agents/` 配下のエージェント定義ファイルを編集し、プロジェクトの要件に合わせて調整します。
+
+### 4. フックによるガードレールの設定
+
+`.claude/settings.json` にフックを追加し、危険な操作のブロックや品質チェックを自動化します。
+
+### 5. MCP サーバーの追加
+
+チームで使用する外部サービスとの連携を `.mcp.json` に定義します。
+
+## 参考リンク
+
+| リソース | URL |
+|---------|-----|
+| Claude Code 公式ドキュメント | https://docs.anthropic.com/en/docs/claude-code |
+| Claude Code ウェブドキュメント | https://code.claude.com/docs/en/ |
+| Claude Code GitHub | https://github.com/anthropics/claude-code |
+| MCP (Model Context Protocol) | https://modelcontextprotocol.io/ |
+
+## ライセンス
+
+MIT License
