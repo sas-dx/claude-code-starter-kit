@@ -54,9 +54,9 @@ claude
 
 ```
 claude-code-starter-kit/
-├── CLAUDE.md                        # プロジェクト指示書（メイン）
 ├── README.md                        # 本ファイル
 ├── .claude/
+│   ├── CLAUDE.md                    # プロジェクト指示書（メイン）
 │   ├── README.md                    # .claude ディレクトリガイド（CLAUDE.md の書き方）
 │   ├── settings.json                # プロジェクト設定（チーム共有）
 │   ├── settings.local.json          # ローカル設定（gitignore対象）
