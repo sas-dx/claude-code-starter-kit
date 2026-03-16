@@ -83,8 +83,13 @@ claude-code-starter-kit/
 │   │       └── SKILL.md            # リファクタリングスキル
 │   ├── mcp/                         # MCP 関連ドキュメント
 │   │   └── README.md               # MCP 設定ガイド
-│   ├── rules/                       # パス別ルール定義
-│   │   └── example-rule.md
+│   ├── rules/                       # プロジェクトルール定義
+│   │   ├── README.md               # ルールガイド
+│   │   ├── 01_git-workflow.md      # Git ワークフロールール
+│   │   ├── 02_coding-standards.md  # コーディング規約
+│   │   ├── 03_testing.md           # テストルール（TDD）
+│   │   ├── 04_security.md          # セキュリティルール
+│   │   └── 05_review-process.md    # コードレビュールール
 │   └── hooks/                       # フックスクリプト
 │       └── protect-files.sh         # ファイル保護スクリプト
 ├── .mcp.json                        # MCP サーバー設定（チーム共有）
