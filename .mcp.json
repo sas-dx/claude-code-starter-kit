@@ -2,7 +2,7 @@
   "mcpServers": {
     "serena": {
       "type": "stdio",
-      "command": "uvx",
+      "command": "/home/sasao020211/.local/bin/uvx",
       "args": [
         "--from",
         "git+https://github.com/oraios/serena",

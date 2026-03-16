@@ -69,6 +69,8 @@ claude-code-starter-kit/
 │   │   │   └── SKILL.md            # PRレビュースキル
 │   │   └── refactor/
 │   │       └── SKILL.md            # リファクタリングスキル
+│   ├── mcp/                         # MCP 関連ドキュメント
+│   │   └── README.md               # MCP 設定ガイド
 │   ├── rules/                       # パス別ルール定義
 │   │   └── example-rule.md
 │   └── hooks/                       # フックスクリプト
@@ -463,38 +465,48 @@ exit 0    # exit 0 で許可
 
 Model Context Protocol (MCP) を通じて、外部ツール・データベース・API・サービスへのアクセスを提供します。
 
-**追加方法：**
+> 詳細なセットアップ手順・トラブルシューティングは [.claude/mcp/README.md](.claude/mcp/README.md) を参照してください。
 
-```bash
-# HTTP サーバー（リモート推奨）
-claude mcp add --transport http github https://api.githubcopilot.com/mcp/
+**本プロジェクトの導入済み MCP サーバー：**
 
-# stdio サーバー（ローカル、サブプロセスとして実行）
-claude mcp add --transport stdio my-server -- npx -y my-mcp-server
-
-# スコープを指定して追加
-claude mcp add --transport http --scope project github https://api.githubcopilot.com/mcp/
-```
+| サーバー | 用途 | 前提条件 |
+|---------|------|---------|
+| [Serena](https://github.com/oraios/serena) | セマンティックコード解析・シンボルレベル編集・コードナビゲーション | `uv` パッケージマネージャー |
+| [Context7](https://github.com/upstash/context7) | 最新ライブラリドキュメントのリアルタイム取得・バージョン固有のコード例提供 | Node.js / npm |
 
 **設定ファイル（`.mcp.json`）：**
+
+本プロジェクトではプロジェクトルートの `.mcp.json` にチーム共有設定を定義しています。
 
 ```json
 {
   "mcpServers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    },
-    "database": {
+    "serena": {
       "type": "stdio",
-      "command": "/usr/local/bin/db-server",
-      "args": ["--config", "/etc/db.json"],
-      "env": {
-        "DB_URL": "postgresql://localhost:5432/mydb"
-      }
+      "command": "/path/to/uvx",
+      "args": [
+        "--from", "git+https://github.com/oraios/serena",
+        "serena", "start-mcp-server",
+        "--context", "ide-assistant",
+        "--project", "."
+      ]
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--yes", "@upstash/context7-mcp"]
     }
   }
 }
+```
+
+> **Note:** Serena の `command` は `uvx` の絶対パスを指定する必要があります。
+> 環境に応じて `which uvx` で確認し、パスを書き換えてください。
+
+**接続確認：**
+
+```bash
+claude mcp list
 ```
 
 **設定スコープ：**
@@ -504,6 +516,16 @@ claude mcp add --transport http --scope project github https://api.githubcopilot
 | `local`（デフォルト） | `~/.claude.json` | 個人のみ |
 | `project` | `.mcp.json` | チーム共有（バージョン管理対象） |
 | `user` | `~/.claude.json` | 個人・全プロジェクト共通 |
+
+**サーバーの追加：**
+
+```bash
+# HTTP サーバー（リモート推奨）
+claude mcp add --transport http --scope project <name> <url>
+
+# stdio サーバー（ローカル、サブプロセスとして実行）
+claude mcp add --transport stdio --scope project <name> -- <command> <args...>
+```
 
 ---
 
