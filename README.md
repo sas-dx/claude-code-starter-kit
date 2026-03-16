@@ -57,7 +57,7 @@ claude-code-starter-kit/
 ├── CLAUDE.md                        # プロジェクト指示書（メイン）
 ├── README.md                        # 本ファイル
 ├── .claude/
-│   ├── claude-md-guide.md           # CLAUDE.md ガイド（書き方のコツ）
+│   ├── README.md                    # .claude ディレクトリガイド（CLAUDE.md の書き方）
 │   ├── settings.json                # プロジェクト設定（チーム共有）
 │   ├── settings.local.json          # ローカル設定（gitignore対象）
 │   ├── commands/                    # カスタムコマンド（/コマンド名 で呼び出し）
@@ -99,7 +99,7 @@ claude-code-starter-kit/
 
 セッション開始時に自動で読み込まれる永続的な指示書です。Claude Code にとっての「業務マニュアル」であり、毎回プロジェクトの説明をしなくても、ルール通りに動いてくれるようになります。
 
-> 詳細なガイド（なぜ必要か、書き方のコツ 7選）は [.claude/claude-md-guide.md](.claude/claude-md-guide.md) を参照してください。
+> 詳細なガイド（なぜ必要か、書き方のコツ 7選）は [.claude/README.md](.claude/README.md) を参照してください。
 
 **なぜ必要か：**
 - **毎回の説明が不要** - セッションごとに「このプロジェクトは...」と説明しなくて済む
