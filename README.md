@@ -85,11 +85,11 @@ claude-code-starter-kit/
 │   │   └── README.md               # MCP 設定ガイド
 │   ├── rules/                       # プロジェクトルール定義
 │   │   ├── README.md               # ルールガイド
-│   │   ├── 01_git-workflow.md      # Git ワークフロールール
-│   │   ├── 02_coding-standards.md  # コーディング規約
-│   │   ├── 03_testing.md           # テストルール（TDD）
-│   │   ├── 04_security.md          # セキュリティルール
-│   │   └── 05_review-process.md    # コードレビュールール
+│   │   ├── git-workflow.md         # Git ワークフロー（常時適用）
+│   │   ├── coding-standards.md     # コーディング規約（常時適用）
+│   │   ├── testing.md              # テストルール（テストファイル操作時のみ適用）
+│   │   ├── security.md             # セキュリティルール（常時適用）
+│   │   └── review-process.md       # コードレビュールール（常時適用）
 │   └── hooks/                       # フックスクリプト
 │       └── protect-files.sh         # ファイル保護スクリプト
 ├── .mcp.json                        # MCP サーバー設定（チーム共有）
