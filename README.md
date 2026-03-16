@@ -67,9 +67,12 @@ claude-code-starter-kit/
 │   │   ├── fix-pr-review.md        # /fix-pr-review - レビュー指摘対応
 │   │   └── resolve-conflict.md     # /resolve-conflict - コンフリクト解消
 │   ├── agents/                      # サブエージェント定義
-│   │   ├── code-reviewer.md         # コードレビュー用エージェント
-│   │   ├── test-runner.md           # テスト実行用エージェント
-│   │   └── doc-writer.md           # ドキュメント作成用エージェント
+│   │   ├── README.md               # サブエージェントガイド
+│   │   ├── code-reviewer.md         # コード品質レビュー担当
+│   │   ├── security-reviewer.md     # セキュリティレビュー担当
+│   │   ├── pr-fix-implementer.md    # PR レビュー指摘修正担当
+│   │   ├── conflict-resolver.md     # コンフリクト解消担当
+│   │   └── rules-coder.md          # ルール準拠コーダー
 │   ├── skills/                      # スキル定義
 │   │   ├── commit/
 │   │   │   └── SKILL.md            # コミットスキル
@@ -270,13 +273,25 @@ allowed-tools: Read, Grep, Glob, Bash
 
 特定のタスクに特化した AI アシスタントを定義します。隔離されたコンテキストで、独自のシステムプロンプトとツール制限を持って自律的に動作します。
 
+> 詳細なガイド・エージェントの作り方は [.claude/agents/README.md](.claude/agents/README.md) を参照してください。
+
+**本リポジトリで提供しているエージェント：**
+
+| エージェント | 役割 |
+|------------|------|
+| `code-reviewer` | コード品質の包括的レビュー（ロジック、規約、テスト、パフォーマンス） |
+| `security-reviewer` | セキュリティ脆弱性の検出と対策提案 |
+| `pr-fix-implementer` | PR レビュー指摘の修正実装と完了報告 |
+| `conflict-resolver` | Git コンフリクトの分析・解決 |
+| `rules-coder` | プロジェクトルール準拠の TDD 実装 |
+
 **ディレクトリ構成：**
 
 ```
 .claude/agents/         # プロジェクトレベル（チーム共有）
 ├── code-reviewer.md
-├── test-runner.md
-└── doc-writer.md
+├── security-reviewer.md
+└── ...
 
 ~/.claude/agents/       # ユーザーレベル（全プロジェクト共通）
 └── my-agent.md
