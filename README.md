@@ -83,8 +83,10 @@ claude-code-starter-kit/
 │   │   │   └── SKILL.md            # /pr-summary - PR 要約（fork 実行）
 │   │   ├── explain-code/
 │   │   │   └── SKILL.md            # /explain-code - コード図解解説
-│   │   └── fix-issue/
-│   │       └── SKILL.md            # /fix-issue - Issue 実装〜PR 作成
+│   │   ├── fix-issue/
+│   │   │   └── SKILL.md            # /fix-issue - Issue 実装〜PR 作成
+│   │   └── scaffold-feature/
+│   │       └── SKILL.md            # /scaffold-feature - 機能ディレクトリ雛形生成
 │   ├── mcp/                         # MCP 関連ドキュメント
 │   │   └── README.md               # MCP 設定ガイド
 │   ├── rules/                       # プロジェクトルール定義
@@ -95,7 +97,8 @@ claude-code-starter-kit/
 │   │   ├── security.md             # セキュリティルール（常時適用）
 │   │   └── review-process.md       # コードレビュールール（常時適用）
 │   └── hooks/                       # フックスクリプト
-│       └── protect-files.sh         # ファイル保護スクリプト
+│       ├── README.md               # フックガイド
+│       └── protect-files.sh         # ファイル保護スクリプト（サンプル）
 ├── .mcp.json                        # MCP サーバー設定（チーム共有）
 └── .gitignore
 ```
