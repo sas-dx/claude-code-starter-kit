@@ -1,0 +1,48 @@
+{
+  "_comment": "これはkeybindings.jsonの設定項目の参考例です。このファイル自体はClaude Codeが読み込むものではありません。実際の設定は ~/.claude/keybindings.json に記述してください。",
+
+  "bindings": [
+    {
+      "_comment_context": "メイン入力エリアのキーバインド",
+      "context": "Chat",
+      "bindings": {
+        "_comment_submit": "Ctrl+J でメッセージ送信（デフォルト: Enter）",
+        "ctrl+j": "chat:submit",
+
+        "_comment_editor": "Ctrl+E で外部エディタを開く",
+        "ctrl+e": "chat:externalEditor",
+
+        "_comment_undo": "Ctrl+Z で元に戻す",
+        "ctrl+z": "chat:undo",
+
+        "_comment_cancel": "Escape で入力キャンセル",
+        "escape": "chat:cancel",
+
+        "_comment_disable": "Ctrl+U を無効化（誤操作防止）",
+        "ctrl+u": null
+      }
+    },
+    {
+      "_comment_context": "グローバル（全画面共通）のキーバインド",
+      "context": "Global",
+      "bindings": {
+        "_comment_todos": "Ctrl+T でタスクリスト表示",
+        "ctrl+t": "app:toggleTodos",
+
+        "_comment_transcript": "Ctrl+L でトランスクリプト表示",
+        "ctrl+l": "app:toggleTranscript"
+      }
+    },
+    {
+      "_comment_context": "権限ダイアログのキーバインド",
+      "context": "Confirmation",
+      "bindings": {
+        "_comment_accept": "Enter で許可",
+        "enter": "confirmation:accept",
+
+        "_comment_deny": "Escape で拒否",
+        "escape": "confirmation:deny"
+      }
+    }
+  ]
+}

@@ -96,9 +96,18 @@ claude-code-starter-kit/
 │   │   ├── testing.md              # テストルール（テストファイル操作時のみ適用）
 │   │   ├── security.md             # セキュリティルール（常時適用）
 │   │   └── review-process.md       # コードレビュールール（常時適用）
-│   └── hooks/                       # フックスクリプト
-│       ├── README.md               # フックガイド
-│       └── protect-files.sh         # ファイル保護スクリプト（サンプル）
+│   ├── hooks/                       # フックスクリプト
+│   │   ├── README.md               # フックガイド
+│   │   └── protect-files.sh         # ファイル保護スクリプト（サンプル）
+│   ├── agent-teams/                 # Agent Teams ガイド
+│   │   ├── README.md               # Agent Teams 解説
+│   │   └── sample-team-config.json  # チーム設定サンプル
+│   ├── settings/                    # Settings ガイド
+│   │   ├── README.md               # Settings 解説
+│   │   └── sample-settings.json     # 設定サンプル
+│   └── keybindings/                 # Keybindings ガイド
+│       ├── README.md               # Keybindings 解説
+│       └── sample-keybindings.json  # キーバインドサンプル
 ├── .mcp.json                        # MCP サーバー設定（チーム共有）
 └── .gitignore
 ```
