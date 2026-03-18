@@ -1,0 +1,8 @@
+{
+  "name": "sample-plugin",
+  "description": "Claude Code Plugin の構成を示すサンプルプラグインです。実際のプラグイン作成の参考にしてください。",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Name"
+  }
+}

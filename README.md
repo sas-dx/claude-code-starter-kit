@@ -57,7 +57,8 @@ claude-code-starter-kit/
     ├── mcp/                         # MCP ガイド
     ├── agent-teams/                 # Agent Teams ガイド
     ├── settings/                    # Settings ガイド
-    └── keybindings/                 # Keybindings ガイド
+    ├── keybindings/                 # Keybindings ガイド
+    └── plugins/                     # Plugins ガイド
 ```
 
 各ディレクトリには README.md とサンプルファイルが含まれています。詳細は各ディレクトリを参照してください。
