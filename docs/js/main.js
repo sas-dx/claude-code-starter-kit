@@ -35,6 +35,7 @@
         html.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
         updateThemeIcon();
+        updateMermaidTheme(next === 'dark');
       });
     }
 
@@ -43,6 +44,7 @@
       if (!localStorage.getItem('theme')) {
         html.setAttribute('data-theme', e.matches ? 'dark' : 'light');
         updateThemeIcon();
+        updateMermaidTheme(e.matches);
       }
     });
   }
@@ -434,6 +436,80 @@
   }
 
   /* ------------------------------------------------------------------------
+     8. Mermaid.js サポート
+     - ページ内に .mermaid 要素がある場合のみ CDN を動的に読み込み
+     - サイトのテーマ（ライト/ダーク）と連動
+     - テーマ切替時に Mermaid の再レンダリングを実行
+     ------------------------------------------------------------------------ */
+
+  /** Mermaid.js の初期化（.mermaid 要素がある場合のみ CDN を読み込む） */
+  function initMermaid() {
+    var mermaidBlocks = document.querySelectorAll('.mermaid');
+    if (mermaidBlocks.length === 0) return;
+
+    // Mermaid CDN を動的に読み込み
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';
+    script.onload = function () {
+      // テーマ切替時の再レンダリング用に元のテキストを保存
+      mermaidBlocks.forEach(function (block) {
+        block.setAttribute('data-original', block.textContent);
+      });
+
+      // テーマをサイトのテーマに連動
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: isDark ? 'dark' : 'default',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif',
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+          curve: 'basis'
+        },
+        sequence: {
+          useMaxWidth: true
+        }
+      });
+      mermaid.run();
+    };
+    document.head.appendChild(script);
+  }
+
+  /** テーマ切替時に Mermaid のテーマを更新して再レンダリング */
+  function updateMermaidTheme(isDark) {
+    if (typeof mermaid === 'undefined') return;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      },
+      sequence: {
+        useMaxWidth: true
+      }
+    });
+
+    // 既存の Mermaid SVG をクリアして再レンダリング
+    var mermaidBlocks = document.querySelectorAll('.mermaid');
+    mermaidBlocks.forEach(function (block) {
+      // data-processed 属性を削除して再処理可能にする
+      block.removeAttribute('data-processed');
+      // Mermaid が生成した SVG を削除し、元のテキストを復元
+      var svg = block.querySelector('svg');
+      if (svg && block.getAttribute('data-original')) {
+        block.innerHTML = block.getAttribute('data-original');
+      }
+    });
+
+    mermaid.run();
+  }
+
+  /* ------------------------------------------------------------------------
      初期化
      ------------------------------------------------------------------------ */
 
@@ -445,6 +521,7 @@
     initTableOfContents();
     initSmoothScroll();
     initScrollSpy();
+    initMermaid();
   });
 
 })();

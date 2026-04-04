@@ -697,6 +697,38 @@ mark.search-highlight {
 }
 
 /* --------------------------------------------------------------------------
+   コンポーネント: Mermaid ダイアグラム
+   -------------------------------------------------------------------------- */
+
+.mermaid {
+  margin: 1.5rem 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram-wrapper {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  background: var(--bg);
+  overflow-x: auto;
+}
+
+.diagram-caption {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
    オーバーレイ（モバイルサイドバー用）
    -------------------------------------------------------------------------- */
 
