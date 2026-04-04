@@ -447,20 +447,21 @@
     var mermaidBlocks = document.querySelectorAll('.mermaid');
     if (mermaidBlocks.length === 0) return;
 
+    // テーマ切替時の再レンダリング用に元のテキストを保存（CDN 読み込み前に実施）
+    mermaidBlocks.forEach(function (block) {
+      block.setAttribute('data-original', block.textContent.trim());
+    });
+
     // Mermaid CDN を動的に読み込み
     var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js';
     script.onload = function () {
-      // テーマ切替時の再レンダリング用に元のテキストを保存
-      mermaidBlocks.forEach(function (block) {
-        block.setAttribute('data-original', block.textContent);
-      });
-
-      // テーマをサイトのテーマに連動
       var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      // startOnLoad: false — DOMContentLoaded 後の動的読み込みのため手動で run() する
       mermaid.initialize({
-        startOnLoad: true,
+        startOnLoad: false,
         theme: isDark ? 'dark' : 'default',
+        securityLevel: 'loose',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif',
         flowchart: {
           useMaxWidth: true,
@@ -471,7 +472,10 @@
           useMaxWidth: true
         }
       });
-      mermaid.run();
+      mermaid.run({ querySelector: '.mermaid' });
+    };
+    script.onerror = function () {
+      console.error('Mermaid CDN の読み込みに失敗しました');
     };
     document.head.appendChild(script);
   }
@@ -483,6 +487,7 @@
     mermaid.initialize({
       startOnLoad: false,
       theme: isDark ? 'dark' : 'default',
+      securityLevel: 'loose',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif',
       flowchart: {
         useMaxWidth: true,
@@ -494,19 +499,18 @@
       }
     });
 
-    // 既存の Mermaid SVG をクリアして再レンダリング
+    // 既存の Mermaid SVG をクリアし、元のテキストを復元して再レンダリング
     var mermaidBlocks = document.querySelectorAll('.mermaid');
     mermaidBlocks.forEach(function (block) {
-      // data-processed 属性を削除して再処理可能にする
       block.removeAttribute('data-processed');
-      // Mermaid が生成した SVG を削除し、元のテキストを復元
-      var svg = block.querySelector('svg');
-      if (svg && block.getAttribute('data-original')) {
-        block.innerHTML = block.getAttribute('data-original');
+      var original = block.getAttribute('data-original');
+      if (original) {
+        block.innerHTML = '';
+        block.textContent = original;
       }
     });
 
-    mermaid.run();
+    mermaid.run({ querySelector: '.mermaid' });
   }
 
   /* ------------------------------------------------------------------------

@@ -350,15 +350,28 @@ API 仕様は @docs/api-spec.md を参照</code></pre>
                     </table>
 
                     <h3>階層構造の図解</h3>
-                    <pre><code>読み込み順（全てマージされる）:
+                    <div class="diagram-wrapper">
+                      <div class="mermaid">
+graph TD
+    A["~/.claude/CLAUDE.md<br/>ユーザー個人の設定（全プロジェクト共通）"]
+    B["./CLAUDE.md<br/>プロジェクトルートの指示書"]
+    C["./.claude/CLAUDE.md<br/>.claude/ 配下の指示書"]
+    D["./.claude/rules/*.md<br/>詳細ルール（CLAUDE.md の詳細版）"]
+    M(["全てマージされて適用"])
 
-~/.claude/CLAUDE.md          ← ユーザー個人の設定（全プロジェクト共通）
-    ↓
-./CLAUDE.md                  ← プロジェクトルートの指示書
-    ↓
-./.claude/CLAUDE.md          ← .claude/ 配下の指示書
-    ↓
-./.claude/rules/*.md         ← 詳細ルール（CLAUDE.md の詳細版）</code></pre>
+    A --> M
+    B --> M
+    C --> M
+    D --> M
+
+    style A fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style B fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style C fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style D fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style M fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+                      </div>
+                      <div class="diagram-caption">CLAUDE.md と Rules の読み込みとマージの流れ</div>
+                    </div>
 
                     <div class="callout info">
                         <p><strong>使い分けの目安:</strong></p>

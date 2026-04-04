@@ -228,6 +228,30 @@
                 <pre><code>/code-review #42
 /code-review feature/user-auth</code></pre>
 
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+    START(["/code-review 実行"])
+    S1["コード品質レビュー<br/>ロジック正確性・規約準拠"]
+    S2["セキュリティレビュー<br/>脆弱性・入力バリデーション"]
+    S3["総合レビューサマリー作成"]
+    CHECK{"PR が存在？"}
+    S4A["PR へコメント投稿"]
+    S4B["ターミナルに結果表示"]
+
+    START --> S1 --> S2 --> S3 --> CHECK
+    CHECK -->|"Yes"| S4A
+    CHECK -->|"No"| S4B
+
+    style START fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style S1 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style S2 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style S3 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style CHECK fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">/code-review コマンドの実行フロー</div>
+                </div>
+
                 <h3>/dev-issue - Issue ベース実装</h3>
                 <p>GitHub Issue の内容を解析し、ブランチ作成 → 実装 → テスト → コミット → PR 作成を一気通貫で実行します。メインブランチで <code>git pull</code> を行い最新化した上で作業を開始します。</p>
                 <pre><code>/dev-issue #42

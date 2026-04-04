@@ -268,18 +268,18 @@ model: sonnet          # 使用モデル（sonnet, opus, haiku）
                 <div class="diagram-wrapper">
                   <div class="mermaid">
 flowchart TD
-    CMD["/dev-issue-team #42\n(チームリーダー)"]
+    CMD["/dev-issue-team #42<br/>(チームリーダー)"]
 
     subgraph P1["Phase 1: 解析"]
-        A1["🔍 analyzer\nIssue 解析・既存実装調査"]
+        A1["🔍 analyzer<br/>Issue 解析・既存実装調査"]
     end
 
     subgraph P2["Phase 2: 実装"]
-        A2["💻 developer\nコード実装・テスト作成"]
+        A2["💻 developer<br/>コード実装・テスト作成"]
     end
 
     subgraph P3["Phase 3: レビュー・Git"]
-        A3["✅ reviewer\nテスト実行・レビュー・PR 作成"]
+        A3["✅ reviewer<br/>テスト実行・レビュー・PR 作成"]
     end
 
     CMD --> P1
@@ -298,8 +298,8 @@ flowchart TD
                   <div class="mermaid">
 flowchart TD
     CMD2["/code-review #42"]
-    CMD2 --> CR["🔍 code-reviewer\n品質レビュー"]
-    CMD2 --> SR["🔒 security-reviewer\n脆弱性検出"]
+    CMD2 --> CR["🔍 code-reviewer<br/>品質レビュー"]
+    CMD2 --> SR["🔒 security-reviewer<br/>脆弱性検出"]
     CR --> SUMMARY["📝 総合レビューサマリー → PR コメント"]
     SR --> SUMMARY
 

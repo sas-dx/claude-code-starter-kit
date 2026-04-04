@@ -228,6 +228,35 @@
           <li>結果を統合して PR を作成</li>
         </ul>
 
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+flowchart TD
+    CMD(["/dev-issue-team #42"])
+
+    subgraph P1["Phase 1: 解析（単体）"]
+        A1["analyzer<br/>Issue 解析・既存実装調査"]
+    end
+
+    subgraph P2["Phase 2: 実装（並列可能）"]
+        A2["developer<br/>コード実装・テスト作成"]
+    end
+
+    subgraph P3["Phase 3: レビュー・Git"]
+        A3["reviewer<br/>テスト実行・レビュー・PR 作成"]
+    end
+
+    CMD --> P1
+    P1 -->|"調査結果を共有"| P2
+    P2 -->|"実装完了を報告"| P3
+
+    style CMD fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style P1 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style P2 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style P3 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+          </div>
+          <div class="diagram-caption">Agent Teams のフェーズ実行フロー</div>
+        </div>
+
         <h2>チーム設定サンプル</h2>
         <p>Hooks を使って品質ゲートを設定し、チームの品質を担保できます。</p>
 

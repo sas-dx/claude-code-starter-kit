@@ -196,6 +196,34 @@
           </tbody>
         </table>
 
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+flowchart LR
+    A(["セッション開始"])
+    B["PreToolUse<br/>ツール実行前"]
+    C["ツール実行"]
+    D["PostToolUse<br/>ツール実行後"]
+    E["Stop<br/>応答完了"]
+
+    A --> B --> C --> D --> E
+
+    N["Notification<br/>通知発生時"]
+    U["UserPromptSubmit<br/>プロンプト送信時"]
+
+    U -.->|"任意のタイミング"| B
+    N -.->|"任意のタイミング"| D
+
+    style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style B fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style C fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style D fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style E fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style N fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style U fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+          </div>
+          <div class="diagram-caption">フックイベントのタイムライン — ツール実行の前後で発火</div>
+        </div>
+
         <h3>チーム開発向けイベント</h3>
         <table>
           <thead>

@@ -234,6 +234,23 @@ claude /init</code></pre>
                         <li><strong>共有する</strong> - 良かったものはチームや他の案件に横展開する。スキル・ルール・エージェントとして形式知化する</li>
                         <li><strong>組み込む</strong> - 自分が所属するプロジェクトやリポジトリを、より AI 駆動開発に適した環境に整備する</li>
                     </ol>
+
+                    <div class="diagram-wrapper">
+                        <div class="mermaid">
+flowchart LR
+    A["1. 調べる<br/>公式ドキュメント<br/>リリースノート"] --> B["2. 試す<br/>新機能を<br/>実際に使う"]
+    B --> C["3. 共有する<br/>チーム・他案件に<br/>横展開"]
+    C --> D["4. 組み込む<br/>プロジェクトに<br/>導入・整備"]
+    D --> A
+
+    style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style B fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style C fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style D fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+                        </div>
+                        <div class="diagram-caption">AI駆動開発の継続的改善サイクル</div>
+                    </div>
+
                     <div class="callout info">
                         <p>ツールに詳しい1人のエンジニアが全てを整備するのではなく、<strong>チーム全員が少しずつ改善を積み重ねる</strong>ことで、プロジェクト全体の開発体験が向上していきます。</p>
                     </div>

@@ -133,6 +133,30 @@ paths:
                   </div>
                 </div>
 
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+    START(["セッション開始"])
+    LOAD["無条件ルール読み込み<br/>security.md, git-workflow.md 等"]
+    WORK["ファイル操作"]
+    CHECK{"paths パターンに<br/>マッチ？"}
+    PATHLOAD["パス別ルール追加読み込み<br/>testing.md 等"]
+    SKIP["パス別ルールなし"]
+    APPLY(["全ルール適用して作業"])
+
+    START --> LOAD --> WORK --> CHECK
+    CHECK -->|"マッチ"| PATHLOAD --> APPLY
+    CHECK -->|"しない"| SKIP --> APPLY
+
+    style START fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style LOAD fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style CHECK fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style PATHLOAD fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style APPLY fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">無条件ルールとパス別ルールの適用フロー</div>
+                </div>
+
                 <h3>グロブパターン</h3>
                 <table>
                   <thead>

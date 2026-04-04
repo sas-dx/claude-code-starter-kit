@@ -101,15 +101,15 @@
         <div class="diagram-wrapper">
           <div class="mermaid">
 flowchart TD
-    subgraph Host["Host（AI アプリケーション）\nClaude Code / VS Code / ChatGPT"]
-        C1["Client\n(GitHub用)"]
-        C2["Client\n(DB用)"]
-        C3["Client\n(Slack用)"]
+    subgraph Host["Host（AI アプリケーション）<br/>Claude Code / VS Code / ChatGPT"]
+        C1["Client<br/>(GitHub用)"]
+        C2["Client<br/>(DB用)"]
+        C3["Client<br/>(Slack用)"]
     end
 
-    C1 -->|"接続"| S1["🔌 MCP Server\nGitHub"]
-    C2 -->|"接続"| S2["🔌 MCP Server\nPostgreSQL"]
-    C3 -->|"接続"| S3["🔌 MCP Server\nSlack"]
+    C1 -->|"接続"| S1["🔌 MCP Server<br/>GitHub"]
+    C2 -->|"接続"| S2["🔌 MCP Server<br/>PostgreSQL"]
+    C3 -->|"接続"| S3["🔌 MCP Server<br/>Slack"]
 
     style Host fill:#e0e7ff,stroke:#6366f1,color:#1e293b
     style S1 fill:#ecfdf5,stroke:#10b981,color:#1e293b

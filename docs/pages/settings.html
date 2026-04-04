@@ -138,6 +138,24 @@
           </tbody>
         </table>
 
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+flowchart TD
+    A["管理者ポリシー<br/>/etc/claude-code/settings.json<br/>（最高優先度）"]
+    B["ユーザーレベル<br/>~/.claude/settings.json"]
+    C["プロジェクトレベル<br/>.claude/settings.json"]
+    D["ローカル<br/>.claude/settings.local.json<br/>（最低優先度）"]
+
+    A -->|"上書き"| B -->|"上書き"| C -->|"上書き"| D
+
+    style A fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style B fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style C fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style D fill:#ecfdf5,stroke:#10b981,color:#1e293b
+          </div>
+          <div class="diagram-caption">設定ファイルの優先度 — 上位が下位を上書き</div>
+        </div>
+
         <h2>settings.json と settings.local.json の違い</h2>
         <table>
           <thead>

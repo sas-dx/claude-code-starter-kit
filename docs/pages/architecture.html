@@ -192,10 +192,10 @@ Tailwind CSS             Redis 7 (Cache)            GitHub Actions
 graph TD
     subgraph foundation["基盤レイヤー"]
         direction LR
-        A["📋 CLAUDE.md\nプロジェクトの憲法"]
-        B["📏 Rules\nコーディング規約の強制"]
-        C["⚙️ Settings\n権限・環境の統一管理"]
-        D["🪝 Hooks\n品質ゲートの自動化"]
+        A["📋 CLAUDE.md<br/>プロジェクトの憲法"]
+        B["📏 Rules<br/>コーディング規約の強制"]
+        C["⚙️ Settings<br/>権限・環境の統一管理"]
+        D["🪝 Hooks<br/>品質ゲートの自動化"]
     end
 
     subgraph workflow["開発ワークフロー"]
@@ -204,16 +204,16 @@ graph TD
 
     subgraph execution["実行レイヤー"]
         direction LR
-        K["⌨️ Commands\n作業の自動化"]
-        L["🎯 Skills\n専門知識の形式知化"]
-        M["🤖 Agents\n品質保証の自動化"]
-        N["👥 Agent Teams\n並列開発の高速化"]
+        K["⌨️ Commands<br/>作業の自動化"]
+        L["🎯 Skills<br/>専門知識の形式知化"]
+        M["🤖 Agents<br/>品質保証の自動化"]
+        N["👥 Agent Teams<br/>並列開発の高速化"]
     end
 
     subgraph integration["外部連携基盤"]
         direction LR
-        O["🔌 MCP\nGitHub / DB / Slack"]
-        P["🧩 Plugins\n配布・共有"]
+        O["🔌 MCP<br/>GitHub / DB / Slack"]
+        P["🧩 Plugins<br/>配布・共有"]
     end
 
     foundation --> workflow
@@ -1347,20 +1347,20 @@ flowchart TD
     S5 --> S6
     S6 --> S7
 
-    S2 -.- C2["🔌 MCP: GitHub で Issue 読み込み\n🔌 MCP: PostgreSQL で DB 確認\n⌨️ Command: ブランチ自動作成"]
-    S3 -.- C3["📏 Rules: api-development, frontend, database\n🪝 Hooks: 自動フォーマット・危険操作ブロック\n🎯 Skills: explain-code 等が自動発動"]
-    S4 -.- C4["🪝 Hooks: PostToolUse でフォーマット\npnpm test（影響範囲のみ）"]
+    S2 -.- C2["🔌 MCP: GitHub で Issue 読み込み<br/>🔌 MCP: PostgreSQL で DB 確認<br/>⌨️ Command: ブランチ自動作成"]
+    S3 -.- C3["📏 Rules: api-development, frontend, database<br/>🪝 Hooks: 自動フォーマット・危険操作ブロック<br/>🎯 Skills: explain-code 等が自動発動"]
+    S4 -.- C4["🪝 Hooks: PostToolUse でフォーマット<br/>pnpm test（影響範囲のみ）"]
     S5 -.- C5["👥 Agent Teams 並列レビュー"]
 
     subgraph reviewers["並列レビュー"]
-        R1["🤖 code-reviewer\nコード品質"]
-        R2["🔒 security-reviewer\nセキュリティ"]
-        R3["⚡ performance-reviewer\nパフォーマンス"]
-        R4["🗄️ db-reviewer\nDB設計"]
+        R1["🤖 code-reviewer<br/>コード品質"]
+        R2["🔒 security-reviewer<br/>セキュリティ"]
+        R3["⚡ performance-reviewer<br/>パフォーマンス"]
+        R4["🗄️ db-reviewer<br/>DB設計"]
     end
     C5 --- reviewers
 
-    S6 -.- C6["GitHub Actions: CI/CD\n🔌 MCP: Slack 通知"]
+    S6 -.- C6["GitHub Actions: CI/CD<br/>🔌 MCP: Slack 通知"]
 
     style S1 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
     style S2 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
