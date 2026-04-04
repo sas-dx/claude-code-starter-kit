@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI駆動開発アーキテクチャ - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="architecture.html" class="active">🏗️ AI駆動開発アーキテクチャ</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>AI駆動開発アーキテクチャ</h1>
+                <p>このページでは、Claude Code の全機能を組み合わせて<strong>実際のプロジェクトにどう適用するか</strong>を、基幹システムリプレイスを題材にした実践ガイドとして解説します。各機能の設定ファイル全文を掲載しているため、このページを見ながらそのまま設定できます。</p>
+
+                <!-- ============================================================
+                     セクション1: AI駆動開発とは
+                     ============================================================ -->
+
+                <h2 id="what-is-ai-driven">AI駆動開発とは</h2>
+
+                <p>AI駆動開発とは、AIがコードを書き、人間が設計・レビュー・意思決定を担う開発スタイルです。従来の「人間が全てのコードを書く」開発とは、役割分担が根本的に異なります。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>従来の開発</h4>
+                    <p>人間がコードを全て書く。設計・実装・テスト・レビューの全工程を人間が担当。作業速度は個人のスキルに依存し、属人化しやすい。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>AI駆動開発</h4>
+                    <p>AIがコードを書き、人間が設計・レビュー・意思決定を行う。AIは指示に従って高速にコードを生成し、人間はその品質を担保する。チーム全体の生産性が底上げされる。</p>
+                  </div>
+                </div>
+
+                <h3 id="claude-code-roles">Claude Code が担う役割</h3>
+                <p>Claude Code は AI駆動開発において、以下の役割を担います。</p>
+                <ul>
+                  <li><strong>コード生成</strong> -- Issue の内容を読み取り、規約に沿ったコードを自動生成</li>
+                  <li><strong>コードレビュー</strong> -- セキュリティ、パフォーマンス、規約準拠を複数の観点で自動チェック</li>
+                  <li><strong>テスト作成</strong> -- 実装に対応するユニットテスト・E2Eテストを自動生成</li>
+                  <li><strong>ドキュメント生成</strong> -- コードから API 仕様書やコメントを自動生成</li>
+                  <li><strong>Issue 対応</strong> -- Issue の分析から実装、PR 作成までの一気通貫ワークフロー</li>
+                </ul>
+
+                <h3 id="why-architecture">なぜ AI駆動開発にアーキテクチャが必要か</h3>
+
+                <div class="callout info">
+                  <strong>重要:</strong> AIに「何を」「どう」やらせるかの設計がないと、以下の問題が発生します。
+                  <ul>
+                    <li><strong>AIが暴走する</strong> -- 制約なしのAIは本番DBを削除したり、セキュリティホールのあるコードを生成する可能性がある</li>
+                    <li><strong>品質がバラつく</strong> -- 同じチーム内でもメンバーごとにAIへの指示が異なり、コードの品質・スタイルが統一されない</li>
+                    <li><strong>チームで統一できない</strong> -- 個人の暗黙知に依存し、ナレッジが共有されない</li>
+                  </ul>
+                  <p>Claude Code の各機能（CLAUDE.md, Rules, Settings, Hooks, Commands, Skills, Agents, Agent Teams, MCP, Plugins）は、この「AIへの設計」を具現化する仕組みです。本ページでは、これらの機能を組み合わせた実践的なアーキテクチャを解説します。</p>
+                </div>
+
+                <!-- ============================================================
+                     セクション2: プロジェクト前提
+                     ============================================================ -->
+
+                <h2 id="project-premise">プロジェクト前提（基幹システムリプレイス）</h2>
+
+                <div class="callout info">
+                  <strong>プロジェクト概要:</strong>
+                  <ul>
+                    <li><strong>プロジェクト:</strong> 製造業の基幹システムリプレイス</li>
+                    <li><strong>移行元:</strong> Java (Spring Boot) + Oracle DB + モノリス</li>
+                    <li><strong>移行先:</strong> TypeScript (NestJS) + PostgreSQL + マイクロサービス</li>
+                    <li><strong>チーム:</strong> 8名（PL 1名、バックエンド 4名、フロントエンド 2名、インフラ 1名）</li>
+                    <li><strong>期間:</strong> 12ヶ月</li>
+                    <li><strong>リポジトリ:</strong> モノレポ（Turborepo）</li>
+                  </ul>
+                </div>
+
+                <h3 id="tech-stack">技術スタック</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>レイヤー</th>
+                      <th>技術</th>
+                      <th>用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>フロントエンド</td>
+                      <td>Next.js 14 (App Router)</td>
+                      <td>Web アプリケーション</td>
+                    </tr>
+                    <tr>
+                      <td>フロントエンド</td>
+                      <td>React 18 + Tailwind CSS</td>
+                      <td>UI コンポーネント・スタイリング</td>
+                    </tr>
+                    <tr>
+                      <td>バックエンド</td>
+                      <td>NestJS + Prisma ORM</td>
+                      <td>API サーバー</td>
+                    </tr>
+                    <tr>
+                      <td>データベース</td>
+                      <td>PostgreSQL 16</td>
+                      <td>メインデータストア</td>
+                    </tr>
+                    <tr>
+                      <td>キャッシュ</td>
+                      <td>Redis 7</td>
+                      <td>セッション・キャッシュ</td>
+                    </tr>
+                    <tr>
+                      <td>ストレージ</td>
+                      <td>Amazon S3</td>
+                      <td>ファイルアップロード</td>
+                    </tr>
+                    <tr>
+                      <td>インフラ</td>
+                      <td>AWS ECS (Fargate) + Terraform</td>
+                      <td>コンテナオーケストレーション・IaC</td>
+                    </tr>
+                    <tr>
+                      <td>CI/CD</td>
+                      <td>GitHub Actions</td>
+                      <td>自動テスト・デプロイ</td>
+                    </tr>
+                    <tr>
+                      <td>モノレポ</td>
+                      <td>Turborepo + pnpm</td>
+                      <td>ワークスペース管理</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <pre><code>[フロントエンド]          [バックエンド]              [インフラ]
+Next.js (App Router)     NestJS + Prisma            AWS ECS (Fargate)
+React 18                 PostgreSQL 16              Terraform
+Tailwind CSS             Redis 7 (Cache)            GitHub Actions
+                         S3 (ファイル)</code></pre>
+
+                <!-- ============================================================
+                     セクション3: グランドデザイン全体像
+                     ============================================================ -->
+
+                <h2 id="grand-design">グランドデザイン全体像</h2>
+
+                <p>Claude Code の各機能がプロジェクトのどの課題を解決するか、全体のマッピングを示します。</p>
+
+                <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    AI駆動開発 グランドデザイン                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────┐  ┌──────────┐  ┌───────────┐  ┌───────────┐  │
+│  │CLAUDE.md│  │  Rules   │  │ Settings  │  │   Hooks   │  │
+│  │プロジェクト│  │コーディング│  │権限・環境  │  │品質ゲート  │  │
+│  │の憲法    │  │規約の強制 │  │の統一管理  │  │の自動化   │  │
+│  └────┬────┘  └────┬─────┘  └─────┬─────┘  └─────┬─────┘  │
+│       │            │              │              │         │
+│       ▼            ▼              ▼              ▼         │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              開発ワークフロー                         │   │
+│  │  Issue → Commands → Skills → Agents → PR → Deploy  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│       │            │              │              │         │
+│       ▼            ▼              ▼              ▼         │
+│  ┌─────────┐  ┌──────────┐  ┌───────────┐  ┌───────────┐  │
+│  │Commands │  │  Skills  │  │  Agents   │  │Agent Teams│  │
+│  │作業の    │  │ 専門知識  │  │品質保証の  │  │並列開発の │  │
+│  │自動化   │  │の形式知化 │  │自動化     │  │高速化    │  │
+│  └─────────┘  └──────────┘  └───────────┘  └───────────┘  │
+│       │            │              │              │         │
+│       ▼            ▼              ▼              ▼         │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              外部連携基盤                             │   │
+│  │  MCP (GitHub / DB / Slack) ─── Plugins (配布・共有)  │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+                <h3 id="feature-mapping">各機能が「なぜ必要か」一覧</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>機能</th>
+                      <th>解決する課題</th>
+                      <th>なぜこの機能で解決するのか</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>CLAUDE.md</strong></td>
+                      <td>チーム間の認識のズレ</td>
+                      <td>セッション開始時に自動読込されるため、全員が同じルールで作業できる</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Rules</strong></td>
+                      <td>コーディング規約の形骸化</td>
+                      <td>ファイル操作時に自動適用され、AIがルール違反を自動検出する</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Settings</strong></td>
+                      <td>危険な操作の制限</td>
+                      <td>権限設定で物理的にブロックし、ルール違反を仕組みで防ぐ</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Hooks</strong></td>
+                      <td>品質チェックの漏れ</td>
+                      <td>ツール実行前後に自動発火し、人間の注意力に依存しない</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Commands</strong></td>
+                      <td>定型作業の属人化</td>
+                      <td><code>/コマンド名</code> で誰でも同じ品質の作業を実行できる</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Skills</strong></td>
+                      <td>専門知識の属人化</td>
+                      <td>ノウハウを SKILL.md に形式知化し、AIが自動で適用する</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Agents</strong></td>
+                      <td>レビュー品質のバラつき</td>
+                      <td>観点別の専門エージェントが一定基準で自動レビュー</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Agent Teams</strong></td>
+                      <td>開発速度のボトルネック</td>
+                      <td>複数AIが並列で作業し、人間はレビューに集中できる</td>
+                    </tr>
+                    <tr>
+                      <td><strong>MCP</strong></td>
+                      <td>外部ツールとの手動連携</td>
+                      <td>GitHub/DB/Slackに直接アクセスし、コンテキスト切替を削減</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Plugins</strong></td>
+                      <td>チーム間のナレッジ共有</td>
+                      <td>設定をパッケージ化して他プロジェクトに横展開できる</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション4: Phase 1 — プロジェクト基盤構築
+                     ============================================================ -->
+
+                <h2 id="phase1">Phase 1 -- プロジェクト基盤構築</h2>
+
+                <p>Phase 1 では、全ての AI 操作の土台となる CLAUDE.md、Rules、Settings を設計します。この基盤がなければ、後続の Commands や Agents は的外れな動作をします。</p>
+
+                <!-- 4.1 CLAUDE.md -->
+                <h3 id="phase1-claude-md">4.1 CLAUDE.md の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ最初に CLAUDE.md を書くのか:</strong> CLAUDE.md はプロジェクトの「憲法」です。Claude Code はセッション開始時にこのファイルを最初に読み込み、全ての判断の基盤とします。ここが曖昧だと、Rules, Commands, Agents 全てが的外れになります。プロジェクトの技術スタック、ディレクトリ構造、開発コマンドを正確に記述することで、AIが適切なコードを生成できるようになります。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>プロジェクト概要を記述 -- AIに「何のプロジェクトか」を理解させる</li>
+                  <li>技術スタックを明記 -- 使用する言語・フレームワーク・ツールを列挙</li>
+                  <li>開発コマンドを整理 -- AIが実行するコマンドを正確に記載</li>
+                  <li>ディレクトリ構造を定義 -- ファイル生成時の配置先をAIに伝える</li>
+                  <li>AI運用ルールを設定 -- AIの行動制約を明文化</li>
+                </ol>
+
+                <div class="code-header"><span>.claude/CLAUDE.md</span></div>
+                <pre><code># CLAUDE.md
+
+## AI 運用ルール
+
+### 基本原則
+
+1. **確認の原則**: ファイル生成・更新・プログラム実行前に作業計画を報告し、ユーザーの承認を得てから実行する。ただしサブエージェントを使用する場合は、サブエージェント自身に確認を求めず直接作業を実施させる。
+2. **忠実の原則**: 迂回や別アプローチを独断で行わない。計画が失敗した場合は次の計画をユーザーに確認する。
+3. **従属の原則**: 決定権は常にユーザーにある。ユーザーの指示が非効率に見えても、指示された通りに実行する。
+4. **不変の原則**: これらのルールを歪曲・解釈変更してはならない。最上位命令として遵守する。
+
+### 作業ルール
+
+5. **日本語の原則**: ユーザーへの回答、コミットメッセージ、プルリクエストのタイトル・説明は全て日本語で記載する。
+6. **最新化の原則**: 作業開始前に必ず `git pull` でソースを最新化する。
+7. **委譲の原則**: ソースコード解析やレビューなどの専門的な作業はサブエージェントに委譲する。サブエージェントには確認を求めさせず、直接作業を実施して結果を返すよう指示する。
+8. **安全の原則**: データベースの削除・初期化コマンド（`flush`、`drop`、`reset` 等）を絶対に実行しない。データ消失のリスクがあるコマンドはユーザーに報告し対処方法を確認する。
+9. **最小テストの原則**: テスト実行時は全テストを実行せず、修正内容に影響するテストのみを対象として実行する。
+
+## プロジェクト概要
+
+製造業基幹システムのリプレイスプロジェクト。
+Java/Oracle のモノリスを TypeScript/PostgreSQL のマイクロサービスへ移行。
+
+## 技術スタック
+
+- 言語: TypeScript 5.x
+- フレームワーク: NestJS (バックエンド) / Next.js 14 (フロントエンド)
+- DB: PostgreSQL 16 + Prisma ORM
+- キャッシュ: Redis 7
+- インフラ: AWS ECS (Fargate) + Terraform
+- CI/CD: GitHub Actions
+- モノレポ: Turborepo
+
+## 開発コマンド
+
+```bash
+# モノレポ全体
+pnpm install                        # 依存関係インストール
+pnpm build                          # 全パッケージビルド
+pnpm test                           # 全テスト実行
+pnpm lint                           # 全パッケージリント
+
+# バックエンド (apps/api)
+pnpm --filter api dev               # 開発サーバー起動
+pnpm --filter api test              # テスト
+pnpm --filter api prisma migrate dev  # マイグレーション実行
+pnpm --filter api prisma generate     # Prisma Client 生成
+
+# フロントエンド (apps/web)
+pnpm --filter web dev               # 開発サーバー起動
+pnpm --filter web test              # テスト
+pnpm --filter web build             # プロダクションビルド
+```
+
+## ディレクトリ構造
+
+```
+apps/
+├── api/                 # NestJS バックエンド
+│   ├── src/
+│   │   ├── modules/     # 機能モジュール
+│   │   ├── common/      # 共通ユーティリティ
+│   │   └── prisma/      # Prisma スキーマ・マイグレーション
+│   └── test/            # E2E テスト
+├── web/                 # Next.js フロントエンド
+│   ├── app/             # App Router ページ
+│   ├── components/      # UI コンポーネント
+│   └── lib/             # ユーティリティ
+└── packages/
+    ├── shared/          # 共有型定義
+    ├── ui/              # 共有 UI ライブラリ
+    └── config/          # 共有設定
+```
+
+## コーディング規約
+
+- インデント: 2スペース
+- 命名: キャメルケース(変数・関数)、パスカルケース(クラス・型・コンポーネント)
+- コミット: Conventional Commits + 日本語
+- テスト: 新機能には必ずテスト追加
+
+## 注意事項
+
+- 本番DB (production) への直接接続禁止
+- .env ファイルのコミット禁止
+- main ブランチへの直接プッシュ禁止
+- マイグレーションは必ず開発環境で検証後に適用</code></pre>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> CLAUDE.md は 200行以内が推奨されています。プロジェクトの「何」「なぜ」を簡潔に書き、「どうやるか」の詳細は Rules に分割しましょう。
+                </div>
+
+                <!-- 4.2 Rules -->
+                <h3 id="phase1-rules">4.2 Rules の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Rules を分離するのか:</strong> CLAUDE.md に全ルールを書くとトークンを浪費します。Rules はファイル単位で分離でき、パス別ルール（<code>paths</code> フロントマター）で「必要な時だけ」読み込まれます。基幹システムのような大規模プロジェクトでは、API開発ルール、フロントエンドルール、DB操作ルールなど領域ごとにルールが異なるため、パス別ルールによるコンテキストの最適化が特に重要です。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>全体適用ルールを整理（セキュリティ、Git ワークフロー） -- プロジェクト全体で常に守るべきルール</li>
+                  <li>パス別ルールを設計（API開発、フロントエンド、DB操作） -- 担当領域ごとに異なるルール</li>
+                  <li>テストルールを分離 -- テストファイル操作時のみ適用</li>
+                </ol>
+
+                <h4>（a）セキュリティルール -- 常時適用</h4>
+
+                <div class="code-header"><span>.claude/rules/security.md</span></div>
+                <pre><code># セキュリティルール
+
+- DB削除コマンド（DROP, TRUNCATE, DELETE without WHERE）を絶対に実行しない
+- 本番環境の接続文字列をソースコードに含めない
+- APIキー・パスワードは環境変数経由で取得する
+- SQLインジェクション対策: 必ず Prisma ORM を使用し、$queryRawUnsafe を禁止
+- XSS対策: dangerouslySetInnerHTML の使用禁止
+- CORS設定: 許可オリジンをホワイトリストで管理</code></pre>
+
+                <h4>（b）API 開発ルール -- パス別ルール</h4>
+
+                <div class="code-header"><span>.claude/rules/api-development.md</span></div>
+                <pre><code>---
+paths:
+  - "apps/api/**/*.ts"
+---
+
+# API 開発ルール
+
+- 全エンドポイントに認証ガード (@UseGuards) を実装
+- リクエストは class-validator の DTO でバリデーション
+- レスポンスは統一フォーマット { data, meta, error }
+- ページネーションは cursor ベースで実装
+- エラーは NestJS の Exception Filter で統一処理
+- N+1 問題を防ぐため Prisma の include/select を明示</code></pre>
+
+                <h4>（c）フロントエンド開発ルール -- パス別ルール</h4>
+
+                <div class="code-header"><span>.claude/rules/frontend.md</span></div>
+                <pre><code>---
+paths:
+  - "apps/web/**/*.{ts,tsx}"
+---
+
+# フロントエンド開発ルール
+
+- コンポーネントは Server Component をデフォルトとし、必要な部分だけ "use client"
+- 状態管理は React の useState/useReducer を基本とし、グローバル状態は最小限に
+- API 呼び出しは Server Actions または React Query を使用
+- スタイリングは Tailwind CSS のユーティリティクラスを使用
+- アクセシビリティ: aria-label, role 属性を適切に設定</code></pre>
+
+                <h4>（d）データベース操作ルール -- パス別ルール</h4>
+
+                <div class="code-header"><span>.claude/rules/database.md</span></div>
+                <pre><code>---
+paths:
+  - "apps/api/src/prisma/**/*"
+  - "**/*.prisma"
+---
+
+# データベース操作ルール
+
+- スキーマ変更は必ず Prisma migrate で管理し、手動 SQL を実行しない
+- テーブル名は英語スネークケース複数形 (users, order_items)
+- カラム名は英語スネークケース (created_at, updated_by)
+- 全テーブルに id, created_at, updated_at, deleted_at を含める（ソフトデリート）
+- インデックスは WHERE 句で頻繁に使うカラムに設定
+- マイグレーションファイルは手動編集禁止。prisma migrate dev で生成</code></pre>
+
+                <div class="callout tip">
+                  <strong>パス別ルールの効果:</strong> フロントエンド担当が <code>apps/web/</code> を触るとき、API開発ルールは不要です。パス別ルールにより、担当領域のルールだけがコンテキストに入り、AIの判断精度が上がります。8名チームでは特に効果的で、バックエンド担当にはバックエンドのルールだけが、フロントエンド担当にはフロントエンドのルールだけが適用されます。
+                </div>
+
+                <!-- 4.3 Settings -->
+                <h3 id="phase1-settings">4.3 Settings の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Settings を使うのか:</strong> CLAUDE.md の「安全の原則」はAIへの"お願い"ですが、Settings は<strong>物理的な制限</strong>です。本番DBの接続コマンドを <code>deny</code> で制限すれば、ルール違反は仕組みで不可能になります。お願いは破られる可能性がありますが、物理的な制限は破れません。基幹システムでは「本番環境への誤操作」が致命的な事故につながるため、Settings による制限が必須です。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>チーム共有の許可・拒否ルールを <code>.claude/settings.json</code> に定義</li>
+                  <li>個人用のトークン設定を <code>.claude/settings.local.json</code> に分離（Git管理外）</li>
+                </ol>
+
+                <h4>（a）チーム共有設定</h4>
+
+                <div class="code-header"><span>.claude/settings.json</span></div>
+                <pre><code>{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(pnpm:*)",
+      "Bash(npm:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(prisma:*)",
+      "Bash(turbo:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(DROP:*)",
+      "Bash(TRUNCATE:*)",
+      "Bash(psql*production*)"
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development",
+    "DATABASE_URL": "postgresql://dev:dev@localhost:5432/app_dev"
+  }
+}</code></pre>
+
+                <h4>（b）個人用設定（Git管理外）</h4>
+
+                <div class="code-header"><span>.claude/settings.local.json</span></div>
+                <pre><code>{
+  "permissions": {
+    "allow": [
+      "mcp__github"
+    ]
+  },
+  "env": {
+    "GITHUB_TOKEN": "ghp_xxxxxxxxxxxx"
+  }
+}</code></pre>
+
+                <div class="callout warning">
+                  <strong>注意:</strong> <code>settings.local.json</code> には個人のトークンが含まれるため、必ず <code>.gitignore</code> に追加してください。チーム共有の <code>settings.json</code> のみ Git 管理下に置きます。
+                </div>
+
+                <!-- ============================================================
+                     セクション5: Phase 2 — 開発ワークフロー構築
+                     ============================================================ -->
+
+                <h2 id="phase2">Phase 2 -- 開発ワークフロー構築</h2>
+
+                <p>Phase 2 では、日々の開発作業を効率化する Commands、Skills、Hooks を設計します。Phase 1 の基盤（CLAUDE.md, Rules, Settings）の上に構築することで、これらが正しく機能します。</p>
+
+                <!-- 5.1 Commands -->
+                <h3 id="phase2-commands">5.1 Commands の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Commands を使うのか:</strong> 「Issue を見て、ブランチ切って、実装して、テスト書いて、PR 出す」という一連の作業は定型的です。Commands にすれば、ジュニアメンバーでもシニアと同じ品質・手順で作業できます。属人化を排除し、チーム全体の生産性を底上げします。コマンドは <code>/コマンド名</code> で呼び出すため、手順を覚える必要もありません。
+                </div>
+
+                <h4>（a）/dev-issue -- Issue ベースの実装コマンド</h4>
+
+                <div class="code-header"><span>.claude/commands/dev-issue.md</span></div>
+                <pre><code>---
+description: GitHub Issue に基づいて実装からPR作成まで一括実行
+allowed-tools: Bash, Read, Edit, Write, Agent
+---
+
+# Issue 実装コマンド
+
+$ARGUMENTS で指定された GitHub Issue に基づいて、以下の手順で実装を行ってください。
+
+## 手順
+
+### 1. 準備
+- `git checkout main && git pull origin main` でソースを最新化
+- `gh issue view $ARGUMENTS` で Issue の内容を確認
+- Issue のタイトルと本文から実装内容を把握
+
+### 2. ブランチ作成
+- Issue 番号とタイトルからブランチ名を生成
+- 形式: `feature/#<Issue番号>-<概要の英語スラッグ>`
+- 例: `feature/#42-user-authentication`
+- `git checkout -b <ブランチ名>` でブランチ作成
+
+### 3. 実装
+- CLAUDE.md の技術スタック・ディレクトリ構造に従ってコードを生成
+- .claude/rules/ のルールを参照し、コーディング規約に準拠
+- 実装が大きい場合は、論理的な単位でコミットを分割
+
+### 4. テスト
+- 実装に対応するユニットテストを作成
+- `pnpm --filter <パッケージ名> test` で影響範囲のテストを実行
+- テストが全て通ることを確認
+
+### 5. PR 作成
+- コミットメッセージは日本語で記述（例: `#42 ユーザー認証のログイン機能を実装`）
+- `gh pr create` で PR を作成
+- PR タイトル・説明は日本語で記述
+- 説明に `Closes #<Issue番号>` を含める
+
+## 注意事項
+- 不明点がある場合はユーザーに確認する
+- セキュリティルール（security.md）を必ず遵守する
+- 本番環境に影響する変更は必ずユーザーに報告する</code></pre>
+
+                <h4>（b）/db-migrate -- マイグレーション実行コマンド</h4>
+
+                <div class="code-header"><span>.claude/commands/db-migrate.md</span></div>
+                <pre><code>---
+description: Prisma マイグレーションを安全に実行する
+allowed-tools: Bash, Read
+---
+
+# DB マイグレーション実行
+
+Prisma マイグレーションを安全に実行します。以下の手順に従ってください。
+
+## 手順
+
+1. 現在のマイグレーション状態を確認
+   ```bash
+   pnpm --filter api prisma migrate status
+   ```
+
+2. 差分があれば開発DBに適用
+   ```bash
+   pnpm --filter api prisma migrate dev
+   ```
+
+3. Prisma Client を再生成
+   ```bash
+   pnpm --filter api prisma generate
+   ```
+
+4. 型チェック
+   ```bash
+   pnpm --filter api tsc --noEmit
+   ```
+
+5. テスト実行
+   ```bash
+   pnpm --filter api test
+   ```
+
+## 注意事項
+- 本番DBへの直接マイグレーションは絶対に実行しない
+- マイグレーションファイルの手動編集禁止
+- データ消失の可能性がある変更（カラム削除等）は必ずユーザーに確認
+- マイグレーション前に必ず現在の状態を確認する</code></pre>
+
+                <h4>（c）/api-scaffold -- API エンドポイント雛形生成</h4>
+
+                <div class="code-header"><span>.claude/commands/api-scaffold.md</span></div>
+                <pre><code>---
+description: NestJS の CRUD エンドポイント雛形を生成
+allowed-tools: Bash, Read, Edit, Write
+---
+
+# API エンドポイント雛形生成
+
+$ARGUMENTS のリソース名で以下のファイルを生成してください。
+
+## 生成するファイル
+
+1. **Module** - `apps/api/src/modules/$ARGUMENTS/$ARGUMENTS.module.ts`
+2. **Controller** - `apps/api/src/modules/$ARGUMENTS/$ARGUMENTS.controller.ts`
+   - CRUD エンドポイント (GET /一覧, GET /:id, POST /, PATCH /:id, DELETE /:id)
+3. **Service** - `apps/api/src/modules/$ARGUMENTS/$ARGUMENTS.service.ts`
+   - ビジネスロジック（Prisma 経由の DB 操作）
+4. **DTO** - `apps/api/src/modules/$ARGUMENTS/dto/`
+   - `create-$ARGUMENTS.dto.ts` - 作成リクエスト
+   - `update-$ARGUMENTS.dto.ts` - 更新リクエスト
+5. **Entity** - `apps/api/src/modules/$ARGUMENTS/entities/$ARGUMENTS.entity.ts`
+6. **テスト**
+   - `apps/api/src/modules/$ARGUMENTS/$ARGUMENTS.controller.spec.ts`
+   - `apps/api/src/modules/$ARGUMENTS/$ARGUMENTS.service.spec.ts`
+
+## 規約
+
+- .claude/rules/coding-standards.md のコーディング規約に準拠
+- .claude/rules/api-development.md の API 開発ルールに準拠
+- 全エンドポイントに認証ガード (@UseGuards(JwtAuthGuard)) を設定
+- DTO に class-validator のバリデーションデコレータを付与
+- Controller に Swagger デコレータ (@ApiTags, @ApiOperation, @ApiResponse) を付与
+- Service のメソッドにはエラーハンドリングを含める
+- レスポンスは統一フォーマット { data, meta, error } に準拠</code></pre>
+
+                <div class="callout tip">
+                  <strong>コマンド設計のポイント:</strong> コマンドは「何を自動化するか」だけでなく「何を自動化しないか」も重要です。判断が必要な設計作業は人間が行い、定型作業だけを Commands に任せましょう。例えば、DB スキーマの設計は人間が行い、その設計に基づくコード生成を <code>/api-scaffold</code> に任せます。
+                </div>
+
+                <!-- 5.2 Skills -->
+                <h3 id="phase2-skills">5.2 Skills の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Commands ではなく Skills を使うのか:</strong> Commands は「ユーザーが <code>/コマンド名</code> で明示的に呼ぶ」ものです。Skills は Claude が文脈に応じて「自動で使う」ことも可能です。例えば <code>explain-code</code> スキルは、ユーザーが「この関数はどう動くの？」と質問するだけで自動発動します。また、Skills は <code>disable-model-invocation: true</code> で手動専用にもでき、Commands より柔軟に制御できます。
+                </div>
+
+                <h4>（a）/explain-code -- コード解説（自動呼び出し可）</h4>
+
+                <div class="code-header"><span>.claude/skills/explain-code/SKILL.md</span></div>
+                <pre><code>---
+name: explain-code
+description: コードの仕組みを図解と例え話で解説する
+argument-hint: &lt;ファイルパス or コードスニペット&gt;
+---
+
+# コード解説スキル
+
+指定されたコードを以下の観点で解説してください。
+
+## 解説の流れ
+
+1. **概要** - このコードは何をするものか（1-2文で）
+2. **処理フロー** - 主要な処理の流れを番号付きリストで
+3. **図解** - ASCII art でデータフローや処理の流れを視覚化
+4. **例え話** - 技術に詳しくない人にも伝わる日常的な例え
+5. **重要なポイント** - パフォーマンス、セキュリティ、保守性の観点
+
+## 注意事項
+- 専門用語には必ず簡単な説明を付記する
+- 「なぜそう書かれているか」の背景・理由も説明する
+- プロジェクトの CLAUDE.md、Rules を参照して文脈に即した解説をする</code></pre>
+
+                <h4>（b）/gen-doc -- ドキュメント生成</h4>
+
+                <div class="code-header"><span>.claude/skills/gen-doc/SKILL.md</span></div>
+                <pre><code>---
+name: gen-doc
+description: コードからドキュメントを自動生成する
+argument-hint: &lt;対象ディレクトリ or ファイルパス&gt;
+disable-model-invocation: true
+---
+
+# ドキュメント生成スキル
+
+指定されたコードからドキュメントを自動生成してください。
+
+## 生成するドキュメント
+
+### モジュールの場合
+- モジュール概要
+- 提供する API エンドポイント一覧
+- 各エンドポイントのリクエスト・レスポンス例
+- 依存関係
+
+### 関数・クラスの場合
+- JSDoc 形式のコメント
+- パラメータの説明
+- 戻り値の説明
+- 使用例
+
+## 注意事項
+- 既存のドキュメントがある場合は上書きではなく更新する
+- コードの実装詳細ではなく「使い方」を中心に記述する</code></pre>
+
+                <h4>（c）/gen-api-spec -- OpenAPI 仕様書生成（基幹システム特有）</h4>
+
+                <div class="code-header"><span>.claude/skills/gen-api-spec/SKILL.md</span></div>
+                <pre><code>---
+name: gen-api-spec
+description: Prisma スキーマと NestJS コントローラーから OpenAPI 仕様書を生成
+argument-hint: &lt;モジュール名&gt;
+disable-model-invocation: true
+---
+
+# OpenAPI 仕様書生成スキル
+
+指定されたモジュールの Prisma スキーマと NestJS コントローラーを解析し、OpenAPI 仕様書を生成してください。
+
+## 手順
+
+1. `apps/api/src/prisma/schema.prisma` からモデル定義を取得
+2. `apps/api/src/modules/<モジュール名>/` 配下のコントローラーを解析
+3. DTO のバリデーションルールからリクエストスキーマを生成
+4. レスポンスの型定義からレスポンススキーマを生成
+5. OpenAPI 3.0 形式の YAML を生成
+
+## 生成フォーマット
+
+```yaml
+openapi: 3.0.0
+info:
+  title: <モジュール名> API
+  version: 1.0.0
+paths:
+  /<リソース名>:
+    get:
+      summary: 一覧取得
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse'
+```
+
+## 注意事項
+- Prisma スキーマの deleted_at カラムがある場合、ソフトデリート対応の仕様を含める
+- 認証が必要なエンドポイントには securitySchemes を設定
+- cursor ベースのページネーションを正しく記述</code></pre>
+
+                <!-- 5.3 Hooks -->
+                <h3 id="phase2-hooks">5.3 Hooks の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Hooks を使うのか:</strong> Rules は「AIにこうして欲しい」という要望です。Hooks は「ツール実行時に自動発火するスクリプト」で、AIの判断を介しません。基幹システムでは「本番DBへの接続」「rm -rf」のような取り返しのつかない操作を、Hooks で物理的にブロックします。Rules が「守ってね」というお願いなら、Hooks は「守らなければ止める」という仕組みです。
+                </div>
+
+                <p>Hooks は <code>.claude/settings.json</code> の <code>hooks</code> セクションに定義します。以下に、基幹システムリプレイスに必要な3つのフックを示します。</p>
+
+                <h4>（a）危険コマンドブロック（PreToolUse / Bash）</h4>
+
+                <p>Bash ツールが実行される前に発火し、危険なコマンドを含む場合はブロックします。</p>
+
+                <div class="code-header"><span>.claude/settings.json（hooks セクション抜粋）</span></div>
+                <pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qiE '(DROP|TRUNCATE|DELETE FROM|rm -rf|--force|production)'; then echo 'BLOCKED: 危険なコマンドが検出されました' &gt;&amp;2; exit 1; fi"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+                <h4>（b）自動フォーマット（PostToolUse / Write, Edit）</h4>
+
+                <p>ファイルの書き込み・編集後に自動でフォーマッターを実行し、コードスタイルを統一します。</p>
+
+                <div class="code-header"><span>.claude/settings.json（hooks セクション抜粋）</span></div>
+                <pre><code>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm prettier --write \"$CLAUDE_FILE_PATH\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+                <h4>（c）マイグレーションファイル保護（PreToolUse / Edit）</h4>
+
+                <p>Prisma が生成したマイグレーションファイルの手動編集を物理的にブロックします。</p>
+
+                <div class="code-header"><span>.claude/settings.json（hooks セクション抜粋）</span></div>
+                <pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATH\" | grep -q 'prisma/migrations/'; then echo 'BLOCKED: マイグレーションファイルの手動編集は禁止されています' &gt;&amp;2; exit 1; fi"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+                <div class="callout warning">
+                  <strong>セキュリティ注意:</strong> Hooks はシェルスクリプトで実行されるため、セキュリティに注意してください。Hooks 自体がインジェクション攻撃の対象にならないよう、入力値のエスケープを忘れずに行いましょう。特に <code>$CLAUDE_TOOL_INPUT</code> や <code>$CLAUDE_FILE_PATH</code> にユーザー制御の値が含まれる可能性を考慮してください。
+                </div>
+
+                <h4>Hooks の統合設定例</h4>
+
+                <p>上記3つの Hooks を統合した <code>settings.json</code> の全体像です。</p>
+
+                <div class="code-header"><span>.claude/settings.json（Hooks 統合版）</span></div>
+                <pre><code>{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(pnpm:*)",
+      "Bash(npm:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(prisma:*)",
+      "Bash(turbo:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(DROP:*)",
+      "Bash(TRUNCATE:*)",
+      "Bash(psql*production*)"
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development",
+    "DATABASE_URL": "postgresql://dev:dev@localhost:5432/app_dev"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qiE '(DROP|TRUNCATE|DELETE FROM|rm -rf|--force|production)'; then echo 'BLOCKED: 危険なコマンドが検出されました' &gt;&amp;2; exit 1; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATH\" | grep -q 'prisma/migrations/'; then echo 'BLOCKED: マイグレーションファイルの手動編集は禁止されています' &gt;&amp;2; exit 1; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm prettier --write \"$CLAUDE_FILE_PATH\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+                <!-- ============================================================
+                     セクション6: Phase 3 — 品質・セキュリティ体制
+                     ============================================================ -->
+
+                <h2 id="phase3">Phase 3 -- 品質・セキュリティ体制</h2>
+
+                <p>Phase 3 では、コードの品質を自動で担保する Agents と、並列作業で開発速度を加速する Agent Teams を設計します。</p>
+
+                <!-- 6.1 Agents -->
+                <h3 id="phase3-agents">6.1 Agents の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Agents を使うのか:</strong> 人間のコードレビューは時間がかかり、見落としもあります。Agents は「特定観点に特化した専門家」として、一定基準で漏れなくチェックします。人間は Agents のレビュー結果を見て最終判断するだけで良くなります。基幹システムではセキュリティ・パフォーマンス・DB設計など、複数の専門観点が必要であり、1人の人間が全てをカバーするのは困難です。
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>code-reviewer</h4>
+                    <p>コード品質・規約準拠・ロジックの正確性を総合的にレビュー</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>security-reviewer</h4>
+                    <p>セキュリティ脆弱性の検出と修正提案に特化したレビュー</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>performance-reviewer</h4>
+                    <p>N+1クエリ、メモリリーク、キャッシュ戦略などパフォーマンス観点</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>db-reviewer</h4>
+                    <p>正規化、インデックス設計、マイグレーション安全性のDB設計レビュー</p>
+                  </div>
+                </div>
+
+                <h4>（a）code-reviewer -- コード品質レビュー</h4>
+
+                <div class="code-header"><span>.claude/agents/code-reviewer.md</span></div>
+                <pre><code>---
+name: code-reviewer
+description: コード品質の総合レビューを実施
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# コード品質レビュー
+
+## あなたの役割
+コードの品質を総合的にレビューする専門エージェントです。
+確認を求めず、直接レビューを実施して結果を返してください。
+
+## チェック観点
+
+1. **コーディング規約** - .claude/rules/coding-standards.md に準拠しているか
+2. **命名規則** - 変数・関数・クラスの命名が適切か
+3. **関数設計** - 単一責務原則、50行以内、ネスト3段以内
+4. **エラー処理** - 空の catch ブロック、握りつぶし
+5. **DRY 原則** - 重複コードの有無
+6. **YAGNI 原則** - 不要な先回り実装
+7. **インポート** - 未使用インポート、順序の統一
+8. **型安全性** - any 型の使用、型アサーションの妥当性
+
+## 出力フォーマット
+
+各指摘は以下の形式で報告:
+- 指摘レベル: 🔴 Critical / 🟡 Warning / 🔵 Suggestion
+- ファイルパス・行番号
+- 問題の説明
+- 修正コード例</code></pre>
+
+                <h4>（b）security-reviewer -- セキュリティ監査</h4>
+
+                <div class="code-header"><span>.claude/agents/security-reviewer.md</span></div>
+                <pre><code>---
+name: security-reviewer
+description: セキュリティ観点でのコードレビューを実施
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# セキュリティレビュー
+
+## あなたの役割
+セキュリティ脆弱性を検出する専門エージェントです。
+確認を求めず、直接レビューを実施して結果を返してください。
+
+## チェック観点
+
+1. **認証・認可** - 全エンドポイントに認証ガードがあるか
+2. **SQLインジェクション** - $queryRawUnsafe の使用、パラメータバインディング
+3. **XSS** - dangerouslySetInnerHTML、ユーザー入力の直接出力
+4. **CSRF** - トークン検証の有無
+5. **機密情報** - ハードコードされた API キー、パスワード、接続文字列
+6. **入力バリデーション** - DTO のバリデーション漏れ
+7. **レスポンス** - 不要な機密データの露出
+8. **ログ** - パスワード・トークンのログ出力
+9. **ファイルアップロード** - 拡張子・サイズ制限
+10. **依存関係** - 既知の脆弱性を持つパッケージ
+
+## 出力フォーマット
+
+各指摘は以下の形式で報告:
+- 深刻度: 🔴 Critical / 🟡 Warning / 🔵 Info
+- 脆弱性の種類（OWASP Top 10 分類）
+- ファイルパス・行番号
+- 攻撃シナリオの説明
+- 修正コード例</code></pre>
+
+                <h4>（c）performance-reviewer -- パフォーマンスレビュー</h4>
+
+                <div class="code-header"><span>.claude/agents/performance-reviewer.md</span></div>
+                <pre><code>---
+name: performance-reviewer
+description: パフォーマンス観点でのコードレビューを実施
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# パフォーマンスレビュー
+
+## あなたの役割
+パフォーマンスの問題を検出する専門エージェントです。
+確認を求めず、直接レビューを実施して結果を返してください。
+
+## チェック観点
+
+1. **N+1 クエリ** - Prisma の include/select の適切性。ループ内での DB アクセス
+2. **不要なデータフェッチ** - SELECT * 相当の操作。必要なカラムだけ select しているか
+3. **インデックス** - WHERE, JOIN, ORDER BY で使うカラムにインデックスがあるか
+4. **メモリリーク** - 大量データの一括読み込み。ストリーム処理の必要性
+5. **キャッシュ戦略** - Redis の TTL 設定の妥当性。キャッシュすべきデータの判断
+6. **バッチ処理** - 大量データ処理のチャンクサイズ。Prisma の createMany/updateMany
+7. **非同期処理** - Promise.all の並列度。不要な await の直列化
+8. **フロントエンド** - 不要な再レンダリング。React.memo/useMemo の適切な使用
+9. **バンドルサイズ** - 不要なライブラリのインポート。Tree shaking の効果
+
+## 出力フォーマット
+
+各指摘は以下の形式で報告:
+- 影響度: 🔴 高 / 🟡 中 / 🔵 低
+- 問題の種類
+- ファイルパス・行番号
+- 現在の推定パフォーマンス影響
+- 改善案とコード例</code></pre>
+
+                <h4>（d）db-reviewer -- DB設計レビュー</h4>
+
+                <div class="code-header"><span>.claude/agents/db-reviewer.md</span></div>
+                <pre><code>---
+name: db-reviewer
+description: データベース設計とマイグレーションのレビュー
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# DB設計レビュー
+
+## あなたの役割
+データベース設計の問題を検出する専門エージェントです。
+確認を求めず、直接レビューを実施して結果を返してください。
+
+## チェック観点
+
+1. **正規化** - 第3正規形が基本。意図的な非正規化にはコメントで理由を明記
+2. **インデックス設計** - WHERE, JOIN, ORDER BY で使うカラムにインデックスがあるか
+3. **外部キー制約** - リレーションに適切な外部キー制約が設定されているか
+4. **ソフトデリート** - 全テーブルに deleted_at カラムがあるか。一貫性の確認
+5. **マイグレーション安全性** - データ消失リスクの有無。カラム削除・型変更の影響
+6. **命名規則** - テーブル名は英語スネークケース複数形、カラム名はスネークケース
+7. **必須カラム** - id, created_at, updated_at, deleted_at の存在
+8. **Prisma スキーマ** - schema.prisma と実 DB の整合性
+9. **パフォーマンス** - 大テーブルへの ALTER TABLE の影響。ロック時間の見積もり
+
+## 出力フォーマット
+
+各指摘は以下の形式で報告:
+- 深刻度: 🔴 Critical / 🟡 Warning / 🔵 Suggestion
+- 問題の種類
+- 対象テーブル・カラム
+- 問題の説明と影響
+- 修正案（Prisma スキーマ or マイグレーション SQL）</code></pre>
+
+                <!-- 6.2 Agent Teams -->
+                <h3 id="phase3-agent-teams">6.2 Agent Teams の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Agent Teams を使うのか:</strong> 1つの PR に対して code-reviewer, security-reviewer, performance-reviewer, db-reviewer を順番に実行すると時間がかかります。Agent Teams は複数のエージェントを並列で実行し、レビュー時間を大幅に短縮します。基幹システムのような大規模 PR では特に効果的です。また、実装作業自体も並列化でき、バックエンド・フロントエンド・テストを同時に進行させることで開発速度を加速します。
+                </div>
+
+                <h4>並列レビューの実行例</h4>
+
+                <pre><code># PR レビューを4つのエージェントで並列実行
+/code-review #42
+
+→ Agent A: code-reviewer（コード品質）
+→ Agent B: security-reviewer（セキュリティ）
+→ Agent C: performance-reviewer（パフォーマンス）
+→ Agent D: db-reviewer（DB設計）
+→ 全完了後: レビュー結果を統合して報告</code></pre>
+
+                <h4>並列実装の実行例</h4>
+
+                <pre><code># Issue 実装を複数エージェントで並列実行
+/dev-issue-team #42
+
+→ Agent A: バックエンド実装（NestJS module/controller/service）
+→ Agent B: フロントエンド実装（React コンポーネント）
+→ Agent C: テスト作成（unit + E2E）
+→ 全完了後: 統合・PR作成</code></pre>
+
+                <div class="code-header"><span>.claude/commands/dev-issue-team.md</span></div>
+                <pre><code>---
+description: GitHub Issue 実装を複数エージェントで並列実行
+allowed-tools: Bash, Read, Edit, Write, Agent
+---
+
+# 並列 Issue 実装
+
+$ARGUMENTS の GitHub Issue を複数エージェントで並列実装してください。
+
+## 手順
+
+### 1. 準備
+- `git checkout main && git pull origin main` でソースを最新化
+- `gh issue view $ARGUMENTS` で Issue の内容を確認
+- ブランチ作成: `feature/#<Issue番号>-<概要>`
+
+### 2. 並列実装（Agent を使用）
+以下の3つのエージェントを並列で起動:
+
+**Agent A: バックエンド実装**
+- NestJS のモジュール・コントローラー・サービスを生成
+- Prisma スキーマの更新（必要な場合）
+- api-development.md の Rules に準拠
+
+**Agent B: フロントエンド実装**
+- React コンポーネントの生成
+- Server Components / Client Components の判断
+- frontend.md の Rules に準拠
+
+**Agent C: テスト作成**
+- ユニットテスト（*.spec.ts）
+- E2E テスト（test/ 配下）
+- testing.md の Rules に準拠
+
+### 3. 統合
+- 全エージェントの作業結果を統合
+- 型チェック: `pnpm tsc --noEmit`
+- テスト実行: `pnpm --filter api test && pnpm --filter web test`
+- PR 作成: タイトル・説明は日本語、`Closes #<Issue番号>` を含める</code></pre>
+
+                <!-- ============================================================
+                     セクション7: Phase 4 — 外部連携
+                     ============================================================ -->
+
+                <h2 id="phase4">Phase 4 -- 外部連携</h2>
+
+                <p>Phase 4 では、Claude Code をプロジェクトの外部ツール（GitHub, DB, Slack）と連携させる MCP と、設定を他プロジェクトに横展開する Plugins を設計します。</p>
+
+                <!-- 7.1 MCP -->
+                <h3 id="phase4-mcp">7.1 MCP の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ MCP を使うのか:</strong> Claude Code はデフォルトではローカルファイルしか見れません。MCP（Model Context Protocol）で GitHub, DB, Slack に接続することで「Issue の内容を読んで、DBスキーマを確認して、実装して、PR を出して、Slack に通知」という一気通貫のワークフローが可能になります。コンテキスト切替（ブラウザでIssue確認→エディタに戻る→DBクライアントで確認→エディタに戻る）がなくなり、開発効率が大幅に向上します。
+                </div>
+
+                <div class="code-header"><span>.mcp.json</span></div>
+                <pre><code>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
+      }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    }
+  }
+}</code></pre>
+
+                <h4>各 MCP サーバーの用途</h4>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>MCP サーバー</th>
+                      <th>用途</th>
+                      <th>活用シーン</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>github</strong></td>
+                      <td>GitHub API へのアクセス</td>
+                      <td>Issue 読み込み、PR 作成、コードレビューコメント投稿</td>
+                    </tr>
+                    <tr>
+                      <td><strong>postgres</strong></td>
+                      <td>開発 DB への直接クエリ</td>
+                      <td>テーブル構造の確認、データの検証、マイグレーション状態の確認</td>
+                    </tr>
+                    <tr>
+                      <td><strong>slack</strong></td>
+                      <td>Slack へのメッセージ送信</td>
+                      <td>PR 作成通知、デプロイ完了通知、レビュー依頼</td>
+                    </tr>
+                    <tr>
+                      <td><strong>context7</strong></td>
+                      <td>ライブラリの最新ドキュメント取得</td>
+                      <td>NestJS, Prisma, Next.js 等の最新 API 仕様の参照</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout tip">
+                  <strong>環境変数の管理:</strong> MCP の接続情報（トークン等）は <code>.claude/settings.local.json</code> の <code>env</code> セクションで管理し、<code>.mcp.json</code> では <code>${変数名}</code> で参照します。これにより、トークンがリポジトリにコミットされるリスクを排除できます。
+                </div>
+
+                <!-- 7.2 Plugins -->
+                <h3 id="phase4-plugins">7.2 Plugins の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Plugins を使うのか:</strong> 1つのプロジェクトで磨いた Rules/Skills/Agents を他プロジェクトに横展開するには、毎回ファイルをコピーするのは非効率です。Plugin にパッケージングすれば <code>claude plugin add</code> 一発で導入でき、バージョン管理もできます。基幹システムリプレイスで培ったノウハウを、次のプロジェクトでも即座に活用できます。
+                </div>
+
+                <p>例えば、本プロジェクトのセキュリティルールと DB 操作ルールを Plugin 化する場合:</p>
+
+                <div class="code-header"><span>plugin.json</span></div>
+                <pre><code>{
+  "name": "enterprise-security-rules",
+  "version": "1.0.0",
+  "description": "基幹システム向けセキュリティ・DB操作ルール",
+  "rules": [
+    "rules/security.md",
+    "rules/database.md"
+  ],
+  "agents": [
+    "agents/security-reviewer.md",
+    "agents/db-reviewer.md"
+  ],
+  "skills": [
+    "skills/gen-api-spec/SKILL.md"
+  ]
+}</code></pre>
+
+                <p>他のプロジェクトでは以下のコマンドで導入:</p>
+
+                <pre><code># Plugin のインストール
+claude plugin add ./path/to/enterprise-security-rules
+
+# または GitHub リポジトリから
+claude plugin add github:your-org/enterprise-security-rules</code></pre>
+
+                <!-- ============================================================
+                     セクション8: 開発フロー全体図
+                     ============================================================ -->
+
+                <h2 id="full-workflow">開発フロー全体図</h2>
+
+                <p>Issue 起票からデプロイまでの一気通貫フローを示します。各ステップでどの Claude Code 機能が使われるかを明示しています。</p>
+
+                <pre><code>[1. Issue 起票]
+     │
+     ▼
+[2. /dev-issue #42]  ← Command が自動で以下を実行:
+     │
+     ├─ git checkout -b feature/#42-xxx
+     ├─ Issue 内容を読み込み（MCP: GitHub）
+     ├─ DBスキーマ確認（MCP: PostgreSQL）
+     │
+     ▼
+[3. 実装]
+     │
+     ├─ Rules が自動適用（api-development, frontend, database）
+     ├─ Hooks が自動フォーマット・危険操作ブロック
+     ├─ Skills が必要に応じて自動発動（explain-code 等）
+     │
+     ▼
+[4. テスト]
+     │
+     ├─ pnpm test（影響範囲のみ実行）
+     ├─ Hooks: PostToolUse でフォーマット自動実行
+     │
+     ▼
+[5. PR レビュー]
+     │
+     ├─ Agent Teams が並列レビュー:
+     │   ├─ code-reviewer（コード品質）
+     │   ├─ security-reviewer（セキュリティ）
+     │   ├─ performance-reviewer（パフォーマンス）
+     │   └─ db-reviewer（DB設計）
+     │
+     ▼
+[6. マージ &amp; デプロイ]
+     │
+     ├─ GitHub Actions: CI/CD パイプライン
+     ├─ Slack 通知（MCP: Slack）
+     │
+     ▼
+[7. 完了]</code></pre>
+
+                <div class="callout tip">
+                  <strong>全体の流れ:</strong> このフローでは、人間が行うのは「Issue の起票」「<code>/dev-issue #42</code> の実行」「レビュー結果の最終判断」「マージの承認」だけです。実装、テスト、フォーマット、レビューは全て Claude Code が自動で実行します。人間は設計と意思決定に集中できます。
+                </div>
+
+                <!-- ============================================================
+                     セクション9: チーム運用ガイド
+                     ============================================================ -->
+
+                <h2 id="team-operation">チーム運用ガイド</h2>
+
+                <h3 id="onboarding">オンボーディング手順</h3>
+
+                <p>新しいメンバーがプロジェクトに参加する際の手順です。</p>
+
+                <ol>
+                  <li><strong>リポジトリ clone</strong>
+                    <pre><code>git clone https://github.com/your-org/your-project.git
+cd your-project
+pnpm install</code></pre>
+                  </li>
+                  <li><strong>Claude Code インストール</strong>
+                    <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+                  </li>
+                  <li><strong><code>claude</code> で起動</strong> -- CLAUDE.md が自動読込され、プロジェクトの技術スタック・規約が即座に把握される</li>
+                  <li><strong>コードベース理解</strong>
+                    <pre><code>/explain-code apps/api/src/main.ts</code></pre>
+                    <p>Skills が自動でコードの仕組みを図解付きで解説</p>
+                  </li>
+                  <li><strong>最初の Issue に取り組む</strong>
+                    <pre><code>/dev-issue 42</code></pre>
+                    <p>Command が Issue の読み込みから PR 作成まで一括実行。新メンバーでもシニアと同じ手順・品質で作業できる</p>
+                  </li>
+                </ol>
+
+                <h3 id="knowledge-cycle">ナレッジ蓄積サイクル</h3>
+
+                <pre><code>発見（バグ、ベストプラクティス、注意点）
+  │
+  ▼
+CLAUDE.md / Rules に追記
+  │
+  ▼
+チームに PR で共有・レビュー
+  │
+  ▼
+マージ → 次のメンバーが自動的に恩恵を受ける
+  │
+  ▼
+新たな発見... (サイクルが回り続ける)</code></pre>
+
+                <div class="callout tip">
+                  <strong>チーム文化の構築:</strong> AI駆動開発は「1人の天才が全てを設定する」のではなく、チーム全員が少しずつ改善を重ねることで成熟します。新しいメンバーが「ここ分かりにくいからルール追加しよう」と提案できる文化を作ることが最も重要です。CLAUDE.md や Rules への改善 PR は、コードの PR と同じくらい価値があります。
+                </div>
+
+                <h3 id="checklist">導入チェックリスト</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Phase</th>
+                      <th>タスク</th>
+                      <th>成果物</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>CLAUDE.md を作成</td>
+                      <td><code>.claude/CLAUDE.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>Rules を作成（セキュリティ、Git、コーディング規約）</td>
+                      <td><code>.claude/rules/*.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>パス別 Rules を作成（API、フロントエンド、DB）</td>
+                      <td><code>.claude/rules/*.md</code>（paths 付き）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>Settings を設定（権限、環境変数）</td>
+                      <td><code>.claude/settings.json</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>Commands を作成（dev-issue、db-migrate、api-scaffold）</td>
+                      <td><code>.claude/commands/*.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>Skills を作成（explain-code、gen-doc、gen-api-spec）</td>
+                      <td><code>.claude/skills/*/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>Hooks を設定（危険コマンドブロック、自動フォーマット）</td>
+                      <td><code>.claude/settings.json</code>（hooks セクション）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td>Agents を作成（code/security/performance/db-reviewer）</td>
+                      <td><code>.claude/agents/*.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td>Agent Teams のコマンドを作成（dev-issue-team）</td>
+                      <td><code>.claude/commands/dev-issue-team.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td>MCP を設定（GitHub、PostgreSQL、Slack）</td>
+                      <td><code>.mcp.json</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td>Plugin 化を検討（横展開対象のルール・エージェント）</td>
+                      <td><code>plugin.json</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout info">
+                  <strong>まとめ:</strong> AI駆動開発アーキテクチャは、Claude Code の10の機能（CLAUDE.md, Rules, Settings, Hooks, Commands, Skills, Agents, Agent Teams, MCP, Plugins）を組み合わせて構築します。Phase 1（基盤）から Phase 4（外部連携）まで段階的に導入することで、チームの負担を最小限にしながら、AI駆動開発の恩恵を最大化できます。
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
