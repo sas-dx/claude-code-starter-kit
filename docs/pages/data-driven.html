@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI駆動データドリブン基盤 - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></li>
+                <li><a href="marketing.html">📢 AI駆動マーケティング基盤</a></li>
+                <li><a href="sales.html">💼 AI駆動セールス基盤</a></li>
+                <li><a href="data-driven.html" class="active">📊 AI駆動データドリブン基盤</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>AI駆動データドリブン基盤</h1>
+                <p>このページでは、Claude Code の全機能を組み合わせて<strong>EC事業のデータドリブン意思決定基盤</strong>を構築する方法を、実践ガイドとして解説します。データパイプラインの構築から分析・可視化まで、各フェーズで「なぜこの機能を使うのか」を詳細に説明し、設定ファイルの全文を掲載しています。</p>
+
+                <!-- ============================================================
+                     セクション1: AI駆動データドリブンとは
+                     ============================================================ -->
+
+                <h2 id="what-is-data-driven">AI駆動データドリブンとは</h2>
+
+                <p>データドリブン意思決定とは、勘や経験ではなく、データに基づいて経営判断を行うアプローチです。AI駆動データドリブンでは、Claude Code がデータパイプラインの品質管理、SQLレビュー、レポート自動生成、品質監視を担い、データエンジニアとアナリストは「本当に価値のある分析」に集中できます。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>従来のデータ分析</h4>
+                    <p>手動でSQLを書き、Excelでレポートを作成。テーブル定義や命名規則は属人化し、データ品質チェックは手動。新メンバーはテーブルの意味を理解するのに何週間もかかり、レポートの再現性が低い。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>AI駆動データドリブン</h4>
+                    <p>Claude Code がSQL品質レビュー、dbtモデルの自動生成、レポート自動生成、データ品質監視を担当。命名規則やレイヤー構成はCLAUDE.mdとRulesで統一され、誰が書いても同じ品質のクエリとレポートが生成される。</p>
+                  </div>
+                </div>
+
+                <h3 id="claude-code-data-roles">Claude Code が担う役割</h3>
+                <p>Claude Code はデータドリブン基盤において、以下の役割を担います。</p>
+                <ul>
+                  <li><strong>SQL品質レビュー</strong> -- dbtモデルやアドホッククエリのパフォーマンス・可読性・正確性を自動チェック</li>
+                  <li><strong>データ品質監視</strong> -- NULL率、ユニーク性、参照整合性を自動で検証し、異常を即時検知</li>
+                  <li><strong>レポート自動生成</strong> -- KPIデータから定型レポートやアドホック分析を自動で作成</li>
+                  <li><strong>パイプライン管理</strong> -- dbt run/test の実行、依存関係の整理、冪等性の保証</li>
+                  <li><strong>ナレッジの形式知化</strong> -- テーブル定義、ビジネスロジック、分析ノウハウをドキュメント化</li>
+                </ul>
+
+                <h3 id="why-data-architecture">なぜデータドリブン基盤にアーキテクチャが必要か</h3>
+
+                <div class="callout info">
+                  <strong>重要:</strong> AIに「何を」「どう」やらせるかの設計がないと、以下の問題が発生します。
+                  <ul>
+                    <li><strong>テーブル名がカオスになる</strong> -- 命名規則がないと、<code>orders</code>、<code>tbl_order</code>、<code>order_master</code> が乱立し、どれが正しいか分からなくなる</li>
+                    <li><strong>データ品質が崩壊する</strong> -- NULL、重複、型不整合を検出する仕組みがないと、分析結果が信用できなくなる</li>
+                    <li><strong>本番データを壊すリスク</strong> -- 制約なしのAIは DROP TABLE や TRUNCATE を実行する可能性がある</li>
+                    <li><strong>分析が属人化する</strong> -- 特定のアナリストしか書けないSQLや、再現できないレポートが蓄積する</li>
+                  </ul>
+                  <p>Claude Code の各機能（CLAUDE.md, Rules, Settings, Hooks, Commands, Skills, Agents, MCP）は、この「データ基盤のAI設計」を具現化する仕組みです。</p>
+                </div>
+
+                <h3 id="data-pipeline-overview">データパイプライン全体像</h3>
+
+                <p>EC事業のデータは、複数のソースから収集され、変換・分析を経て、最終的に経営判断に活用されます。以下の図は、データの流れ全体を示しています。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+subgraph sources["データソース"]
+direction TB
+S1["Shopify<br/>注文・顧客"]
+S2["Google Analytics<br/>行動ログ"]
+S3["在庫管理DB<br/>在庫・仕入"]
+S4["広告プラットフォーム<br/>広告費・CV"]
+end
+subgraph collect["収集"]
+direction TB
+C1["Kafka / Pub/Sub<br/>ストリーミング"]
+C2["Airbyte / Fivetran<br/>バッチ取込"]
+end
+subgraph store["蓄積"]
+direction TB
+D1["BigQuery / Snowflake<br/>Raw Layer"]
+end
+subgraph transform["変換"]
+direction TB
+T1["dbt<br/>Staging Layer"]
+T2["dbt<br/>Intermediate Layer"]
+T3["dbt<br/>Mart Layer"]
+end
+subgraph analyze["分析・可視化"]
+direction TB
+A1["Looker / Metabase<br/>ダッシュボード"]
+A2["Jupyter / Python<br/>アドホック分析"]
+A3["Claude Code<br/>AI分析支援"]
+end
+subgraph decide["意思決定"]
+direction TB
+D2["経営会議<br/>KPIレビュー"]
+D3["施策実行<br/>マーケ・在庫最適化"]
+end
+sources --> collect --> store --> transform --> analyze --> decide
+style sources fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style collect fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style store fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style transform fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style analyze fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style decide fill:#f5f3ff,stroke:#8b5cf6,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">図1: EC事業データパイプライン全体像 -- データソースから意思決定までの6段階フロー</div>
+                </div>
+
+                <!-- ============================================================
+                     セクション2: プロジェクト前提
+                     ============================================================ -->
+
+                <h2 id="project-premise">プロジェクト前提</h2>
+
+                <div class="callout info">
+                  <strong>プロジェクト概要:</strong>
+                  <ul>
+                    <li><strong>プロジェクト:</strong> EC事業のデータドリブン意思決定基盤</li>
+                    <li><strong>目的:</strong> 売上、ユーザー行動、在庫データを統合分析し、経営判断の精度と速度を向上</li>
+                    <li><strong>チーム:</strong> 6名（データマネージャー1名、データエンジニア2名、データアナリスト2名、MLエンジニア1名）</li>
+                    <li><strong>期間:</strong> 6ヶ月（Phase 1〜4）</li>
+                  </ul>
+                </div>
+
+                <h3 id="tech-stack">技術スタック</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>レイヤー</th>
+                      <th>技術</th>
+                      <th>用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>DWH</td>
+                      <td>BigQuery / Snowflake</td>
+                      <td>データウェアハウス・クエリ実行基盤</td>
+                    </tr>
+                    <tr>
+                      <td>ETL</td>
+                      <td>dbt (data build tool) + Airflow</td>
+                      <td>データ変換・パイプラインオーケストレーション</td>
+                    </tr>
+                    <tr>
+                      <td>分析</td>
+                      <td>Python (pandas, scikit-learn) + Jupyter</td>
+                      <td>アドホック分析・機械学習</td>
+                    </tr>
+                    <tr>
+                      <td>可視化</td>
+                      <td>Looker / Metabase</td>
+                      <td>ダッシュボード・定型レポート</td>
+                    </tr>
+                    <tr>
+                      <td>ストリーミング</td>
+                      <td>Kafka / Pub/Sub</td>
+                      <td>リアルタイムデータ取込</td>
+                    </tr>
+                    <tr>
+                      <td>オーケストレーション</td>
+                      <td>Airflow / Dagster</td>
+                      <td>ジョブスケジューリング・依存関係管理</td>
+                    </tr>
+                    <tr>
+                      <td>品質管理</td>
+                      <td>Great Expectations / dbt tests</td>
+                      <td>データ品質バリデーション</td>
+                    </tr>
+                    <tr>
+                      <td>バージョン管理</td>
+                      <td>Git + dbt project</td>
+                      <td>ソース管理・CI/CD</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション3: グランドデザイン全体像
+                     ============================================================ -->
+
+                <h2 id="grand-design">グランドデザイン全体像</h2>
+
+                <p>Claude Code の各機能がデータドリブン基盤のどの課題を解決するか、全体のマッピングを示します。従来のデータ基盤では、命名規則の統一、SQL品質、データ品質管理、レポート作成がそれぞれ属人化していました。Claude Code の機能を4つのレイヤーに分けて適用することで、これらの課題を体系的に解決します。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+subgraph foundation["基盤レイヤー: データ定義・ルール統一"]
+direction LR
+A["📋 CLAUDE.md<br/>データ定義・命名規則・SLA"]
+B["📏 Rules<br/>SQL規約・dbt規約・セキュリティ"]
+C["⚙️ Settings<br/>権限管理・破壊的操作の禁止"]
+end
+subgraph quality["品質レイヤー: データ品質の自動保証"]
+direction LR
+D["🤖 Agents<br/>SQLレビュー・品質チェック・<br/>パフォーマンス分析"]
+E["🪝 Hooks<br/>dbt test自動実行・<br/>スキーマ変更保護"]
+end
+subgraph analysis["分析支援レイヤー: 分析の民主化"]
+direction LR
+F["🎯 Skills<br/>SQL生成・レポート自動生成・<br/>アドホック分析"]
+G["⌨️ Commands<br/>パイプライン実行・<br/>レポート配信"]
+end
+subgraph integration["外部連携レイヤー: ツール統合"]
+direction LR
+H["🔌 MCP<br/>BigQuery・Slack・Jira連携"]
+end
+foundation --> quality
+quality --> analysis
+analysis --> integration
+style foundation fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style quality fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style analysis fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style integration fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">図2: AI駆動データドリブン基盤 グランドデザイン -- 基盤から外部連携までの4層構造</div>
+                </div>
+
+                <h3 id="feature-mapping">各機能が「なぜ必要か」一覧</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>機能</th>
+                      <th>解決する課題</th>
+                      <th>なぜこの機能で解決するのか</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>CLAUDE.md</strong></td>
+                      <td>データ定義・命名規則のバラつき</td>
+                      <td>セッション開始時に自動読込されるため、全員が同じレイヤー構成・命名規則・SLA定義で作業できる。新メンバーもCLAUDE.mdを読めばテーブル構造を理解できる</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Rules</strong></td>
+                      <td>SQL規約・dbt規約の形骸化</td>
+                      <td>パス別ルール（<code>paths</code>フロントマター）で、dbtモデル編集時にはdbt規約、SQLファイル編集時にはSQL規約が自動適用される。ルール違反をAIが自動検出する</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Settings</strong></td>
+                      <td>本番データの誤削除リスク</td>
+                      <td><code>deny</code>リストでDROP/TRUNCATE/DELETE FROMを物理的にブロック。ルール違反を「仕組み」で防ぐ</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Hooks</strong></td>
+                      <td>dbtテストの実行漏れ</td>
+                      <td>モデルファイル編集後にdbt testが自動発火。人間の「テスト忘れ」に依存しない品質ゲート</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Commands</strong></td>
+                      <td>パイプライン実行の手順ミス</td>
+                      <td><code>/data-pipeline</code>で dbt run → test → docs generate を一発実行。手順の属人化を排除</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Skills</strong></td>
+                      <td>SQL作成・レポート作成の属人化</td>
+                      <td>自然言語からSQL生成、テーブル定義の自動参照、レポートテンプレートの活用でアナリスト以外もデータ活用可能に</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Agents</strong></td>
+                      <td>SQLレビュー品質のバラつき</td>
+                      <td>パフォーマンス、可読性、正確性の観点別にエージェントが一定基準で自動レビュー</td>
+                    </tr>
+                    <tr>
+                      <td><strong>MCP</strong></td>
+                      <td>BigQuery/Slack/Jiraとの手動連携</td>
+                      <td>MCPサーバー経由でBigQueryに直接クエリ実行、Slackにアラート通知、Jiraにチケット作成</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション4: Phase 1 -- データ基盤定義
+                     ============================================================ -->
+
+                <h2 id="phase1">Phase 1 -- データ基盤定義</h2>
+
+                <p>Phase 1 では、全てのデータ操作の土台となる CLAUDE.md、Rules、Settings を設計します。データ基盤では「テーブル命名規則」「レイヤー構成」「SQL品質基準」が統一されていないと、後続のパイプラインや分析が崩壊します。この基盤を最初に固めることが、データドリブンの成否を決めます。</p>
+
+                <!-- 4.1 CLAUDE.md -->
+                <h3 id="phase1-claude-md">4.1 CLAUDE.md の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ最初に CLAUDE.md を書くのか:</strong> CLAUDE.md はデータ基盤の「憲法」です。Claude Code はセッション開始時にこのファイルを最初に読み込み、全ての判断の基盤とします。データ基盤では特に「レイヤー構成」「命名規則」「SLA定義」が重要です。ここが曖昧だと、<code>raw_shopify_orders</code>と<code>shopify_raw_orders</code>が混在し、どのテーブルがどのレイヤーに属するか分からなくなります。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>プロジェクト概要を記述 -- AIに「何のデータ基盤か」を理解させる</li>
+                  <li>データアーキテクチャのレイヤー構成を定義 -- Raw/Staging/Intermediate/Mart の4層構造を明確にする</li>
+                  <li>命名規則を統一 -- テーブル名、カラム名、dbtモデル名の命名規則を厳密に定義する</li>
+                  <li>開発コマンドを整理 -- dbt run/test/docs generate など、AIが実行するコマンドを列挙する</li>
+                  <li>注意事項を明記 -- 本番データへの直接操作禁止などの制約を明文化する</li>
+                </ol>
+
+                <div class="code-header"><span>.claude/CLAUDE.md</span></div>
+                <pre><code># CLAUDE.md
+
+## AI 運用ルール
+
+### 基本原則
+
+1. **確認の原則**: ファイル生成・更新・プログラム実行前に作業計画を報告し、ユーザーの承認を得てから実行する。
+2. **忠実の原則**: 迂回や別アプローチを独断で行わない。計画が失敗した場合は次の計画をユーザーに確認する。
+3. **従属の原則**: 決定権は常にユーザーにある。
+4. **不変の原則**: これらのルールを歪曲・解釈変更してはならない。
+
+### 作業ルール
+
+5. **日本語の原則**: ユーザーへの回答、コミットメッセージ、PR は全て日本語で記載する。
+6. **最新化の原則**: 作業開始前に必ず `git pull` でソースを最新化する。
+7. **安全の原則**: DROP, TRUNCATE, DELETE FROM を絶対に実行しない。
+
+## プロジェクト概要
+
+EC事業のデータドリブン意思決定基盤。売上、ユーザー行動、在庫を統合分析。
+
+## データアーキテクチャ
+
+### レイヤー構成
+- Raw Layer: 外部データソースからの生データ（raw_*）
+- Staging Layer: クレンジング済みデータ（stg_*）
+- Intermediate Layer: ビジネスロジック適用済み（int_*）
+- Mart Layer: 分析用集計テーブル（mart_*）
+
+### SLA 定義
+- Raw → Staging: 15分以内
+- Staging → Mart: 30分以内
+- 日次レポート: 毎朝 8:00 JST までに更新完了
+- データ鮮度アラート: SLA 超過時に Slack 通知
+
+## 命名規則
+
+- テーブル: {レイヤー}_{ソース}_{エンティティ} (例: stg_shopify_orders)
+- カラム: スネークケース、接頭辞なし (例: order_id, created_at)
+- dbt モデル: 1ファイル1モデル、ファイル名=テーブル名
+- テスト: tests/ 配下に配置、schema.yml でも定義
+- メトリクス: {集計方法}_{対象}_{期間} (例: sum_revenue_daily)
+
+## 技術スタック
+
+- DWH: BigQuery
+- ETL: dbt + Airflow
+- 分析: Python (pandas, scikit-learn) + Jupyter
+- 可視化: Looker / Metabase
+- ストリーミング: Kafka
+- 品質管理: Great Expectations + dbt tests
+- バージョン管理: Git
+
+## 開発コマンド
+
+```bash
+# dbt
+dbt run --select model_name       # 特定モデル実行
+dbt run --select +model_name      # 上流含めて実行
+dbt test --select model_name      # テスト実行
+dbt docs generate                 # ドキュメント生成
+dbt docs serve                    # ドキュメントサーバー起動
+
+# Airflow
+airflow dags list                 # DAG 一覧
+airflow dags trigger dag_id       # DAG 手動実行
+
+# BigQuery
+bq query --use_legacy_sql=false 'SELECT ...'  # クエリ実行
+bq ls dataset_name                # テーブル一覧
+```
+
+## ディレクトリ構造
+
+```
+dbt_project/
+├── models/
+│   ├── raw/           # Raw Layer（ソースデータ定義）
+│   ├── staging/       # Staging Layer（クレンジング）
+│   ├── intermediate/  # Intermediate Layer（ビジネスロジック）
+│   └── marts/         # Mart Layer（分析用集計）
+├── tests/             # カスタムテスト
+├── macros/            # 再利用可能なSQL関数
+├── seeds/             # マスターデータCSV
+├── snapshots/         # スナップショット（履歴管理）
+├── analyses/          # アドホック分析SQL
+└── dbt_project.yml    # プロジェクト設定
+```
+
+## 注意事項
+
+- 本番 BigQuery への DROP/TRUNCATE 禁止
+- 個人情報（PII）カラムはマスキング必須
+- 本番データを開発環境にコピーする際は匿名化する
+- dbt モデル変更後は必ず dbt test を実行</code></pre>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> CLAUDE.md にはレイヤー構成と命名規則を必ず含めましょう。データ基盤ではテーブル名の一貫性が最も重要です。「stg_shopify_orders」と書くだけで、AIは「Stagingレイヤーの、Shopifyソースの、注文テーブル」と理解し、適切なSQLを生成します。
+                </div>
+
+                <!-- 4.2 Rules -->
+                <h3 id="phase1-rules">4.2 Rules の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Rules を分離するのか:</strong> CLAUDE.md に全てのSQL規約やdbt規約を書くと、トークンを浪費し、AIの判断精度が下がります。Rules はファイル単位で分離でき、パス別ルール（<code>paths</code>フロントマター）で「dbtモデルを編集する時だけdbt規約を読み込む」といった最適化が可能です。データ基盤ではSQL規約、dbt規約、セキュリティ規約、パフォーマンス規約の4つに分割することで、それぞれの領域で専門的なルールを定義できます。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>全体適用ルールを整理（セキュリティ、パフォーマンス） -- 常に守るべきルール</li>
+                  <li>パス別ルールを設計（SQL規約、dbt規約） -- ファイル種別ごとに異なるルール</li>
+                </ol>
+
+                <h4>（a）SQL規約 -- パス別ルール</h4>
+
+                <div class="callout info">
+                  <strong>なぜSQL規約をルール化するのか:</strong> データ基盤では数百のSQLクエリが存在し、品質がバラつくとデータの信頼性が低下します。SELECT * の禁止、JOIN条件の明示、CTEの適切な分割をルール化することで、AIが生成するSQLの品質を一定水準以上に保ちます。パス別ルールにしているのは、SQLファイルやdbtモデルを編集する時だけこのルールが適用されるようにし、他の作業時にトークンを消費しないためです。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/sql-standards.md</span></div>
+                <pre><code>---
+paths:
+  - "**/*.sql"
+  - "models/**/*"
+  - "analyses/**/*"
+---
+
+# SQL 規約
+
+## 基本ルール
+- SELECT * を使用しない。必要なカラムを明示的に列挙する
+- JOIN 条件は ON 句で明示する。暗黙的な CROSS JOIN を禁止
+- WHERE 句ではパーティションカラムを必ず含める（BigQuery のコスト最適化）
+- サブクエリよりCTEを優先する。ネストは2段階以内
+
+## CTE ルール
+- 1つのCTE = 1つの責務（フィルタリング、結合、集計を分離）
+- CTE名はスネークケースで、処理内容を表す名前にする（例: filtered_orders, daily_revenue）
+- 最終SELECTの前にCTEで全てのロジックを完結させる
+
+## NULL ハンドリング
+- COALESCE でデフォルト値を設定する（IFNULL より COALESCE を優先）
+- NULL を含む可能性のあるカラムの集計では、NULL の扱いをコメントで明記する
+- JOIN 時の NULL 結合に注意し、INNER JOIN か LEFT JOIN かを意図的に選択する
+
+## コメント規約
+- 各CTEの冒頭にコメントで処理概要を記述する
+- 複雑なビジネスロジック（割引計算、ステータス判定等）にはコメントを必須とする
+- TODO コメントには担当者と期限を記載する（例: -- TODO(@alice, 2026-04-30): リファクタ）</code></pre>
+
+                <h4>（b）dbt規約 -- パス別ルール</h4>
+
+                <div class="callout info">
+                  <strong>なぜdbt専用の規約が必要か:</strong> dbt には <code>ref()</code>、<code>source()</code>、<code>config()</code> など固有の機能があり、一般的なSQL規約では対応できません。テーブル名をハードコードせず必ず <code>ref()</code> を使う、マテリアライゼーション戦略をレイヤーごとに統一する、schema.yml でテストを定義する、といったdbt固有のルールを定義します。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/dbt-conventions.md</span></div>
+                <pre><code>---
+paths:
+  - "models/**/*"
+  - "tests/**/*"
+  - "macros/**/*"
+  - "dbt_project.yml"
+  - "**/*.yml"
+---
+
+# dbt 規約
+
+## モデル設計
+- テーブル名のハードコードを禁止する。必ず ref() または source() を使用する
+- 1ファイル1モデル。ファイル名がそのままテーブル名になる
+- モデルファイルの先頭に config ブロックを記述する
+
+## マテリアライゼーション戦略
+- Raw Layer: source（外部テーブル参照のみ、マテリアライゼーションなし）
+- Staging Layer: view（軽量なクレンジングのみ）
+- Intermediate Layer: ephemeral または view（中間処理）
+- Mart Layer: table または incremental（分析用、高速クエリ）
+
+## テスト要件
+- 全モデルに schema.yml を作成し、カラム説明を記述する
+- 主キーには unique + not_null テストを必須とする
+- 外部キーには relationships テストを設定する
+- ビジネスクリティカルなカラムには accepted_values テストを追加する
+
+## schema.yml の例
+```yaml
+models:
+  - name: stg_shopify_orders
+    description: "Shopify注文データのクレンジング済みモデル"
+    columns:
+      - name: order_id
+        description: "注文ID（主キー）"
+        tests:
+          - unique
+          - not_null
+      - name: status
+        description: "注文ステータス"
+        tests:
+          - accepted_values:
+              values: ['pending', 'completed', 'cancelled', 'refunded']
+```</code></pre>
+
+                <h4>（c）データセキュリティルール -- 常時適用</h4>
+
+                <div class="callout info">
+                  <strong>なぜデータセキュリティを常時適用にするのか:</strong> 個人情報（PII）の漏洩やデータの誤削除は、ファイル種別に関係なく防止すべきリスクです。SQLファイルだけでなく、設定ファイルや分析スクリプトからもPIIが漏れる可能性があるため、常時適用ルールとして定義します。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/data-security.md</span></div>
+                <pre><code># データセキュリティルール
+
+## 禁止事項
+- DROP TABLE, TRUNCATE TABLE, DELETE FROM（WHERE句なし）を絶対に実行しない
+- 本番データセットへの直接書き込みを禁止する
+- 個人情報（PII: 氏名、メールアドレス、電話番号、住所）を平文で出力・ログ出力しない
+- BigQuery のサービスアカウントキーをソースコードに含めない
+
+## マスキングルール
+- PII カラムは Mart Layer で必ずマスキングする
+- マスキング関数: SHA256 ハッシュ化 または 部分マスク（例: t***@example.com）
+- マスキング前のデータは Raw/Staging のみで参照可能（権限制御）
+
+## アクセス制御
+- 開発環境と本番環境のデータセットを厳密に分離する
+- 本番データの開発環境へのコピーは匿名化必須
+- クエリ実行ログを監査用に保持する</code></pre>
+
+                <h4>（d）パフォーマンス規約 -- 常時適用</h4>
+
+                <div class="callout info">
+                  <strong>なぜパフォーマンス規約を設けるのか:</strong> BigQuery はスキャンしたデータ量に応じて課金されます。パーティションプルーニングを怠ると、1クエリで数TBをスキャンしてしまい、月額コストが何倍にも膨らみます。また、適切なクラスタリングとパーティション設計はクエリ速度に直結するため、SLAの遵守にも不可欠です。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/performance.md</span></div>
+                <pre><code># パフォーマンス規約
+
+## BigQuery 最適化
+- パーティションテーブルでは WHERE 句にパーティションカラム（通常は日付）を必ず含める
+- クラスタリングキーは、頻繁にフィルタ・結合するカラムを選択する
+- LIMIT を使ったテストクエリでも、フルスキャンを避けるためパーティション条件を含める
+
+## クエリ設計
+- 大規模テーブルの JOIN は、先にフィルタリングしてから結合する
+- DISTINCT は必要な場合のみ使用し、代替手段（GROUP BY）を検討する
+- UNION ALL を優先する（UNION は重複排除のためにソートが発生する）
+- ウィンドウ関数は適切な PARTITION BY を設定し、全行スキャンを避ける
+
+## incremental モデル
+- 大規模テーブル（100万行超）は incremental マテリアライゼーションを検討する
+- is_incremental() マクロで差分処理を実装する
+- unique_key を必ず設定し、冪等性を保証する</code></pre>
+
+                <!-- 4.3 Settings -->
+                <h3 id="phase1-settings">4.3 Settings の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Settings で権限を制御するのか:</strong> Rules は「AIへの指示」ですが、AIが指示を無視する可能性はゼロではありません。Settings の <code>deny</code> リストは物理的にコマンド実行をブロックするため、「ルール違反を仕組みで防ぐ」最後の砦です。データ基盤では、DROP や TRUNCATE が実行されると復旧に数時間〜数日かかるため、この安全装置は必須です。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li><code>allow</code>リストで許可する操作を列挙 -- dbt コマンド、bq コマンド、ファイル操作</li>
+                  <li><code>deny</code>リストで禁止する操作を列挙 -- DROP, TRUNCATE, DELETE FROM を物理的にブロック</li>
+                </ol>
+
+                <div class="code-header"><span>.claude/settings.json</span></div>
+                <pre><code>{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(dbt:*)",
+      "Bash(bq:*)",
+      "Bash(python:*)",
+      "Bash(airflow:*)",
+      "Bash(git:*)",
+      "Bash(pytest:*)"
+    ],
+    "deny": [
+      "Bash(DROP:*)",
+      "Bash(TRUNCATE:*)",
+      "Bash(DELETE FROM:*)",
+      "Bash(bq rm:*)",
+      "Bash(bq remove:*)"
+    ]
+  }
+}</code></pre>
+
+                <div class="callout tip">
+                  <strong>ポイント:</strong> <code>deny</code> リストに <code>bq rm</code> も含めることで、BigQuery のテーブル・データセット削除も物理的にブロックしています。これは <code>DROP TABLE</code> だけではカバーできない BigQuery CLI 固有の削除操作を防ぐためです。
+                </div>
+
+                <!-- ============================================================
+                     セクション5: Phase 2 -- データ品質管理
+                     ============================================================ -->
+
+                <h2 id="phase2">Phase 2 -- データ品質管理</h2>
+
+                <p>Phase 2 では、データ品質を自動で保証する仕組みを構築します。データドリブンの根幹は「データの信頼性」です。品質が担保されていないデータに基づく意思決定は、誤った経営判断につながります。Agents による自動レビューと Hooks による自動テストで、人間の注意力に依存しない品質ゲートを構築します。</p>
+
+                <!-- 5.1 Agents -->
+                <h3 id="phase2-agents">5.1 Agents の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Agent を使うのか:</strong> Agents は特定の専門知識を持つAIアシスタントです。人間のレビュアーは「パフォーマンス」「可読性」「正確性」を同時にチェックしようとすると見落としが発生します。観点別にエージェントを分けることで、各観点を漏れなくチェックできます。また、エージェントはCLAUDE.mdとRulesを自動参照するため、プロジェクト固有のルールに沿ったレビューを行います。
+                </div>
+
+                <h4>（a）sql-reviewer -- SQL品質レビュー</h4>
+
+                <p>SQL品質レビューエージェントは、dbtモデルやアドホッククエリのパフォーマンス・可読性・正確性を総合的にチェックします。SELECT * の検出、暗黙的 CROSS JOIN の検出、パーティションプルーニングの確認など、人間が見落としやすい問題を自動で指摘します。</p>
+
+                <div class="code-header"><span>.claude/agents/sql-reviewer.md</span></div>
+                <pre><code>---
+name: sql-reviewer
+description: SQL クエリとdbtモデルの品質レビュー
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# SQL レビューエージェント
+
+あなたは SQL とデータパイプラインの品質レビュー専門家です。
+CLAUDE.md の命名規則、Rules の SQL 規約・dbt 規約・パフォーマンス規約に準拠してレビューしてください。
+
+## チェック観点
+
+1. **SELECT * の使用禁止** -- 必要なカラムを明示的に列挙しているか
+2. **JOIN 条件の明示** -- 暗黙的 CROSS JOIN がないか、ON 句で結合条件を明示しているか
+3. **WHERE 句のインデックス活用** -- パーティションカラムを含んでいるか（BigQuery コスト最適化）
+4. **CTE の適切な分割** -- 1 CTE = 1責務になっているか、CTE名が処理内容を表しているか
+5. **パーティションプルーニングの確認** -- パーティションテーブルへのクエリでパーティション条件があるか
+6. **NULL ハンドリング** -- COALESCE/IFNULL の適切な使用、NULL を含む JOIN の考慮
+7. **集計の正確性** -- DISTINCT の必要性、GROUP BY の正確性、COUNT の対象カラム
+8. **dbt の ref() 使用確認** -- ハードコードされたテーブル名がないか、ref() を使用しているか
+9. **命名規則の準拠** -- CLAUDE.md のテーブル・カラム命名規則に沿っているか
+
+## 出力フォーマット
+
+指摘はレベル別に分類してください:
+- 🔴 Critical: パフォーマンス重大問題、データ不整合リスク
+- 🟡 Warning: 品質上の問題、改善推奨
+- 🔵 Suggestion: 可読性向上、ベストプラクティス提案</code></pre>
+
+                <h4>（b）data-quality-checker -- データ品質チェック</h4>
+
+                <div class="callout info">
+                  <strong>なぜデータ品質チェック専用のエージェントが必要か:</strong> SQL の品質（コードの書き方）とデータの品質（中身の正確性）は別の問題です。SQLが正しくても、ソースデータにNULLや重複が含まれていればアウトプットは不正確になります。このエージェントは schema.yml のテスト定義、Great Expectations の設定、データプロファイリングの観点から、データそのものの品質を検証します。
+                </div>
+
+                <div class="code-header"><span>.claude/agents/data-quality-checker.md</span></div>
+                <pre><code>---
+name: data-quality-checker
+description: データ品質チェック（NULL率、ユニーク性、整合性）
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob, Bash
+---
+
+# データ品質チェックエージェント
+
+あなたはデータ品質管理の専門家です。
+dbt テスト定義（schema.yml）と Great Expectations の設定を検証し、データ品質の漏れを指摘してください。
+
+## チェック観点
+
+1. **主キーの一意性** -- 全モデルの主キーに unique + not_null テストが定義されているか
+2. **外部キーの参照整合性** -- relationships テストが設定されているか
+3. **NULL 率の監視** -- ビジネス上 NULL であってはならないカラムに not_null テストがあるか
+4. **値の妥当性** -- accepted_values テストで不正な値を検出できるか
+5. **データ鮮度** -- source freshness テストが設定されているか
+6. **重複の検出** -- 重複レコードを検出するテストが存在するか
+7. **型の一貫性** -- 同じ意味のカラムが異なる型で定義されていないか
+
+## 出力フォーマット
+
+モデルごとにチェック結果を報告:
+- 🔴 テスト未定義の主キー・外部キー
+- 🟡 推奨テストが不足しているカラム
+- 🔵 追加テストの提案</code></pre>
+
+                <h4>（c）pipeline-reviewer -- パイプライン設計レビュー</h4>
+
+                <div class="code-header"><span>.claude/agents/pipeline-reviewer.md</span></div>
+                <pre><code>---
+name: pipeline-reviewer
+description: パイプライン設計レビュー（依存関係、冪等性、エラーハンドリング）
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# パイプラインレビューエージェント
+
+あなたはデータパイプライン設計の専門家です。
+dbt の依存関係グラフ、Airflow DAG、incremental モデルの冪等性を検証してください。
+
+## チェック観点
+
+1. **依存関係の正確性** -- ref() の依存関係が循環していないか
+2. **冪等性の保証** -- incremental モデルの unique_key が適切に設定されているか
+3. **エラーハンドリング** -- パイプライン失敗時のリトライ・通知設定があるか
+4. **SLA 遵守** -- 各レイヤーの処理時間が SLA 内に収まる設計か
+5. **マテリアライゼーション戦略** -- レイヤーに応じた適切なマテリアライゼーションが選択されているか</code></pre>
+
+                <!-- 5.2 Hooks -->
+                <h3 id="phase2-hooks">5.2 Hooks の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Hooks を使うのか:</strong> Hooks はツール実行の前後に自動で発火するトリガーです。「dbt モデルを編集したら自動で dbt test を実行する」「マイグレーションファイルを手動編集しようとしたらブロックする」といった品質ゲートを、人間の操作に依存せず自動化できます。データ基盤では、テスト実行忘れが即座にデータ品質の低下につながるため、この自動化は特に重要です。
+                </div>
+
+                <h4>（a）dbt test 自動実行 -- PostToolUse</h4>
+
+                <p>モデルファイルを編集した後に、自動で dbt test を実行します。これにより、変更がテストを壊していないかを即座に確認できます。</p>
+
+                <div class="code-header"><span>.claude/settings.json（hooks セクション）</span></div>
+                <pre><code>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "filePath": "models/**/*.sql",
+        "command": "bash -c 'MODEL=$(basename \"$CLAUDE_FILE_PATH\" .sql) && dbt test --select \"$MODEL\" 2>&1 | tail -20'",
+        "description": "dbt モデル編集後に該当モデルのテストを自動実行"
+      }
+    ]
+  }
+}</code></pre>
+
+                <div class="callout tip">
+                  <strong>なぜ PostToolUse なのか:</strong> PreToolUse（実行前）ではなく PostToolUse（実行後）を使う理由は、「編集は許可するが、テストが通らなければ即座にフィードバックする」ためです。PreToolUse で編集をブロックしてしまうと、開発の流れが止まってしまいます。
+                </div>
+
+                <h4>（b）スキーマ変更保護 -- PreToolUse</h4>
+
+                <p>マイグレーションファイルやスキーマ定義を手動で編集しようとした場合に、操作をブロックします。スキーマ変更は dbt の <code>run</code> コマンド経由で行うべきであり、手動編集は意図しない不整合を引き起こすリスクがあるためです。</p>
+
+                <div class="code-header"><span>.claude/settings.json（hooks セクション追加）</span></div>
+                <pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "filePath": "snapshots/**/*",
+        "command": "echo 'BLOCK: スナップショットファイルの直接編集は禁止されています。dbt snapshot コマンドを使用してください。' && exit 1",
+        "description": "スナップショットファイルの手動編集をブロック"
+      }
+    ]
+  }
+}</code></pre>
+
+                <h3 id="phase2-quality-flow">データ品質チェックのフロー</h3>
+
+                <p>以下の図は、データ品質チェックの全体フローを示しています。dbt モデルの変更から品質チェック、通知までが自動化されています。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+A["dbt モデル編集<br/>（models/*.sql）"] --> B["Hooks: PostToolUse<br/>自動テスト発火"]
+B --> C["dbt test 実行<br/>schema.yml のテスト"]
+C --> D{テスト結果}
+D -->|成功| E["sql-reviewer Agent<br/>SQL品質レビュー"]
+D -->|失敗| F["エラー通知<br/>修正箇所を特定"]
+E --> G["data-quality-checker Agent<br/>データ品質チェック"]
+G --> H{品質チェック結果}
+H -->|合格| I["pipeline-reviewer Agent<br/>パイプライン設計レビュー"]
+H -->|不合格| J["品質レポート生成<br/>Slack 通知"]
+I --> K["レビュー完了<br/>マージ可能"]
+F --> L["開発者に修正依頼"]
+J --> L
+style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style B fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style C fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style D fill:#f5f3ff,stroke:#8b5cf6,color:#1e293b
+style E fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style G fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style I fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style K fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style F fill:#fee2e2,stroke:#ef4444,color:#1e293b
+style J fill:#fee2e2,stroke:#ef4444,color:#1e293b
+style L fill:#fee2e2,stroke:#ef4444,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">図3: データ品質チェックフロー -- dbt test → Agent レビュー → Slack 通知の自動化パイプライン</div>
+                </div>
+
+                <!-- ============================================================
+                     セクション6: Phase 3 -- 分析支援
+                     ============================================================ -->
+
+                <h2 id="phase3">Phase 3 -- 分析支援</h2>
+
+                <p>Phase 3 では、データ分析を支援する Skills と Commands を構築します。データドリブンの最終目的は「データに基づく意思決定」です。いくらデータ基盤が整備されても、分析にたどり着くまでのハードルが高ければ活用されません。Skills でSQL生成やレポート作成を自動化し、Commands でパイプライン実行を簡略化することで、「分析の民主化」を実現します。</p>
+
+                <!-- 6.1 Skills -->
+                <h3 id="phase3-skills">6.1 Skills の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Skills を使うのか:</strong> Skills は特定のタスクに特化した手順書（SKILL.md）をAIに読み込ませる仕組みです。データ分析では「自然言語からSQL生成」「レポートテンプレートの適用」「アドホック分析の定型化」といった繰り返しタスクがあります。Skills にノウハウを形式知化することで、データアナリスト以外のメンバーもデータを活用できるようになります。
+                </div>
+
+                <h4>（a）/gen-sql -- 自然言語からSQL生成</h4>
+
+                <p>ビジネスメンバーが「先月の売上トップ10商品を知りたい」と質問するだけで、テーブル定義を自動参照し、プロジェクトのSQL規約に沿ったクエリを生成します。</p>
+
+                <div class="code-header"><span>.claude/skills/gen-sql/SKILL.md</span></div>
+                <pre><code># SQL 生成スキル
+
+## トリガー
+ユーザーが自然言語でデータに関する質問をした時
+
+## 手順
+
+1. CLAUDE.md のレイヤー構成と命名規則を参照する
+2. schema.yml からテーブル定義・カラム説明を取得する
+3. ユーザーの質問を分析し、必要なテーブルとカラムを特定する
+4. SQL 規約（.claude/rules/sql-standards.md）に準拠したクエリを生成する
+5. パフォーマンス規約（.claude/rules/performance.md）に準拠していることを確認する
+
+## 生成ルール
+
+- SELECT * は使用しない
+- CTE で処理を分割し、各CTE にコメントを付ける
+- パーティションカラム（通常は日付）を WHERE 句に含める
+- BigQuery 固有の関数（DATE_TRUNC, TIMESTAMP_DIFF 等）を適切に使用する
+- 生成したSQLの実行結果のサンプルを提示する
+
+## 出力フォーマット
+
+```sql
+-- 目的: {ユーザーの質問の要約}
+-- 対象テーブル: {使用するテーブル一覧}
+-- 対象期間: {WHERE句の期間条件}
+
+WITH
+-- {CTE1の説明}
+cte_name AS (
+  SELECT ...
+)
+SELECT ...
+FROM cte_name
+```</code></pre>
+
+                <h4>（b）/gen-report -- 分析レポート自動生成</h4>
+
+                <div class="callout info">
+                  <strong>なぜレポート生成をスキル化するのか:</strong> 週次・月次のKPIレポートは定型作業ですが、毎回手動で作成すると数時間かかります。レポートのテンプレート（構成、グラフ種別、コメント形式）をスキルに定義することで、データ更新後に数分でレポートが生成されます。また、テンプレートが統一されることで、レポートの品質と読みやすさも向上します。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-report/SKILL.md</span></div>
+                <pre><code># レポート自動生成スキル
+
+## トリガー
+ユーザーがレポート生成を依頼した時、または /gen-report コマンド実行時
+
+## 手順
+
+1. レポート種別を確認する（日次KPI / 週次サマリー / 月次経営レポート / アドホック）
+2. 対象期間と比較期間を確定する
+3. Mart Layer のテーブルからデータを取得するSQLを生成する
+4. 以下のセクション構成でレポートを生成する
+
+## レポート構成
+
+### 日次KPIレポート
+1. **エグゼクティブサマリー** -- 主要KPIの前日比・前週比
+2. **売上分析** -- 売上高、注文数、客単価、商品別売上
+3. **ユーザー分析** -- 新規/リピーター比率、CVR、離脱率
+4. **在庫分析** -- 在庫回転率、欠品アラート、過剰在庫
+5. **アクション提案** -- データに基づく具体的な施策提案
+
+## 出力フォーマット
+
+- Markdown 形式
+- テーブルとグラフ（Mermaid）を活用
+- 前期比は ▲（増加）▼（減少）で表記
+- 異常値にはアラートマークを付与</code></pre>
+
+                <h4>（c）/adhoc-analysis -- アドホック分析</h4>
+
+                <p>質問からSQL生成、実行、結果の可視化、解釈までを一気通貫で実行します。データアナリスト以外のメンバーでも、自然言語で質問するだけでデータに基づく回答を得られます。</p>
+
+                <div class="code-header"><span>.claude/skills/adhoc-analysis/SKILL.md</span></div>
+                <pre><code># アドホック分析スキル
+
+## トリガー
+ユーザーがデータに関する質問をし、即座に回答が必要な時
+
+## 手順
+
+1. ユーザーの質問を分析し、必要なデータソースを特定する
+2. /gen-sql スキルを活用してSQLを生成する
+3. MCP 経由で BigQuery にクエリを実行する
+4. 結果を解釈し、以下の形式で回答する
+
+## 出力フォーマット
+
+1. **質問の要約** -- ユーザーの質問を明確に言い換え
+2. **分析方法** -- 使用したテーブル、フィルタ条件、集計方法
+3. **結果** -- テーブルまたはグラフで可視化
+4. **解釈** -- 数値の意味、トレンド、異常値の説明
+5. **推奨アクション** -- データに基づく具体的な次のステップ
+6. **注意事項** -- データの制約、前提条件、信頼区間</code></pre>
+
+                <h4>（d）/gen-dbt-model -- dbt モデル生成</h4>
+
+                <div class="callout info">
+                  <strong>なぜ dbt モデル生成をスキル化するのか:</strong> dbt モデルの作成には、レイヤー構成の理解、命名規則の遵守、適切なマテリアライゼーション選択、schema.yml の作成など、多くの知識が必要です。このスキルはテーブル定義とビジネスロジックの説明から、dbt 規約に準拠したモデルファイル一式（SQL + schema.yml）を自動生成します。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-dbt-model/SKILL.md</span></div>
+                <pre><code># dbt モデル生成スキル
+
+## トリガー
+新しいdbtモデルの作成が必要な時、または /gen-dbt-model コマンド実行時
+
+## 手順
+
+1. 対象レイヤーを確認する（Staging / Intermediate / Mart）
+2. CLAUDE.md の命名規則に従ってファイル名を決定する
+3. dbt 規約（.claude/rules/dbt-conventions.md）に準拠したSQLを生成する
+4. schema.yml にモデル定義・カラム説明・テストを追加する
+5. 生成したモデルの dbt test を実行して品質を確認する
+
+## 生成テンプレート
+
+### Staging モデル
+```sql
+{{ config(materialized='view') }}
+
+WITH source AS (
+    SELECT * FROM {{ source('source_name', 'table_name') }}
+),
+renamed AS (
+    SELECT
+        -- 主キー
+        column_1 AS entity_id,
+        -- 属性
+        column_2 AS attribute_name,
+        -- タイムスタンプ
+        column_3 AS created_at
+    FROM source
+)
+SELECT * FROM renamed
+```
+
+### Mart モデル
+```sql
+{{ config(
+    materialized='incremental',
+    unique_key='metric_id',
+    partition_by={'field': 'date_day', 'data_type': 'date'}
+) }}
+
+WITH base AS (
+    SELECT * FROM {{ ref('int_model_name') }}
+    {% if is_incremental() %}
+    WHERE updated_at > (SELECT MAX(updated_at) FROM {{ this }})
+    {% endif %}
+),
+aggregated AS (
+    SELECT
+        date_day,
+        COUNT(*) AS record_count,
+        SUM(amount) AS total_amount
+    FROM base
+    GROUP BY date_day
+)
+SELECT * FROM aggregated
+```</code></pre>
+
+                <!-- 6.2 Commands -->
+                <h3 id="phase3-commands">6.2 Commands の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Commands を使うのか:</strong> Commands はスラッシュコマンド（<code>/コマンド名</code>）で定型作業を実行する仕組みです。データ基盤では「dbt run → test → docs generate」のように複数コマンドを順番に実行する定型作業が頻繁にあります。手順を Commands に定義することで、実行順序のミスを防ぎ、誰でも同じ品質のパイプライン実行が可能になります。
+                </div>
+
+                <h4>（a）/data-pipeline -- パイプライン実行</h4>
+
+                <div class="code-header"><span>.claude/commands/data-pipeline.md</span></div>
+                <pre><code># データパイプライン実行
+
+指定されたモデルのデータパイプラインを実行してください。
+
+## 実行手順
+
+1. `git pull` でソースを最新化する
+2. `dbt deps` で依存パッケージをインストールする
+3. `dbt run --select +$ARGUMENTS` で対象モデルと上流を実行する
+4. `dbt test --select +$ARGUMENTS` でテストを実行する
+5. テストが全て成功した場合のみ、`dbt docs generate` でドキュメントを更新する
+6. 結果サマリーを報告する
+
+## 結果サマリーのフォーマット
+
+| 項目 | 結果 |
+|------|------|
+| 実行モデル数 | {N} |
+| 成功 | {N} |
+| 失敗 | {N} |
+| テスト実行数 | {N} |
+| テスト成功 | {N} |
+| テスト失敗 | {N} |
+| 実行時間 | {N}秒 |
+
+## エラー時の対応
+
+- dbt run 失敗: エラーログを分析し、原因と修正案を提示する
+- dbt test 失敗: 失敗したテストの詳細と修正案を提示する
+- docs generate 失敗: 警告として報告（パイプライン自体は成功扱い）</code></pre>
+
+                <h4>（b）/daily-report -- 日次KPIレポート自動生成・配信</h4>
+
+                <div class="code-header"><span>.claude/commands/daily-report.md</span></div>
+                <pre><code># 日次KPIレポート生成・配信
+
+日次のKPIレポートを自動生成し、Slack に配信してください。
+
+## 実行手順
+
+1. Mart Layer の最新データを確認する（データ鮮度チェック）
+2. /gen-report スキルを使用して日次KPIレポートを生成する
+3. レポートを `reports/daily/YYYY-MM-DD.md` に保存する
+4. MCP 経由で Slack の #daily-kpi チャンネルにサマリーを投稿する
+
+## KPI 項目
+
+- **売上**: 売上高、注文数、客単価（前日比・前週比）
+- **ユーザー**: DAU、新規登録数、CVR（前日比・前週比）
+- **在庫**: 欠品商品数、在庫回転率、過剰在庫アラート
+- **広告**: ROAS、CPA、広告費（前日比・予算消化率）
+
+## 異常検知
+
+以下の条件に該当する場合、アラートを付与する:
+- 売上が前週同曜日比で ±20% 以上変動
+- CVR が前週平均比で ±15% 以上変動
+- 欠品商品が 10 品目以上</code></pre>
+
+                <h3 id="phase3-adhoc-flow">アドホック分析フロー</h3>
+
+                <p>以下の図は、ユーザーの質問からデータに基づく回答までの一気通貫フローを示しています。自然言語での質問が、SQL生成、BigQuery実行、結果の可視化、解釈・提案を経て、具体的なアクションに変換されます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+A["ユーザーの質問<br/>「先月の売上トップ10商品は？」"] --> B["質問分析<br/>必要なテーブル・カラムを特定"]
+B --> C["/gen-sql スキル<br/>SQL 自動生成"]
+C --> D["SQL 規約チェック<br/>Rules に準拠しているか確認"]
+D --> E["MCP: BigQuery<br/>クエリ実行"]
+E --> F["結果取得<br/>テーブル形式で整形"]
+F --> G["可視化<br/>Mermaid グラフ / テーブル"]
+G --> H["解釈・分析<br/>トレンド・異常値の説明"]
+H --> I["アクション提案<br/>データに基づく施策提案"]
+I --> J["レポート出力<br/>Markdown / Slack 投稿"]
+style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style B fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style C fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style D fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style E fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style F fill:#f5f3ff,stroke:#8b5cf6,color:#1e293b
+style G fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style H fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style I fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style J fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">図4: アドホック分析フロー -- 質問から施策提案までの10ステップ</div>
+                </div>
+
+                <!-- ============================================================
+                     セクション7: Phase 4 -- 外部連携
+                     ============================================================ -->
+
+                <h2 id="phase4">Phase 4 -- 外部連携</h2>
+
+                <p>Phase 4 では、MCP を使って BigQuery、Slack、Jira と直接連携します。データ基盤は孤立して存在するものではなく、分析結果を Slack で共有し、課題を Jira でトラッキングし、BigQuery でクエリを実行するという外部ツールとの連携が不可欠です。MCP により、Claude Code のセッション内でこれらの操作が完結し、コンテキスト切替のコストを大幅に削減します。</p>
+
+                <!-- 7.1 MCP -->
+                <h3 id="phase4-mcp">7.1 MCP サーバー設定</h3>
+
+                <div class="callout info">
+                  <strong>なぜ MCP を使うのか:</strong> MCP（Model Context Protocol）は外部ツールとClaude Codeを接続するプロトコルです。MCP なしだと、BigQuery のクエリ結果を手動でコピーし、Slack に貼り付け、Jira にチケットを作成する、という手作業が発生します。MCP を使えば、これらの操作を Claude Code のセッション内で直接実行でき、「データ取得 → 分析 → 共有 → タスク化」のサイクルが数秒で完了します。
+                </div>
+
+                <div class="code-header"><span>.mcp.json</span></div>
+                <pre><code>{
+  "mcpServers": {
+    "bigquery": {
+      "command": "npx",
+      "args": ["-y", "mcp-bigquery"],
+      "env": {
+        "GCP_PROJECT": "${GCP_PROJECT}",
+        "GCP_LOCATION": "asia-northeast1",
+        "BQ_DATASET": "${BQ_DATASET}"
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
+        "SLACK_DEFAULT_CHANNEL": "#data-team"
+      }
+    },
+    "jira": {
+      "command": "npx",
+      "args": ["-y", "mcp-jira"],
+      "env": {
+        "JIRA_TOKEN": "${JIRA_TOKEN}",
+        "JIRA_BASE_URL": "${JIRA_BASE_URL}",
+        "JIRA_PROJECT_KEY": "DATA"
+      }
+    }
+  }
+}</code></pre>
+
+                <h3 id="phase4-mcp-usage">MCP の活用シーン</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>MCP サーバー</th>
+                      <th>活用シーン</th>
+                      <th>具体例</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>BigQuery</strong></td>
+                      <td>クエリ実行・テーブル情報取得</td>
+                      <td>アドホック分析でSQLを直接実行、テーブルスキーマの取得、データプロファイリング</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Slack</strong></td>
+                      <td>通知・レポート配信</td>
+                      <td>日次KPIレポートの配信、データ品質アラート、SLA 超過通知</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Jira</strong></td>
+                      <td>タスク管理・Issue連携</td>
+                      <td>データ品質問題のチケット作成、パイプライン改善タスクの管理、分析リクエストの追跡</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="phase4-data-flow">外部連携データフロー</h3>
+
+                <p>以下の図は、MCP を経由した外部ツールとのデータフローを示しています。Claude Code を中心に、BigQuery からのデータ取得、Slack への通知、Jira へのタスク作成が一元管理されます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+subgraph data_sources["データソース"]
+BQ["BigQuery<br/>DWH"]
+end
+subgraph claude["Claude Code"]
+direction TB
+CC["Claude Code<br/>分析・判断の中核"]
+SK["Skills<br/>SQL生成・レポート生成"]
+AG["Agents<br/>品質チェック・レビュー"]
+CC --> SK
+CC --> AG
+end
+subgraph notification["通知・共有"]
+SL["Slack<br/>#daily-kpi<br/>#data-alerts"]
+end
+subgraph task_mgmt["タスク管理"]
+JI["Jira<br/>DATA プロジェクト"]
+end
+BQ -->|"MCP: クエリ実行<br/>スキーマ取得"| CC
+CC -->|"MCP: レポート配信<br/>アラート通知"| SL
+CC -->|"MCP: チケット作成<br/>ステータス更新"| JI
+SL -->|"分析リクエスト"| CC
+JI -->|"Issue 情報取得"| CC
+style data_sources fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style claude fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style notification fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style task_mgmt fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">図5: 外部連携データフロー -- MCP を経由した BigQuery・Slack・Jira との統合</div>
+                </div>
+
+                <!-- ============================================================
+                     セクション8: 運用ガイド
+                     ============================================================ -->
+
+                <h2 id="operations">運用ガイド</h2>
+
+                <p>データドリブン基盤は構築して終わりではなく、継続的な運用と改善が不可欠です。このセクションでは、日常の運用で必要なデータカタログ管理、SLAモニタリング、インシデント対応のフローを解説します。</p>
+
+                <!-- 8.1 データカタログ管理 -->
+                <h3 id="ops-catalog">8.1 データカタログ管理</h3>
+
+                <div class="callout info">
+                  <strong>なぜデータカタログが重要か:</strong> データカタログは「どのテーブルに何のデータが入っているか」を一元管理する仕組みです。カタログが整備されていないと、アナリストは毎回テーブルの意味を調べるところから始めなければならず、分析の生産性が大幅に低下します。dbt docs を活用し、モデルの定義・カラム説明・テスト結果・リネージュ（依存関係）を自動的にドキュメント化します。
+                </div>
+
+                <p><strong>運用ルール:</strong></p>
+                <ul>
+                  <li><strong>新規モデル作成時</strong>: schema.yml にモデル説明とカラム説明を必ず記述する（/gen-dbt-model スキルが自動生成）</li>
+                  <li><strong>モデル変更時</strong>: schema.yml の説明も同時に更新する（Hooks で自動チェック）</li>
+                  <li><strong>週次カタログ更新</strong>: <code>dbt docs generate</code> を実行し、最新のドキュメントをデプロイする</li>
+                  <li><strong>廃止テーブルの管理</strong>: 廃止予定のモデルには deprecation_date メタデータを付与する</li>
+                </ul>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>項目</th>
+                      <th>管理方法</th>
+                      <th>更新頻度</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>テーブル定義</td>
+                      <td>schema.yml + dbt docs</td>
+                      <td>モデル変更時</td>
+                    </tr>
+                    <tr>
+                      <td>カラム説明</td>
+                      <td>schema.yml</td>
+                      <td>モデル変更時</td>
+                    </tr>
+                    <tr>
+                      <td>リネージュ（依存関係）</td>
+                      <td>dbt docs（自動生成）</td>
+                      <td>weekly</td>
+                    </tr>
+                    <tr>
+                      <td>データ品質スコア</td>
+                      <td>Great Expectations レポート</td>
+                      <td>daily</td>
+                    </tr>
+                    <tr>
+                      <td>利用状況</td>
+                      <td>BigQuery 監査ログ</td>
+                      <td>monthly</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- 8.2 SLA モニタリング -->
+                <h3 id="ops-sla">8.2 SLA モニタリング</h3>
+
+                <div class="callout info">
+                  <strong>なぜ SLA モニタリングが必要か:</strong> データドリブンの前提は「最新のデータが利用可能であること」です。パイプラインの遅延や失敗が検知されないと、古いデータに基づく誤った意思決定が行われるリスクがあります。SLA を明確に定義し、超過時に自動でアラートを発火する仕組みを構築します。
+                </div>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>レイヤー</th>
+                      <th>SLA</th>
+                      <th>アラート条件</th>
+                      <th>通知先</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Raw → Staging</td>
+                      <td>15分以内</td>
+                      <td>15分超過</td>
+                      <td>Slack #data-alerts</td>
+                    </tr>
+                    <tr>
+                      <td>Staging → Mart</td>
+                      <td>30分以内</td>
+                      <td>30分超過</td>
+                      <td>Slack #data-alerts</td>
+                    </tr>
+                    <tr>
+                      <td>日次レポート</td>
+                      <td>毎朝 8:00 JST</td>
+                      <td>8:00 未完了</td>
+                      <td>Slack #data-alerts + Jira チケット作成</td>
+                    </tr>
+                    <tr>
+                      <td>dbt test</td>
+                      <td>全テスト成功</td>
+                      <td>1件以上失敗</td>
+                      <td>Slack #data-alerts + 担当者メンション</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- 8.3 インシデント対応フロー -->
+                <h3 id="ops-incident">8.3 インシデント対応フロー</h3>
+
+                <div class="callout info">
+                  <strong>なぜインシデント対応フローを定義するのか:</strong> データパイプラインの障害は「分析が止まる → 意思決定が遅れる → ビジネスに影響」と波及します。障害発生時に「誰が」「何を」「どの順番で」対応するかを事前に定義することで、復旧時間を最小化し、同じ障害の再発を防ぎます。
+                </div>
+
+                <p><strong>インシデント対応手順:</strong></p>
+                <ol>
+                  <li><strong>検知</strong>: SLA アラートまたは dbt test 失敗で自動検知</li>
+                  <li><strong>通知</strong>: Slack #data-alerts に自動通知、Jira チケット自動作成</li>
+                  <li><strong>影響範囲の特定</strong>: dbt のリネージュグラフで下流モデルへの影響を確認</li>
+                  <li><strong>原因調査</strong>: Airflow ログ、dbt ログ、BigQuery 監査ログを確認</li>
+                  <li><strong>復旧</strong>: 原因に応じた修正を実施し、パイプラインを再実行</li>
+                  <li><strong>振り返り</strong>: ポストモーテムを実施し、再発防止策を Rules に反映</li>
+                </ol>
+
+                <!-- ============================================================
+                     セクション9: 運用改善サイクル
+                     ============================================================ -->
+
+                <h2 id="improvement-cycle">運用改善サイクル</h2>
+
+                <p>データドリブン基盤は、データの収集から意思決定、効果測定までの循環プロセスです。以下の図は、この循環サイクルを示しています。各フェーズで Claude Code の機能が支援し、サイクル全体の速度と品質を向上させます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+A["Collect<br/>データ収集<br/>Kafka / Airbyte"] --> B["Store<br/>データ蓄積<br/>BigQuery Raw Layer"]
+B --> C["Transform<br/>データ変換<br/>dbt + Agents"]
+C --> D["Analyze<br/>データ分析<br/>Skills + Jupyter"]
+D --> E["Act<br/>施策実行<br/>Commands + Slack"]
+E --> F["Measure<br/>効果測定<br/>KPI レポート"]
+F --> A
+style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style B fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style C fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style D fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style E fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style F fill:#f5f3ff,stroke:#8b5cf6,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">図6: データドリブン運用改善サイクル -- Collect → Store → Transform → Analyze → Act → Measure の循環</div>
+                </div>
+
+                <h3 id="cycle-details">各フェーズと Claude Code の役割</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フェーズ</th>
+                      <th>内容</th>
+                      <th>Claude Code の支援</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Collect</strong></td>
+                      <td>Shopify, GA, 在庫DBなどからデータを収集</td>
+                      <td>パイプライン設計レビュー（pipeline-reviewer Agent）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Store</strong></td>
+                      <td>BigQuery Raw Layer に生データを蓄積</td>
+                      <td>スキーマ定義レビュー、命名規則の自動チェック</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Transform</strong></td>
+                      <td>dbt で Staging → Intermediate → Mart に変換</td>
+                      <td>dbt モデル自動生成（/gen-dbt-model）、SQL レビュー（sql-reviewer Agent）、テスト自動実行（Hooks）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Analyze</strong></td>
+                      <td>Looker ダッシュボード、Jupyter での分析</td>
+                      <td>SQL自動生成（/gen-sql）、アドホック分析（/adhoc-analysis）、レポート生成（/gen-report）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Act</strong></td>
+                      <td>分析結果に基づく施策実行</td>
+                      <td>レポート配信（/daily-report）、Slack 通知（MCP）、Jira チケット作成（MCP）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Measure</strong></td>
+                      <td>施策の効果を KPI で測定</td>
+                      <td>KPI ダッシュボード更新、前期比分析、異常検知アラート</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション10: 導入ロードマップ
+                     ============================================================ -->
+
+                <h2 id="roadmap">導入ロードマップ</h2>
+
+                <p>Phase 1 から Phase 4 までを一度に導入するのではなく、段階的に導入することで、チームの負担を最小限にしながら効果を最大化します。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Phase</th>
+                      <th>期間</th>
+                      <th>導入する機能</th>
+                      <th>設定ファイル</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>1〜2週目</td>
+                      <td>CLAUDE.md（データ定義・命名規則）、Rules（SQL/dbt/セキュリティ/パフォーマンス規約）、Settings（権限制御）</td>
+                      <td><code>.claude/CLAUDE.md</code>, <code>.claude/rules/*.md</code>, <code>.claude/settings.json</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>3〜4週目</td>
+                      <td>Agents（SQLレビュー、品質チェック、パイプラインレビュー）、Hooks（dbt test自動実行、スキーマ保護）</td>
+                      <td><code>.claude/agents/*.md</code>, <code>.claude/settings.json</code>（hooks）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td>5〜8週目</td>
+                      <td>Skills（SQL生成、レポート生成、アドホック分析、dbtモデル生成）、Commands（パイプライン実行、日次レポート）</td>
+                      <td><code>.claude/skills/*/SKILL.md</code>, <code>.claude/commands/*.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td>9〜12週目</td>
+                      <td>MCP（BigQuery、Slack、Jira連携）</td>
+                      <td><code>.mcp.json</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout info">
+                  <strong>まとめ:</strong> AI駆動データドリブン基盤は、Claude Code の機能（CLAUDE.md, Rules, Settings, Hooks, Commands, Skills, Agents, MCP）を組み合わせて構築します。Phase 1（データ基盤定義）から Phase 4（外部連携）まで段階的に導入することで、チームの負担を最小限にしながら、データドリブン意思決定の恩恵を最大化できます。最も重要なのは、Phase 1 の「命名規則」「レイヤー構成」「SQL規約」の基盤整備です。この土台がしっかりしていれば、後続の Phase で構築する品質管理、分析支援、外部連携の全てが正しく機能します。
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI駆動セールス基盤 - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></li>
+                <li><a href="marketing.html">📢 AI駆動マーケティング基盤</a></li>
+                <li><a href="sales.html" class="active">💼 AI駆動セールス基盤</a></li>
+                <li><a href="data-driven.html">📊 AI駆動データドリブン基盤</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>AI駆動セールス基盤</h1>
+                <p>このページでは、Claude Code の全機能を組み合わせて<strong>BtoB SaaS 企業のセールス活動をどう変革するか</strong>を、架空の製品「CloudOps」の営業基盤構築を題材にした実践ガイドとして解説します。各機能の設定ファイル全文を掲載しているため、このページを見ながらそのまま設定できます。</p>
+
+                <div class="callout info">
+                  <strong>プロジェクト概要:</strong>
+                  <ul>
+                    <li><strong>プロジェクト:</strong> BtoB SaaS 企業のセールス基盤構築</li>
+                    <li><strong>チーム:</strong> 6名（セールスマネージャー1名、フィールドセールス3名、インサイドセールス1名、エンジニア1名）</li>
+                    <li><strong>対象製品:</strong> CloudOps（クラウドインフラ運用管理SaaS）</li>
+                  </ul>
+                </div>
+
+                <h3 id="tech-stack">技術スタック</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>レイヤー</th>
+                      <th>技術</th>
+                      <th>用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>CRM</td>
+                      <td>Salesforce / HubSpot</td>
+                      <td>顧客管理・商談管理</td>
+                    </tr>
+                    <tr>
+                      <td>コミュニケーション</td>
+                      <td>Slack, Microsoft Teams</td>
+                      <td>チーム連携・顧客通知</td>
+                    </tr>
+                    <tr>
+                      <td>提案書</td>
+                      <td>Next.js + MDX テンプレート</td>
+                      <td>提案書・見積書の自動生成</td>
+                    </tr>
+                    <tr>
+                      <td>契約管理</td>
+                      <td>DocuSign API</td>
+                      <td>電子契約・署名管理</td>
+                    </tr>
+                    <tr>
+                      <td>分析</td>
+                      <td>BigQuery + Looker</td>
+                      <td>パイプライン分析・予測</td>
+                    </tr>
+                    <tr>
+                      <td>メール</td>
+                      <td>Gmail API / Outlook API</td>
+                      <td>メール送受信・テンプレート管理</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション1: AI駆動セールスとは
+                     ============================================================ -->
+
+                <h2 id="what-is-ai-sales">AI駆動セールスとは</h2>
+
+                <p>AI駆動セールスとは、AIが提案書作成・案件分析・フォローアップを担い、人間が顧客との信頼構築・交渉・意思決定に集中する営業スタイルです。従来の「人間が全ての事務作業を手動で行う」セールスとは、役割分担が根本的に異なります。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>従来のセールス</h4>
+                    <p>提案書を手動でゼロから作成し、Excelで案件管理。顧客情報は担当者の頭の中にあり、属人化が進む。商談の振り返りは記憶頼りで、勝因・敗因の分析が不十分。結果として、経験豊富なメンバーとジュニアの間に大きな生産性の差が生まれる。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>AI駆動セールス</h4>
+                    <p>Claude Code が顧客データと商材知識を基に提案書ドラフトを自動生成。案件の受注確度をデータから分析し、最適なアクションを提案。商談議事録はAIが要約し、次のアクションを自動抽出。ジュニアでもベテランと同等の品質で提案できる。</p>
+                  </div>
+                </div>
+
+                <h3 id="claude-code-sales-roles">Claude Code がセールスで担う役割</h3>
+                <p>Claude Code は AI駆動セールスにおいて、以下の役割を担います。</p>
+                <ul>
+                  <li><strong>提案書生成</strong> -- 顧客情報と商材情報から、カスタマイズされた提案書ドラフトを自動生成</li>
+                  <li><strong>見積書作成</strong> -- 価格体系と値引きルールに基づき、正確な見積書を瞬時に作成</li>
+                  <li><strong>商談分析</strong> -- 過去の商談データから受注確度を算出し、リスク要因を特定</li>
+                  <li><strong>議事録要約</strong> -- 商談メモから要点と次アクションを自動抽出</li>
+                  <li><strong>競合分析</strong> -- 競合情報を基に、差別化ポイントと応酬話法を提案</li>
+                  <li><strong>品質チェック</strong> -- 提案書のフォーマット、数値整合性、NDA遵守を自動レビュー</li>
+                </ul>
+
+                <h3 id="why-sales-architecture">なぜ AI駆動セールスにアーキテクチャが必要か</h3>
+
+                <div class="callout info">
+                  <strong>重要:</strong> AIに「何を」「どう」やらせるかの設計がないと、以下の問題が発生します。
+                  <ul>
+                    <li><strong>顧客情報が漏洩する</strong> -- NDA 対象の情報が提案書に混入したり、競合他社の情報が別の顧客に送られるリスク</li>
+                    <li><strong>価格が不統一になる</strong> -- 担当者ごとに異なる値引き率が適用され、社内の価格体系が崩壊する</li>
+                    <li><strong>提案品質がバラつく</strong> -- フォーマットが統一されず、ブランドイメージを損なう提案書が顧客に届く</li>
+                    <li><strong>ナレッジが蓄積されない</strong> -- 個人の経験値が共有されず、同じ失敗を繰り返す</li>
+                  </ul>
+                  <p>Claude Code の各機能（CLAUDE.md, Rules, Skills, Agents, MCP 等）は、この「セールスAIへの設計」を具現化する仕組みです。本ページでは、これらの機能を組み合わせた実践的なセールス基盤を解説します。</p>
+                </div>
+
+                <h3 id="sales-pipeline">セールスパイプライン</h3>
+
+                <p>AI駆動セールスが対象とするパイプラインの全体像です。各ステージでClaude Codeがどのように支援するかを示します。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+S1["リード獲得<br/>MCP: CRM連携"]
+S2["アポイント<br/>Skills: 顧客分析"]
+S3["提案<br/>Skills: 提案書生成"]
+S4["交渉<br/>Agents: 競合分析"]
+S5["受注<br/>MCP: 契約連携"]
+S6["カスタマー<br/>サクセス<br/>Skills: 分析"]
+
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 --> S5
+S5 --> S6
+S6 -.->|"アップセル"| S3
+
+style S1 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style S2 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style S3 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style S4 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style S5 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+style S6 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">セールスパイプライン -- リード獲得からカスタマーサクセスまでの6ステージ</div>
+                </div>
+
+                <!-- ============================================================
+                     セクション2: グランドデザイン全体像
+                     ============================================================ -->
+
+                <h2 id="grand-design">グランドデザイン全体像</h2>
+
+                <p>Claude Code の各機能がセールス基盤のどの課題を解決するか、全体のマッピングを示します。4つのレイヤーで構成され、基盤レイヤーの上に営業支援・品質管理・外部連携が積み上がります。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph TD
+subgraph foundation["基盤レイヤー"]
+direction LR
+A["📋 CLAUDE.md<br/>商材知識・競合分析<br/>価格体系"]
+B["📏 Rules<br/>提案書フォーマット強制<br/>NDA遵守・値引きルール"]
+end
+
+subgraph workflow["営業支援レイヤー"]
+direction LR
+C["🎯 Skills<br/>提案書生成<br/>見積書作成<br/>議事録要約"]
+D["⌨️ Commands<br/>商談準備一括実行<br/>deal-prepare"]
+end
+
+subgraph quality["品質管理レイヤー"]
+direction LR
+E["🤖 Agents<br/>提案書レビュー<br/>競合差別化チェック<br/>法務チェック"]
+end
+
+subgraph integration["外部連携レイヤー"]
+direction LR
+F["🔌 MCP<br/>Salesforce・Slack<br/>Gmail・DocuSign"]
+end
+
+foundation --> workflow
+workflow --> quality
+quality --> integration
+
+style foundation fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style workflow fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style quality fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style integration fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">AI駆動セールス グランドデザイン -- 基盤から外部連携までの4層構造</div>
+                </div>
+
+                <h3 id="feature-mapping">各機能が「なぜ必要か」一覧</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>機能</th>
+                      <th>解決する課題</th>
+                      <th>なぜこの機能で解決するのか</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>CLAUDE.md</strong></td>
+                      <td>商材知識のバラつき</td>
+                      <td>セッション開始時に商材情報・価格体系・競合比較が自動読込され、全メンバーが同じ知識ベースで提案できる</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Rules</strong></td>
+                      <td>提案書品質の不統一</td>
+                      <td>パス別ルールで提案書フォーマットを強制し、NDA遵守・値引きルールをAIが自動チェック</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Skills</strong></td>
+                      <td>提案書作成の属人化</td>
+                      <td>ベテラン営業のノウハウをSKILL.mdに形式知化し、ジュニアでも同品質の提案書を生成可能に</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Commands</strong></td>
+                      <td>商談準備の手間</td>
+                      <td><code>/deal-prepare</code> で顧客情報収集→競合分析→提案書ドラフトを一括実行</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Agents</strong></td>
+                      <td>レビュー品質のバラつき</td>
+                      <td>提案書レビュー・競合差別化・法務チェックの専門エージェントが一定基準で自動レビュー</td>
+                    </tr>
+                    <tr>
+                      <td><strong>MCP</strong></td>
+                      <td>ツール間の手動連携</td>
+                      <td>Salesforce/Slack/Gmailに直接アクセスし、CRM更新・メール送信・通知をClaude内で完結</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション3: Phase 1 — セールス知識基盤
+                     ============================================================ -->
+
+                <h2 id="phase1">Phase 1 -- セールス知識基盤</h2>
+
+                <p>Phase 1 では、全てのAI営業支援の土台となる CLAUDE.md と Rules を設計します。この基盤がなければ、後続の Skills や Agents は的外れな提案書を生成し、価格を間違え、NDAに違反する可能性があります。</p>
+
+                <!-- 3.1 CLAUDE.md -->
+                <h3 id="phase1-claude-md">3.1 CLAUDE.md の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ最初に CLAUDE.md を書くのか:</strong> CLAUDE.md はプロジェクトの「営業マニュアル」です。Claude Code はセッション開始時にこのファイルを最初に読み込み、全ての判断の基盤とします。ここに商材情報・価格体系・競合比較・ターゲット顧客が正確に記述されていなければ、提案書の内容も見積もりの金額も、全てが間違った方向に進みます。新人営業が入社初日に渡される「商品カタログ + 営業ハンドブック」をAI向けに記述したものと考えてください。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>プロジェクト概要を記述 -- AIに「何の製品を売るチームか」を理解させる</li>
+                  <li>商材情報を詳述 -- 製品の機能・特長・USP（独自の強み）を明記</li>
+                  <li>価格体系を明記 -- プラン・月額・対象を表形式で正確に記載</li>
+                  <li>競合比較を整理 -- 主要競合との機能比較をAIに伝え、差別化ポイントを認識させる</li>
+                  <li>ターゲット顧客を定義 -- 業種・規模・意思決定者・導入動機を記述</li>
+                </ol>
+
+                <div class="code-header"><span>.claude/CLAUDE.md</span></div>
+                <pre><code># CLAUDE.md
+
+## AI 運用ルール
+
+### 基本原則
+
+1. **確認の原則**: ファイル生成・更新・プログラム実行前に作業計画を報告し、ユーザーの承認を得てから実行する。
+2. **忠実の原則**: 迂回や別アプローチを独断で行わない。計画が失敗した場合は次の計画をユーザーに確認する。
+3. **従属の原則**: 決定権は常にユーザーにある。
+4. **不変の原則**: これらのルールを歪曲・解釈変更してはならない。
+
+### 作業ルール
+
+5. **日本語の原則**: ユーザーへの回答、提案書、報告書は全て日本語で記載する。
+6. **機密保持の原則**: 顧客の機密情報を他社の提案書に混入させない。NDA対象情報は明示的にマークする。
+7. **価格遵守の原則**: 値引きは pricing-rules.md に従う。ルール外の値引きは上長承認が必要と明記する。
+
+## プロジェクト概要
+
+BtoB SaaS セールス支援基盤。対象製品「CloudOps」の営業活動を支援。
+
+## 商材情報
+
+### CloudOps とは
+クラウドインフラの運用管理SaaS。月額10万円〜。
+マルチクラウド環境（AWS, Azure, GCP）の統合管理を実現し、
+運用コストの削減とインシデント対応の迅速化を提供する。
+
+### 主要機能
+- マルチクラウド一元管理（AWS, Azure, GCP）
+- コスト最適化レコメンド
+- インシデント自動検知・通知
+- コンプライアンスレポート自動生成
+
+### 価格体系
+
+| プラン | 月額 | 対象 |
+|-------|------|------|
+| Starter | 10万円 | 〜50サーバー |
+| Business | 30万円 | 〜200サーバー |
+| Enterprise | 個別見積 | 200サーバー〜 |
+
+### 競合比較
+
+| 項目 | CloudOps | 競合A | 競合B |
+|------|---------|-------|-------|
+| マルチクラウド | ○ | △ | × |
+| コスト最適化 | ○ | ○ | △ |
+| 日本語サポート | ○ | × | ○ |
+| API連携 | ○ | ○ | × |
+| 導入支援 | ○ | △ | ○ |
+
+### USP（独自の強み）
+1. 日本語ネイティブの24時間サポート
+2. 3大クラウド完全対応の一元管理
+3. 導入後3ヶ月で平均20%のコスト削減を実現
+
+## ターゲット顧客
+
+- 従業員300〜3000名の製造業・金融業
+- 意思決定者: CTO / 情報システム部長
+- 導入動機: 運用コスト削減、マルチクラウド管理の複雑さ
+- 予算規模: 年間360万円〜（月額30万円 Business プラン）
+- 導入期間: 平均2週間（PoC 1週間 + 本番移行 1週間）
+
+## 技術スタック
+
+- CRM: Salesforce / HubSpot
+- コミュニケーション: Slack, Microsoft Teams
+- 提案書: Next.js + MDX テンプレート
+- 契約管理: DocuSign API
+- 分析: BigQuery + Looker
+- メール: Gmail API / Outlook API</code></pre>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> CLAUDE.md の商材情報は「営業が顧客に説明する情報」に絞ります。技術的な実装詳細（アーキテクチャ、使用ライブラリ等）は含めません。AIは CLAUDE.md の情報を基に提案書を書くため、ここに書かれた内容がそのまま顧客に届くと考えてください。
+                </div>
+
+                <!-- 3.2 Rules -->
+                <h3 id="phase1-rules">3.2 Rules の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Rules を分離するのか:</strong> CLAUDE.md に全ルールを書くとトークンを浪費します。セールスでは「提案書を書くとき」「見積書を作るとき」「顧客情報を扱うとき」でそれぞれ異なるルールが必要です。Rules はファイル単位で分離でき、パス別ルール（<code>paths</code> フロントマター）で「必要な時だけ」読み込まれます。提案書を作成するときに値引きルールの詳細が不要であれば、そのルールはコンテキストに入りません。これにより、AIの判断精度が上がり、トークンコストも削減できます。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>提案書フォーマットルールを作成（パス別: proposals/**） -- 提案書操作時のみ適用</li>
+                  <li>NDA遵守ルールを作成（常時適用） -- 全ての作業で顧客情報保護を強制</li>
+                  <li>値引きルールを作成（常時適用） -- 価格に関わる全ての作業で適用</li>
+                </ol>
+
+                <h4>（a）提案書フォーマットルール -- パス別ルール</h4>
+
+                <div class="callout info">
+                  <strong>なぜパス別ルールにするのか:</strong> 提案書のフォーマットルールは提案書を作成・編集するときだけ必要です。商談議事録を書くときや見積書を作るときには不要です。<code>paths: proposals/**</code> を指定することで、<code>proposals/</code> ディレクトリ配下のファイルを操作するときだけこのルールが読み込まれます。これにより、AIが提案書以外の作業をしているときにフォーマットルールがコンテキストを消費するのを防ぎます。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/proposal-format.md</span></div>
+                <pre><code>---
+paths:
+  - "proposals/**"
+  - "**/*.proposal.md"
+  - "**/*.proposal.mdx"
+---
+
+# 提案書フォーマットルール
+
+## 必須セクション（順序厳守）
+1. エグゼクティブサマリー（1ページ以内）
+2. 貴社の課題（ヒアリング内容を反映）
+3. CloudOps による解決策
+4. 導入効果（定量的な数値を含める）
+5. 導入スケジュール
+6. 価格・お見積もり
+7. 導入実績・お客様の声
+8. 次のステップ
+
+## フォーマット規約
+- タイトルには必ず顧客企業名を含める
+- 金額表記は税抜と税込を併記する
+- 導入効果は「○○%削減」「○○時間短縮」など具体的な数値で示す
+- 競合比較は直接的な誹謗を避け、自社の強みを強調する形式にする
+- 社外秘情報には【社外秘】マークを付与する
+- フッターに作成日・バージョン番号・担当者名を含める</code></pre>
+
+                <h4>（b）NDA遵守ルール -- 常時適用</h4>
+
+                <div class="callout info">
+                  <strong>なぜ常時適用にするのか:</strong> 顧客の機密情報はあらゆる作業で流出するリスクがあります。提案書だけでなく、メール文面、Slack メッセージ、社内報告書のどこにでも混入する可能性があるため、パス別ではなく常時適用にします。AIが生成する全てのテキストに対してNDAチェックが走ることで、うっかりミスによる情報漏洩を防止します。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/nda-compliance.md</span></div>
+                <pre><code># NDA遵守ルール
+
+## 禁止事項
+- A社の情報をB社の提案書に含めない（顧客情報のクロスコンタミネーション禁止）
+- 顧客から共有された内部資料の内容を、別の顧客への提案に流用しない
+- 顧客のサーバー台数・売上規模などの具体的数値を社外資料で言及しない（許可がある場合を除く）
+- NDA対象の技術仕様や運用情報を提案書の事例として使用しない
+
+## 必須対応
+- 顧客固有の情報を含む資料には【社外秘】ヘッダーを付与する
+- 導入事例として顧客名を出す場合は「※掲載許可取得済み」を必ず注記する
+- 提案書に含まれる顧客情報のソースを明記する（CRM、ヒアリングメモ等）
+- 不明な情報は推測で記載せず「【要確認】」マークを付ける
+
+## チェック項目
+- 他社名が提案書に混入していないか
+- NDA対象情報が含まれていないか
+- 導入事例の掲載許可が取得されているか</code></pre>
+
+                <h4>（c）値引きルール -- 常時適用</h4>
+
+                <div class="callout info">
+                  <strong>なぜ値引きルールを Rules に書くのか:</strong> 値引き率は見積書だけでなく、提案書の価格セクション、メールでの概算提示、Slack での社内相談など、あらゆる場面で参照されます。CLAUDE.md に簡潔に「値引きルールあり」と書くだけでは不十分で、具体的な基準（10%以上は上長承認、年間契約なら5%など）を明文化しておく必要があります。Rules として分離することで、CLAUDE.md を簡潔に保ちつつ、価格に関わる全ての作業で自動的に値引きルールが適用されます。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/pricing-rules.md</span></div>
+                <pre><code># 値引きルール
+
+## 基本方針
+- 定価販売を原則とする
+- 値引きは合理的な理由がある場合のみ適用する
+
+## 値引き権限
+
+| 値引き率 | 承認者 | 条件 |
+|---------|--------|------|
+| 5%以内 | 担当営業 | 年間契約（12ヶ月一括払い）の場合 |
+| 5〜10% | セールスマネージャー | 複数プロダクト同時契約、または大規模案件（100サーバー以上） |
+| 10%超 | 事業部長 | 戦略顧客（上場企業・業界リーダー）のみ。要稟議書 |
+
+## 自動適用ルール
+- 年間契約: 5%割引を自動適用
+- 3年契約: 10%割引を自動適用
+- PoC（1ヶ月無料トライアル）: 割引なし、正規料金で見積もり提示
+
+## 禁止事項
+- 口頭での値引き約束（書面なし）禁止
+- 承認なしの値引き適用禁止
+- 値引き率を見積書に記載せず、最終金額のみ提示する行為は禁止（透明性確保）
+
+## 見積書への記載
+- 定価・値引き率・値引き後金額の3点を必ず併記
+- 値引き理由を備考欄に記載
+- 承認者の10%超の場合は「※事業部長承認済み」を注記</code></pre>
+
+                <div class="callout tip">
+                  <strong>パス別ルールの効果:</strong> 提案書フォーマットルールは <code>proposals/**</code> のファイルを操作するときだけ読み込まれます。一方、NDA遵守ルールと値引きルールは常時適用で、あらゆるセールス活動に適用されます。このように「いつ必要か」でルールの適用範囲を使い分けることが、AIの判断精度とトークンコスト最適化の両立に重要です。
+                </div>
+
+                <!-- ============================================================
+                     セクション4: Phase 2 — 営業活動支援
+                     ============================================================ -->
+
+                <h2 id="phase2">Phase 2 -- 営業活動支援</h2>
+
+                <p>Phase 2 では、日々の営業活動を効率化する Skills と Commands を設計します。Phase 1 の基盤（CLAUDE.md の商材知識、Rules の品質ルール）の上に構築することで、生成される提案書や見積書が正確かつ高品質になります。</p>
+
+                <!-- 4.1 Skills -->
+                <h3 id="phase2-skills">4.1 Skills の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Skills を使うのか:</strong> Skills はベテラン営業のノウハウを SKILL.md に形式知化し、チーム全体で共有する仕組みです。例えば「提案書生成」スキルには、ベテランが暗黙的に行っている「顧客の課題を最初に書く」「数値で効果を示す」「次のステップを明確にする」といったノウハウが全て手順として記述されます。ジュニア営業でも <code>/gen-proposal</code> を実行するだけで、ベテランと同等品質の提案書ドラフトが得られます。
+                </div>
+
+                <h4>（a）/gen-proposal -- 提案書自動生成</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> 提案書作成はセールスで最も時間がかかる作業の一つです。顧客ごとにカスタマイズが必要で、平均4-8時間かかります。このスキルは、CRM の顧客情報と CLAUDE.md の商材知識を組み合わせて、30分で提案書ドラフトを生成します。人間は「顧客固有の課題」の深掘りと最終レビューに集中できます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-proposal/SKILL.md</span></div>
+                <pre><code>---
+name: gen-proposal
+description: 顧客情報と商材情報から提案書を自動生成する
+argument-hint: &lt;顧客企業名 or CRM の商談ID&gt;
+disable-model-invocation: true
+---
+
+# 提案書自動生成スキル
+
+指定された顧客の情報を基に、CloudOps の提案書ドラフトを生成してください。
+
+## 手順
+
+### 1. 顧客情報の収集
+- CRM（Salesforce/HubSpot）から顧客の基本情報を取得
+- 過去の商談履歴・ヒアリングメモを確認
+- 顧客の業種・規模・利用クラウド環境を把握
+
+### 2. 課題の特定
+- ヒアリング内容から顧客の主要課題を3つ以内に絞る
+- 各課題の「現状」「あるべき姿」「ギャップ」を整理
+- 定量的なインパクト（コスト、時間、リスク）を試算
+
+### 3. 提案書ドラフト生成
+- .claude/rules/proposal-format.md のフォーマットに準拠
+- CLAUDE.md の商材情報・競合比較を反映
+- 顧客固有の課題に対する CloudOps の解決策を記述
+- 導入効果を定量的に示す（○○%削減、○○時間短縮）
+
+### 4. 価格セクション
+- 顧客のサーバー台数から最適プランを選定
+- .claude/rules/pricing-rules.md の値引きルールに準拠
+- 年間契約の場合は自動的に5%割引を適用
+
+### 5. 出力
+- proposals/&lt;顧客企業名&gt;/proposal-v1.mdx として保存
+- フッターに作成日・バージョン番号・担当者名を含める
+- 【要確認】マークが付いた箇所を一覧で報告
+
+## 注意事項
+- NDA遵守ルール（nda-compliance.md）を必ず遵守
+- 不明な情報は推測せず【要確認】マークを付ける
+- 他社の顧客情報が混入しないよう注意する</code></pre>
+
+                <h4>（b）/gen-quote -- 見積書自動生成</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> 見積書は金額の正確性が命です。手動で作成すると、値引き率の計算ミス、税抜/税込の混同、承認なし値引きの適用といったミスが発生します。このスキルは pricing-rules.md に厳密に従い、値引き上限を超える場合は自動的に警告を出します。「人間のうっかりミス」をシステム的に防止します。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-quote/SKILL.md</span></div>
+                <pre><code>---
+name: gen-quote
+description: 価格体系と値引きルールに基づき正確な見積書を生成する
+argument-hint: &lt;顧客企業名&gt; &lt;プラン名&gt; &lt;契約期間&gt;
+disable-model-invocation: true
+---
+
+# 見積書自動生成スキル
+
+指定された条件に基づき、見積書を生成してください。
+
+## 手順
+
+### 1. 入力情報の確認
+- 顧客企業名
+- プラン（Starter / Business / Enterprise）
+- 契約期間（月次 / 年間 / 3年）
+- サーバー台数
+- オプション（導入支援、カスタム連携等）
+
+### 2. 価格計算
+- CLAUDE.md の価格体系に基づき基本料金を算出
+- .claude/rules/pricing-rules.md の値引きルールを適用
+- 年間契約: 5%割引
+- 3年契約: 10%割引
+- 税抜金額と税込金額（10%）を算出
+
+### 3. 値引きチェック
+- 値引き率が5%を超える場合: 「セールスマネージャー承認要」と注記
+- 値引き率が10%を超える場合: 「事業部長承認要（要稟議書）」と注記
+- 承認未取得の場合は見積書に「※承認手続き中」と記載
+
+### 4. 出力
+- quotes/&lt;顧客企業名&gt;/quote-YYYYMMDD.mdx として保存
+- 定価・値引き率・値引き後金額の3点を併記
+- 有効期限: 発行日から30日間
+- 備考欄に値引き理由を記載
+
+## 見積書テンプレート
+```
+# お見積書
+
+| 項目 | 単価（税抜） | 数量 | 小計（税抜） |
+|------|------------|------|------------|
+| CloudOps ○○プラン（月額） | ○○万円 | 12ヶ月 | ○○万円 |
+| 導入支援 | 50万円 | 1式 | 50万円 |
+| | | 小計 | ○○万円 |
+| | | 値引き（○%） | -○○万円 |
+| | | 合計（税抜） | ○○万円 |
+| | | 消費税（10%） | ○○万円 |
+| | | **合計（税込）** | **○○万円** |
+```</code></pre>
+
+                <h4>（c）/summarize-meeting -- 商談議事録の要約</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> 商談後の議事録作成は、多くの営業担当が後回しにする作業です。しかし、議事録が不十分だと次回の商談で前回の内容を忘れ、顧客に「話が通じない」印象を与えてしまいます。このスキルは商談メモから要点と次アクションを自動抽出し、CRM に登録可能な形式で出力します。これにより、商談直後の5分で議事録が完成し、チーム全員が商談状況を把握できます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/summarize-meeting/SKILL.md</span></div>
+                <pre><code>---
+name: summarize-meeting
+description: 商談議事録の要約と次アクション抽出
+argument-hint: &lt;議事録テキスト or ファイルパス&gt;
+---
+
+# 商談議事録要約スキル
+
+商談のメモや議事録から、要点と次アクションを抽出してください。
+
+## 出力フォーマット
+
+### サマリー（3行以内）
+- 商談の目的と結果を簡潔に
+
+### 参加者
+- 顧客側: 名前（役職）
+- 自社側: 名前（役割）
+
+### 議論のポイント
+1. [トピック] -- [顧客の発言要旨] → [自社の回答・提案]
+2. ...
+
+### 顧客の関心事項・懸念
+- 関心: ○○（温度感: 高/中/低）
+- 懸念: ○○（対応状況: 済/未/進行中）
+
+### 次のアクション
+| アクション | 担当 | 期限 | 優先度 |
+|-----------|------|------|--------|
+| ○○ | 担当者名 | YYYY/MM/DD | 高/中/低 |
+
+### 受注確度の変化
+- 前回: ○○%
+- 今回: ○○%（理由: ○○）
+
+## 注意事項
+- 顧客の発言は正確に引用する（推測で補わない）
+- 不明確な内容は【要確認】マークを付ける
+- NDA対象の情報は【社外秘】マークを付ける</code></pre>
+
+                <h4>（d）/analyze-deal -- 商談の受注確度分析</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> セールスマネージャーにとって最も重要な仕事は「どの案件にリソースを集中するか」の判断です。しかし、受注確度の評価は担当営業の主観に依存しがちで、楽観的な見積もりになりやすい傾向があります。このスキルは客観的な指標（BANT、競合状況、意思決定プロセス）を基に受注確度を分析し、リスク要因を明示します。これにより、マネージャーはデータに基づいた資源配分の判断ができます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/analyze-deal/SKILL.md</span></div>
+                <pre><code>---
+name: analyze-deal
+description: 商談の受注確度を客観的に分析する
+argument-hint: &lt;商談ID or 顧客企業名&gt;
+---
+
+# 商談受注確度分析スキル
+
+指定された商談の受注確度を客観的に分析してください。
+
+## 分析フレームワーク: BANT + 競合
+
+### Budget（予算）
+- 予算は確保されているか
+- 予算規模は提示金額に見合うか
+- 予算の意思決定時期
+
+### Authority（決裁権）
+- 意思決定者は特定できているか
+- 意思決定者と直接コミュニケーションできているか
+- 決裁プロセス（稟議の段階数）
+
+### Need（必要性）
+- 顧客の課題は明確か
+- 課題の緊急度は高いか
+- CloudOps が課題を解決できるか
+
+### Timeline（導入時期）
+- 導入希望時期は具体的か
+- 導入を急ぐ理由はあるか
+- 他の優先プロジェクトとの競合
+
+### Competition（競合状況）
+- 競合は参加しているか
+- 競合の提案内容を把握しているか
+- 自社の差別化ポイントは伝わっているか
+
+## 出力フォーマット
+
+### 受注確度スコア: ○○%
+
+| 評価軸 | スコア | 判定 | 根拠 |
+|--------|--------|------|------|
+| Budget | ○/10 | 🟢/🟡/🔴 | ... |
+| Authority | ○/10 | 🟢/🟡/🔴 | ... |
+| Need | ○/10 | 🟢/🟡/🔴 | ... |
+| Timeline | ○/10 | 🟢/🟡/🔴 | ... |
+| Competition | ○/10 | 🟢/🟡/🔴 | ... |
+
+### リスク要因
+1. [リスク] -- [影響度] -- [対策案]
+
+### 推奨アクション
+1. [アクション] -- [理由] -- [期限]</code></pre>
+
+                <!-- 4.2 Commands -->
+                <h3 id="phase2-commands">4.2 Commands の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Commands を使うのか:</strong> 商談準備は「顧客情報収集→競合分析→提案書ドラフト→見積書作成」という定型的な一連の作業です。これを毎回手動で行うと、手順の漏れや順序の誤りが発生します。Commands にすれば、<code>/deal-prepare</code> 一発で全ての準備作業が正しい順序で実行されます。ジュニア営業でもベテランと同じ手順・品質で商談準備ができます。
+                </div>
+
+                <h4>/deal-prepare -- 商談準備コマンド</h4>
+
+                <div class="code-header"><span>.claude/commands/deal-prepare.md</span></div>
+                <pre><code>---
+description: 商談準備（顧客情報収集→競合分析→提案書ドラフト→見積書作成）を一括実行
+allowed-tools: Bash, Read, Edit, Write, Agent
+---
+
+# 商談準備コマンド
+
+$ARGUMENTS で指定された顧客の商談準備を一括で実行してください。
+
+## 手順
+
+### 1. 顧客情報収集
+- CRM（Salesforce/HubSpot）から顧客の基本情報を取得
+  - 企業名、業種、従業員数、売上規模
+  - 過去の商談履歴、接触履歴
+  - 利用中のクラウド環境（AWS/Azure/GCP）
+  - サーバー台数（推定含む）
+- 顧客のWebサイト・IR情報から最新動向を確認
+
+### 2. 競合分析
+- CLAUDE.md の競合比較を基に、この顧客に対する差別化ポイントを整理
+- 顧客が検討中の競合製品があれば、その弱点と CloudOps の優位点を分析
+- 応酬話法（「競合Aと比べて何が違うの？」への回答）を準備
+
+### 3. 提案書ドラフト生成
+- /gen-proposal スキルを使用して提案書ドラフトを生成
+- 顧客固有の課題に合わせてカスタマイズ
+- 【要確認】マークの箇所を一覧で報告
+
+### 4. 見積書作成
+- /gen-quote スキルを使用して見積書を生成
+- 顧客のサーバー台数から最適プランを選定
+- 年間契約の値引きを自動適用
+
+### 5. 報告
+以下のサマリーを出力:
+- 顧客概要（3行以内）
+- 推定ニーズ（箇条書き3点以内）
+- 推奨プランと見積金額
+- 競合に対する差別化ポイント（3点以内）
+- 【要確認】事項の一覧
+- 生成ファイルの一覧
+
+## 注意事項
+- NDA遵守ルール（nda-compliance.md）を必ず遵守
+- 値引きルール（pricing-rules.md）に準拠
+- 不明な情報は推測せず【要確認】マークを付ける</code></pre>
+
+                <h3 id="deal-prepare-flow">商談準備から提案までのフロー</h3>
+
+                <p><code>/deal-prepare</code> コマンドが実行する一連の処理フローです。各ステップでどの Claude Code 機能が使われるかを明示しています。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+S1["1. /deal-prepare 実行"]
+S2["2. 顧客情報収集"]
+S3["3. 競合分析"]
+S4["4. 提案書ドラフト生成"]
+S5["5. 見積書作成"]
+S6["6. 品質レビュー"]
+S7["7. 報告・成果物一覧"]
+
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 --> S5
+S5 --> S6
+S6 --> S7
+
+S2 -.- C2["🔌 MCP: Salesforce から顧客データ取得<br/>📋 CLAUDE.md: ターゲット顧客定義を参照"]
+S3 -.- C3["📋 CLAUDE.md: 競合比較テーブル参照<br/>🎯 Skills: 差別化ポイント整理"]
+S4 -.- C4["🎯 Skills: /gen-proposal 実行<br/>📏 Rules: proposal-format.md 準拠"]
+S5 -.- C5["🎯 Skills: /gen-quote 実行<br/>📏 Rules: pricing-rules.md 準拠"]
+S6 -.- C6["🤖 Agents: 提案書レビュー<br/>🤖 Agents: 法務チェック"]
+
+style S1 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style S2 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style S3 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style S4 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style S5 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style S6 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style S7 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">商談準備フロー -- /deal-prepare が実行する6ステップと各ステップで使用される Claude Code 機能</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>コマンド設計のポイント:</strong> <code>/deal-prepare</code> は定型作業を自動化しますが、「顧客との信頼関係の構築」「交渉戦略の策定」「最終的な価格の決定」といった判断が必要な作業は人間が行います。AIは「材料の準備」に徹し、人間は「材料を使った判断」に集中する設計です。
+                </div>
+
+                <!-- ============================================================
+                     セクション5: Phase 3 — 品質・コンプライアンス
+                     ============================================================ -->
+
+                <h2 id="phase3">Phase 3 -- 品質・コンプライアンス</h2>
+
+                <p>Phase 3 では、提案書の品質を自動で担保する Agents を設計します。人間のレビューは見落としが発生しますが、Agents は一定基準で漏れなくチェックします。特にセールスでは、誤字脱字、数値の不整合、NDA違反が顧客の信頼を損なう直接的な原因になるため、自動チェックの仕組みが不可欠です。</p>
+
+                <!-- 5.1 Agents -->
+                <h3 id="phase3-agents">5.1 Agents の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Agents を使うのか:</strong> 提案書のレビューには「フォーマット」「数値整合性」「競合差別化」「法務・NDA」という複数の観点が必要です。1人の人間が全てをカバーするのは困難で、急いでいるときほど見落としが増えます。Agents は観点別の専門家として、一定基準で漏れなくチェックします。人間は Agents のレビュー結果を見て最終判断するだけで、レビュー品質が安定します。
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>proposal-reviewer</h4>
+                    <p>提案書の品質レビュー。誤字脱字、数値整合性、フォーマット準拠を総合的にチェック</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>competitive-analyzer</h4>
+                    <p>競合差別化ポイントの確認。自社の強みが正確に伝わっているかを検証</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>compliance-checker</h4>
+                    <p>NDA準拠、値引きルール遵守、法務リスクのチェック。コンプライアンス違反を未然に防止</p>
+                  </div>
+                </div>
+
+                <h4>（a）proposal-reviewer -- 提案書品質レビュー</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのエージェントが必要か:</strong> 提案書は顧客に直接渡る成果物です。誤字脱字、数値の不整合（本文で「20%削減」と書きながら見積もりに反映されていない等）、フォーマットの崩れは、企業としてのプロフェッショナリズムを損ないます。このエージェントは proposal-format.md に準拠したフォーマットチェックと、数値の一貫性チェックを自動で行います。
+                </div>
+
+                <div class="code-header"><span>.claude/agents/proposal-reviewer.md</span></div>
+                <pre><code>---
+name: proposal-reviewer
+description: 提案書の品質を総合的にレビューする
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# 提案書品質レビュー
+
+## あなたの役割
+提案書の品質を総合的にレビューする専門エージェントです。
+確認を求めず、直接レビューを実施して結果を返してください。
+
+## チェック観点
+
+### 1. フォーマット
+- .claude/rules/proposal-format.md の必須セクションが全て含まれているか
+- セクションの順序は正しいか
+- タイトルに顧客企業名が含まれているか
+- フッターに作成日・バージョン番号・担当者名があるか
+
+### 2. 数値整合性
+- 本文中の「○○%削減」と見積もりセクションの金額が整合しているか
+- サーバー台数とプラン選定が整合しているか
+- 税抜金額と税込金額の計算が正しいか
+- 値引き率と値引き後金額の計算が正しいか
+
+### 3. 文章品質
+- 誤字脱字、文法エラー
+- 主語・述語のねじれ
+- 専門用語の説明不足
+- 冗長な表現
+
+### 4. 顧客適合性
+- 顧客の業種・規模に合った事例が引用されているか
+- 顧客の課題に対する解決策が具体的か
+- 導入効果が定量的に示されているか
+
+## 出力フォーマット
+各指摘は以下の形式で報告:
+- 指摘レベル: 🔴 Critical / 🟡 Warning / 🔵 Suggestion
+- 該当箇所（セクション名・行番号）
+- 問題の説明
+- 修正案</code></pre>
+
+                <h4>（b）competitive-analyzer -- 競合差別化チェック</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのエージェントが必要か:</strong> 提案書で最も重要なのは「なぜ CloudOps を選ぶべきか」が明確に伝わることです。しかし、提案書を書くうちに機能説明に偏り、競合との差別化が弱くなることがあります。このエージェントは CLAUDE.md の競合比較データを基に、提案書が競合に対する優位性を十分に伝えているかをチェックします。
+                </div>
+
+                <div class="code-header"><span>.claude/agents/competitive-analyzer.md</span></div>
+                <pre><code>---
+name: competitive-analyzer
+description: 提案書の競合差別化ポイントを検証する
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# 競合差別化チェック
+
+## あなたの役割
+提案書における競合差別化の質を検証する専門エージェントです。
+確認を求めず、直接分析を実施して結果を返してください。
+
+## チェック観点
+
+### 1. USP の訴求
+- CLAUDE.md に記載された USP（独自の強み）3点が提案書に反映されているか
+  - 日本語ネイティブの24時間サポート
+  - 3大クラウド完全対応の一元管理
+  - 導入後3ヶ月で平均20%のコスト削減
+- USP が顧客の課題と紐づけて説明されているか
+
+### 2. 競合との比較
+- 競合の弱点に対して自社の強みが明確に対比されているか
+- 競合の名前を直接出さず、品位を保った比較になっているか
+- 比較表がある場合、CLAUDE.md の競合比較データと整合しているか
+
+### 3. 顧客視点の差別化
+- 「機能がある」だけでなく「その機能で顧客が何を得るか」が書かれているか
+- 顧客の業種に特化した差別化（製造業ならコンプライアンス、金融なら可用性等）
+
+### 4. 弱点の先回り対策
+- CloudOps の弱点（該当する場合）に対するリスク緩和策が記載されているか
+- 「なぜ価格が高いか」の根拠が示されているか（価格で劣る場合）
+
+## 出力フォーマット
+
+### 差別化スコア: ○○/100
+- USP 訴求: ○/30
+- 競合比較: ○/30
+- 顧客視点: ○/20
+- 弱点対策: ○/20
+
+### 改善提案
+1. [改善ポイント] -- [現状] → [推奨修正]</code></pre>
+
+                <h4>（c）compliance-checker -- 法務・コンプライアンスチェック</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのエージェントが必要か:</strong> セールスにおけるコンプライアンス違反は法的リスクに直結します。NDA対象情報の漏洩、承認なしの値引き、虚偽の導入実績の記載は、企業の信頼を根本的に損ないます。このエージェントは nda-compliance.md と pricing-rules.md に基づき、全ての提案書・見積書を自動でスキャンします。人間のレビューでは見落としがちな「別の顧客の情報が1行だけ混入している」といった問題も検出します。
+                </div>
+
+                <div class="code-header"><span>.claude/agents/compliance-checker.md</span></div>
+                <pre><code>---
+name: compliance-checker
+description: NDA準拠と価格ルール遵守をチェックする
+model: claude-sonnet-4-6
+tools: Read, Grep, Glob
+---
+
+# 法務・コンプライアンスチェック
+
+## あなたの役割
+提案書・見積書の法務リスクとコンプライアンス違反を検出する専門エージェントです。
+確認を求めず、直接チェックを実施して結果を返してください。
+
+## チェック観点
+
+### 1. NDA 遵守（nda-compliance.md 準拠）
+- 他社の顧客情報が混入していないか
+- NDA対象の技術仕様や運用情報が含まれていないか
+- 導入事例に掲載許可の注記があるか
+- 顧客固有情報を含む資料に【社外秘】ヘッダーがあるか
+
+### 2. 価格ルール遵守（pricing-rules.md 準拠）
+- 値引き率が権限範囲内か
+  - 5%以内: 担当営業で可
+  - 5〜10%: セールスマネージャー承認要
+  - 10%超: 事業部長承認要
+- 定価・値引き率・値引き後金額の3点が併記されているか
+- 値引き理由が備考欄に記載されているか
+- 承認が必要な場合に承認ステータスが記載されているか
+
+### 3. 表現の適切性
+- 「確実に」「必ず」など過度な保証表現がないか
+- 法的拘束力のある約束が含まれていないか
+- 競合に対する誹謗中傷表現がないか
+- 導入効果の過大表現（根拠のない数値）がないか
+
+### 4. 情報の正確性
+- 価格体系が CLAUDE.md の最新情報と一致しているか
+- 機能説明が実際の製品仕様と一致しているか
+- 導入実績の数値が正確か
+
+## 出力フォーマット
+各指摘は以下の形式で報告:
+- 深刻度: 🔴 Critical（修正必須） / 🟡 Warning（修正推奨） / 🔵 Info（確認推奨）
+- 違反カテゴリ（NDA / 価格 / 表現 / 正確性）
+- 該当箇所
+- 問題の説明
+- 修正案</code></pre>
+
+                <h3 id="parallel-review">並列レビューの仕組み</h3>
+
+                <p>3つのエージェントは並列で実行され、レビュー時間を大幅に短縮します。1つのエージェントが5分かかる場合、直列実行なら15分ですが、並列実行なら5分で完了します。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+S1["提案書ドラフト完成"]
+S2["並列レビュー開始"]
+
+S2 --> R1["🤖 proposal-reviewer<br/>品質レビュー<br/>フォーマット・数値・文章"]
+S2 --> R2["🤖 competitive-analyzer<br/>競合差別化チェック<br/>USP・比較・顧客視点"]
+S2 --> R3["🤖 compliance-checker<br/>法務チェック<br/>NDA・価格・表現"]
+
+R1 --> S3["レビュー結果統合"]
+R2 --> S3
+R3 --> S3
+
+S3 --> S4["修正箇所一覧を<br/>担当営業に報告"]
+S4 --> S5["担当営業が<br/>最終確認・修正"]
+
+S1 --> S2
+
+style S1 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style S2 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style R1 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style R2 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style R3 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+style S3 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style S4 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style S5 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">並列レビュー -- 3つの専門エージェントが同時に提案書をチェックし、結果を統合</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>エージェント設計のポイント:</strong> 各エージェントは「1つの観点に特化」しています。1つのエージェントに全てのチェックを詰め込むと、指示が複雑になりレビュー精度が下がります。観点ごとにエージェントを分離し、並列実行することで、精度と速度を両立します。
+                </div>
+
+                <!-- ============================================================
+                     セクション6: Phase 4 — CRM連携と分析
+                     ============================================================ -->
+
+                <h2 id="phase4">Phase 4 -- CRM連携と分析</h2>
+
+                <p>Phase 4 では、Claude Code を外部ツール（Salesforce, Slack, Gmail, DocuSign）と連携させる MCP を設計します。これにより、CRM のデータ取得からメール送信、契約管理までを Claude Code 内で完結させ、コンテキスト切替のコストを削減します。</p>
+
+                <!-- 6.1 MCP -->
+                <h3 id="phase4-mcp">6.1 MCP の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ MCP を使うのか:</strong> 営業担当の1日は「Salesforce で顧客情報を確認→Excel に転記→提案書を書く→Gmail でメール送信→Slack で上長に報告→Salesforce に商談ステータスを更新」というツール間の行き来で溢れています。MCP（Model Context Protocol）で各ツールに接続すれば、Claude Code 内で「顧客情報を取得して、提案書を作って、メールで送って、Slack で報告して、CRM を更新」が一気通貫で完了します。ツール間のコピペミスや更新忘れがなくなり、営業担当は顧客との対話に集中できます。
+                </div>
+
+                <div class="code-header"><span>.mcp.json</span></div>
+                <pre><code>{
+  "mcpServers": {
+    "salesforce": {
+      "command": "npx",
+      "args": ["-y", "mcp-salesforce"],
+      "env": {
+        "SF_TOKEN": "${SF_TOKEN}",
+        "SF_INSTANCE_URL": "${SF_INSTANCE_URL}"
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
+      }
+    },
+    "gmail": {
+      "command": "npx",
+      "args": ["-y", "mcp-gmail"],
+      "env": {
+        "GMAIL_TOKEN": "${GMAIL_TOKEN}"
+      }
+    }
+  }
+}</code></pre>
+
+                <h4>各 MCP サーバーの用途</h4>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>MCP サーバー</th>
+                      <th>用途</th>
+                      <th>セールスでの活用シーン</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>salesforce</strong></td>
+                      <td>CRM データのリアルタイム取得・更新</td>
+                      <td>顧客情報取得、商談ステータス更新、活動ログ登録、パイプラインデータ取得</td>
+                    </tr>
+                    <tr>
+                      <td><strong>slack</strong></td>
+                      <td>チームコミュニケーション</td>
+                      <td>商談進捗の社内報告、上長への承認依頼、チーム全体への勝敗共有</td>
+                    </tr>
+                    <tr>
+                      <td><strong>gmail</strong></td>
+                      <td>顧客とのメールコミュニケーション</td>
+                      <td>提案書送付メール、フォローアップメール、アポイント調整</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout warning">
+                  <strong>セキュリティ注意:</strong> MCP の接続情報（トークン等）は <code>.claude/settings.local.json</code> の <code>env</code> セクションで管理し、<code>.mcp.json</code> では <code>${変数名}</code> で参照します。トークンが Git リポジトリにコミットされないよう、<code>settings.local.json</code> は必ず <code>.gitignore</code> に追加してください。
+                </div>
+
+                <h3 id="data-flow">CRM連携のデータフロー</h3>
+
+                <p>MCP を介したデータフローの全体像です。Claude Code が中心となり、各外部ツールとリアルタイムにデータをやり取りします。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+subgraph crm["CRM（Salesforce）"]
+direction LR
+SF1["顧客マスタ"]
+SF2["商談データ"]
+SF3["活動ログ"]
+end
+
+subgraph claude["Claude Code"]
+direction TB
+CC1["📋 CLAUDE.md<br/>商材知識"]
+CC2["🎯 Skills<br/>提案書・見積書生成"]
+CC3["🤖 Agents<br/>品質レビュー"]
+end
+
+subgraph output["アウトプット"]
+direction LR
+OUT1["📧 Gmail<br/>提案書送付"]
+OUT2["💬 Slack<br/>社内報告"]
+OUT3["📊 BigQuery<br/>分析データ"]
+end
+
+crm -->|"MCP: データ取得"| claude
+claude -->|"MCP: メール送信"| OUT1
+claude -->|"MCP: 通知"| OUT2
+claude -->|"MCP: ステータス更新"| crm
+claude -->|"データ蓄積"| OUT3
+OUT3 -->|"分析結果<br/>フィードバック"| claude
+
+style crm fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style claude fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style output fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">CRM連携データフロー -- Salesforce からデータ取得し、提案書生成・メール送信・分析までを一気通貫</div>
+                </div>
+
+                <h3 id="mcp-workflow-example">MCP を活用した営業ワークフロー例</h3>
+
+                <p>以下は、MCP を活用した具体的な営業ワークフローの例です。<code>/deal-prepare</code> コマンドと MCP が連携することで、ツール間の手動操作が不要になります。</p>
+
+                <pre><code># 1. 商談準備（Claude Code 内で完結）
+/deal-prepare 株式会社ABC製造
+
+→ MCP(salesforce): 株式会社ABC製造の顧客情報を取得
+→ MCP(salesforce): 過去の商談履歴・活動ログを取得
+→ Skills(/gen-proposal): 提案書ドラフトを生成
+→ Skills(/gen-quote): 見積書を生成
+→ Agents: 並列レビュー（品質・競合・法務）
+→ MCP(salesforce): 商談ステータスを「提案準備中」に更新
+
+# 2. 提案書送付
+→ MCP(gmail): 提案書をPDF添付してメール送信
+→ MCP(slack): #sales チャネルに「ABC製造に提案書送付完了」を通知
+→ MCP(salesforce): 活動ログに「提案書送付」を登録
+
+# 3. フォローアップ（3日後）
+→ MCP(salesforce): ABC製造の商談ステータスを確認
+→ MCP(gmail): フォローアップメールを送信
+→ MCP(salesforce): 活動ログに「フォローアップメール送信」を登録</code></pre>
+
+                <div class="callout tip">
+                  <strong>MCP の効果:</strong> 上記のワークフローでは、従来なら Salesforce→メーラー→Slack→Salesforce と4つのツールを行き来する必要がありました。MCP により、Claude Code 内で全てが完結します。ツール間のコピペミスや更新忘れがなくなり、営業担当は「何を伝えるか」に集中できます。
+                </div>
+
+                <!-- ============================================================
+                     セクション7: 運用ガイド
+                     ============================================================ -->
+
+                <h2 id="operation-guide">運用ガイド</h2>
+
+                <p>AI駆動セールス基盤を構築した後、チームとして継続的に運用・改善するためのガイドです。基盤は作って終わりではなく、日々の営業活動から得られるフィードバックを取り込んで進化させることが重要です。</p>
+
+                <h3 id="weekly-review">週次パイプラインレビュー</h3>
+
+                <div class="callout info">
+                  <strong>なぜ週次レビューが重要か:</strong> AI駆動セールスはデータの鮮度が命です。CRM のデータが古いと、提案書の内容も古くなり、受注確度の分析も不正確になります。週次レビューで全案件のステータスを更新し、AIが参照するデータの鮮度を保つことが、AI活用の効果を最大化する鍵です。
+                </div>
+
+                <p>毎週月曜日に全案件のパイプラインレビューを実施します。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>時間</th>
+                      <th>内容</th>
+                      <th>Claude Code の活用</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>10:00-10:15</td>
+                      <td>パイプライン全体サマリー</td>
+                      <td><code>/analyze-deal</code> で全案件の受注確度を一括分析</td>
+                    </tr>
+                    <tr>
+                      <td>10:15-10:30</td>
+                      <td>今週クローズ予定の案件</td>
+                      <td>リスク要因の確認と対策立案</td>
+                    </tr>
+                    <tr>
+                      <td>10:30-10:45</td>
+                      <td>停滞案件の対策</td>
+                      <td>停滞理由の分析と打開策の提案</td>
+                    </tr>
+                    <tr>
+                      <td>10:45-11:00</td>
+                      <td>今週の重点アクション決定</td>
+                      <td>優先案件と担当者のアサイン</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="knowledge-management">成功パターンのナレッジ化</h3>
+
+                <div class="callout info">
+                  <strong>なぜナレッジ化が重要か:</strong> AI駆動セールスの最大の利点は「成功パターンをチーム全体に即座に展開できる」ことです。ベテラン営業が受注した商談の提案書・応酬話法・交渉戦略を CLAUDE.md や Rules にフィードバックすれば、次の日からジュニア営業も同じパターンで提案できます。従来なら「数年の経験で身につくノウハウ」が、システム的に共有されます。
+                </div>
+
+                <p>成功パターンのナレッジ化サイクルです。</p>
+
+                <ol>
+                  <li><strong>受注分析</strong> -- 受注した商談の勝因を分析（どの差別化ポイントが刺さったか、どのタイミングで確度が上がったか）</li>
+                  <li><strong>テンプレート化</strong> -- 成功した提案書のパターンを Skills のテンプレートに反映</li>
+                  <li><strong>ルール更新</strong> -- 新たに判明した「やるべきこと/やってはいけないこと」を Rules に追記</li>
+                  <li><strong>競合情報更新</strong> -- 競合の新しい動きを CLAUDE.md の競合比較に反映</li>
+                  <li><strong>チーム共有</strong> -- 更新内容を PR で共有し、レビューを経てマージ</li>
+                </ol>
+
+                <h3 id="enablement">セールスイネーブルメント</h3>
+
+                <p>新しいメンバーがチームに参加した際のオンボーディング手順です。</p>
+
+                <ol>
+                  <li><strong>リポジトリ clone</strong>
+                    <pre><code>git clone https://github.com/your-org/sales-platform.git
+cd sales-platform</code></pre>
+                  </li>
+                  <li><strong>Claude Code 起動</strong> -- CLAUDE.md が自動読込され、商材情報・価格体系・競合比較が即座に把握される</li>
+                  <li><strong>商材理解</strong>
+                    <pre><code># CloudOps の概要と差別化ポイントを確認
+「CloudOps の主要機能と競合比較を教えて」</code></pre>
+                    <p>CLAUDE.md の商材情報を基に、AIが分かりやすく説明</p>
+                  </li>
+                  <li><strong>初回商談準備</strong>
+                    <pre><code>/deal-prepare 初回商談企業名</code></pre>
+                    <p>Command が顧客情報収集から提案書作成まで一括実行。新メンバーでもベテランと同じ品質で商談準備ができる</p>
+                  </li>
+                  <li><strong>ロールプレイ</strong> -- AIに顧客役をさせて、想定問答の練習ができる</li>
+                </ol>
+
+                <h3 id="improvement-cycle">継続的改善サイクル</h3>
+
+                <p>AI駆動セールス基盤は「作って終わり」ではありません。営業活動から得られるフィードバックを継続的に取り込むことで、基盤の精度と有用性が向上し続けます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+S1["Prospect<br/>リード獲得<br/>MCP: CRM連携"]
+S2["Qualify<br/>見込み評価<br/>Skills: 分析"]
+S3["Propose<br/>提案<br/>Skills: 提案書"]
+S4["Close<br/>受注<br/>MCP: 契約"]
+S5["Expand<br/>拡大<br/>Skills: 分析"]
+
+S1 --> S2
+S2 --> S3
+S3 --> S4
+S4 --> S5
+S5 -->|"アップセル<br/>クロスセル"| S1
+
+S4 -.->|"勝因分析→<br/>CLAUDE.md 更新"| S1
+S3 -.->|"失注分析→<br/>Rules 改善"| S1
+
+style S1 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style S2 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style S3 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style S4 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style S5 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">継続的改善サイクル -- 受注・失注の分析結果を CLAUDE.md と Rules にフィードバックし、提案品質を向上させ続ける</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>チーム文化の構築:</strong> AI駆動セールスは「1人のトップセールスが全てを設定する」のではなく、チーム全員が少しずつ改善を重ねることで成熟します。新しいメンバーが「この応酬話法が効いたのでテンプレートに追加しよう」と提案できる文化を作ることが最も重要です。CLAUDE.md や Rules への改善 PR は、受注報告と同じくらい価値があります。
+                </div>
+
+                <!-- ============================================================
+                     セクション8: 導入チェックリスト
+                     ============================================================ -->
+
+                <h2 id="checklist">導入チェックリスト</h2>
+
+                <p>Phase 1 から Phase 4 までの導入チェックリストです。上から順に実施することで、セールス基盤が段階的に構築されます。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Phase</th>
+                      <th>タスク</th>
+                      <th>成果物</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>CLAUDE.md を作成（商材情報・価格体系・競合比較・ターゲット顧客）</td>
+                      <td><code>.claude/CLAUDE.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>提案書フォーマットルールを作成（パス別: proposals/**）</td>
+                      <td><code>.claude/rules/proposal-format.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>NDA遵守ルールを作成（常時適用）</td>
+                      <td><code>.claude/rules/nda-compliance.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td>値引きルールを作成（常時適用）</td>
+                      <td><code>.claude/rules/pricing-rules.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>提案書生成スキルを作成（/gen-proposal）</td>
+                      <td><code>.claude/skills/gen-proposal/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>見積書生成スキルを作成（/gen-quote）</td>
+                      <td><code>.claude/skills/gen-quote/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>議事録要約スキルを作成（/summarize-meeting）</td>
+                      <td><code>.claude/skills/summarize-meeting/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>受注確度分析スキルを作成（/analyze-deal）</td>
+                      <td><code>.claude/skills/analyze-deal/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td>商談準備コマンドを作成（/deal-prepare）</td>
+                      <td><code>.claude/commands/deal-prepare.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td>提案書レビューエージェントを作成</td>
+                      <td><code>.claude/agents/proposal-reviewer.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td>競合差別化チェックエージェントを作成</td>
+                      <td><code>.claude/agents/competitive-analyzer.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td>法務チェックエージェントを作成</td>
+                      <td><code>.claude/agents/compliance-checker.md</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td>MCP を設定（Salesforce、Slack、Gmail）</td>
+                      <td><code>.mcp.json</code></td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td>環境変数を設定（CRMトークン、Slackトークン等）</td>
+                      <td><code>.claude/settings.local.json</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout info">
+                  <strong>まとめ:</strong> AI駆動セールス基盤は、Claude Code の機能（CLAUDE.md, Rules, Skills, Commands, Agents, MCP）を組み合わせて構築します。Phase 1（知識基盤）で商材知識とルールを整備し、Phase 2（営業支援）で提案書・見積書の生成を自動化し、Phase 3（品質管理）でレビューの品質を担保し、Phase 4（CRM連携）で外部ツールとの連携を実現します。段階的に導入することで、チームの負担を最小限にしながら、AI駆動セールスの恩恵を最大化できます。
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>

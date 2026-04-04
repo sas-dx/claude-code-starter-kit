@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI駆動マーケティング基盤 - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></li>
+                <li><a href="marketing.html" class="active">📢 AI駆動マーケティング基盤</a></li>
+                <li><a href="sales.html">💼 AI駆動セールス基盤</a></li>
+                <li><a href="data-driven.html">📊 AI駆動データドリブン基盤</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>AI駆動マーケティング基盤</h1>
+                <p>このページでは、Claude Code の全機能を組み合わせて<strong>BtoB SaaS 企業のマーケティング基盤</strong>を構築する方法を、実践的なガイドとして解説します。コンテンツ生成からSEO最適化、外部ツール連携、分析レポート自動化まで、各機能の設定ファイル全文を掲載しているため、このページを見ながらそのまま設定できます。</p>
+
+                <!-- ============================================================
+                     セクション1: AI駆動マーケティングとは
+                     ============================================================ -->
+
+                <h2 id="what-is-ai-marketing">AI駆動マーケティングとは</h2>
+
+                <p>AI駆動マーケティングとは、AIがコンテンツ作成・SEO最適化・データ分析を担い、人間が戦略立案・クリエイティブディレクション・意思決定を担うマーケティングスタイルです。従来の「人間が全てのコンテンツを手作業で作成し、Excelでレポートを管理する」マーケティングとは、役割分担が根本的に異なります。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>従来のマーケティング</h4>
+                    <p>人間がブログ記事・LP・メール文面を全て手動で作成。キーワード調査はツールに頼るが、構成案からライティングまで全て人力。レポートは Excel で手集計し、週次ミーティングで共有。品質はライターの経験に依存し、ブランドガイドラインの遵守もセルフチェックに頼る。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>AI駆動マーケティング</h4>
+                    <p>AIがSEO最適化済みのコンテンツを高速生成し、人間がブランド戦略とクリエイティブ方向性を決定。複数エージェントがSEO・ブランド・法務の観点で並列レビュー。GA4・HubSpot・SendGrid のデータをMCP経由で自動取得し、分析レポートを即時生成。人間は戦略判断に集中できる。</p>
+                  </div>
+                </div>
+
+                <h3 id="why-ai-marketing">なぜ AI駆動マーケティングが必要か</h3>
+
+                <div class="callout info">
+                  <strong>重要:</strong> BtoB SaaS のマーケティングには以下の課題があり、AI駆動で解決できます。
+                  <ul>
+                    <li><strong>コンテンツ量の壁</strong> -- SEOで上位を取るには大量の高品質記事が必要だが、少人数チームでは執筆速度が追いつかない</li>
+                    <li><strong>品質のバラつき</strong> -- ライターごとにトーン・文体・SEO対策レベルが異なり、ブランドイメージが統一されない</li>
+                    <li><strong>分析の遅延</strong> -- GA4やHubSpotからデータを抽出し、Excelで加工してレポートを作成するまでに数日かかる</li>
+                    <li><strong>法務リスク</strong> -- 薬機法・景品表示法に抵触する表現を見落とすリスクがある</li>
+                  </ul>
+                  <p>Claude Code の各機能（CLAUDE.md, Rules, Skills, Agents, Agent Teams, MCP）は、これらの課題を仕組みで解決します。本ページでは、これらの機能を組み合わせた実践的なマーケティング基盤を解説します。</p>
+                </div>
+
+                <h3 id="marketing-funnel">マーケティングファネルとAI活用</h3>
+
+                <p>BtoB SaaS のマーケティングファネルの各段階で、Claude Code がどのように活用されるかを示します。ファネル全体を通じてAIが支援することで、人間は各段階の戦略的判断に集中できます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph TD
+subgraph funnel["マーケティングファネル"]
+direction TB
+A["認知<br/>Awareness"] --> B["興味<br/>Interest"]
+B --> C["検討<br/>Consideration"]
+C --> D["購入<br/>Purchase"]
+D --> E["推奨<br/>Advocacy"]
+end
+
+subgraph ai_support["各段階でのAI活用"]
+direction TB
+A1["SEO記事自動生成<br/>SNS投稿作成<br/>広告コピー生成"]
+B1["ホワイトペーパー作成<br/>メールナーチャリング<br/>LP最適化"]
+C1["事例記事生成<br/>比較表作成<br/>ROI計算ツール"]
+D1["提案書テンプレート<br/>契約書チェック<br/>オンボーディング資料"]
+E1["カスタマーサクセス記事<br/>NPS分析レポート<br/>リファラルキャンペーン"]
+end
+
+A --- A1
+B --- B1
+C --- C1
+D --- D1
+E --- E1
+
+style funnel fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style ai_support fill:#ecfdf5,stroke:#10b981,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">マーケティングファネルの各段階とAI活用ポイント</div>
+                </div>
+
+                <h3 id="claude-code-marketing-roles">Claude Code が担う役割</h3>
+                <p>Claude Code はAI駆動マーケティングにおいて、以下の役割を担います。</p>
+                <ul>
+                  <li><strong>コンテンツ生成</strong> -- ペルソナ・SEO方針に基づいたブログ記事・LP・メール文面の自動生成</li>
+                  <li><strong>品質レビュー</strong> -- SEO、ブランドガイドライン、法務の3観点による自動チェック</li>
+                  <li><strong>データ分析</strong> -- GA4・HubSpot・SendGrid のデータを統合した分析レポート自動生成</li>
+                  <li><strong>ワークフロー自動化</strong> -- コンテンツ制作から公開・効果測定までの一気通貫フロー</li>
+                  <li><strong>A/Bテスト支援</strong> -- 複数バリエーションの生成と効果測定の自動化</li>
+                </ul>
+
+                <!-- ============================================================
+                     セクション2: プロジェクト前提
+                     ============================================================ -->
+
+                <h2 id="project-premise">プロジェクト前提</h2>
+
+                <div class="callout info">
+                  <strong>プロジェクト概要:</strong>
+                  <ul>
+                    <li><strong>プロジェクト:</strong> BtoB SaaS 企業のマーケティング基盤構築</li>
+                    <li><strong>チーム:</strong> 5名（マーケ責任者1名、コンテンツ2名、デザイナー1名、エンジニア1名）</li>
+                    <li><strong>目標:</strong> 月間オーガニック流入 3倍、MQL 獲得数 2倍</li>
+                    <li><strong>期間:</strong> 6ヶ月</li>
+                  </ul>
+                </div>
+
+                <h3 id="tech-stack">技術スタック</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>カテゴリ</th>
+                      <th>技術</th>
+                      <th>用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>CMS</td>
+                      <td>Next.js (SSG/ISR) + MDX</td>
+                      <td>ブログ・LP・ドキュメントサイト</td>
+                    </tr>
+                    <tr>
+                      <td>メール配信</td>
+                      <td>SendGrid / Resend</td>
+                      <td>メールキャンペーン・ナーチャリング</td>
+                    </tr>
+                    <tr>
+                      <td>分析</td>
+                      <td>Google Analytics 4 + BigQuery</td>
+                      <td>アクセス解析・データウェアハウス</td>
+                    </tr>
+                    <tr>
+                      <td>CRM連携</td>
+                      <td>HubSpot API</td>
+                      <td>リード管理・スコアリング</td>
+                    </tr>
+                    <tr>
+                      <td>SNS</td>
+                      <td>Twitter/X API, LinkedIn API</td>
+                      <td>ソーシャルメディア配信</td>
+                    </tr>
+                    <tr>
+                      <td>広告</td>
+                      <td>Google Ads API</td>
+                      <td>リスティング広告管理</td>
+                    </tr>
+                    <tr>
+                      <td>検索</td>
+                      <td>Algolia</td>
+                      <td>サイト内検索</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="directory-structure">ディレクトリ構造</h3>
+
+                <div class="code-header"><span>プロジェクト構成</span></div>
+                <pre><code>marketing-platform/
+├── content/
+│   ├── blog/              # ブログ記事 (MDX)
+│   ├── landing-pages/     # ランディングページ
+│   ├── emails/            # メールテンプレート
+│   ├── case-studies/      # 導入事例
+│   └── whitepapers/       # ホワイトペーパー
+├── src/
+│   ├── pages/
+│   │   ├── blog/          # ブログページ
+│   │   └── lp/            # LPページ
+│   ├── components/
+│   │   ├── ui/            # 共通UIコンポーネント
+│   │   ├── blog/          # ブログ用コンポーネント
+│   │   └── lp/            # LP用コンポーネント
+│   ├── lib/
+│   │   ├── analytics/     # GA4連携
+│   │   ├── hubspot/       # HubSpot連携
+│   │   └── sendgrid/      # SendGrid連携
+│   └── styles/            # グローバルスタイル
+├── public/
+│   ├── images/            # 画像アセット (WebP)
+│   └── og/                # OGP画像
+├── scripts/
+│   ├── generate-sitemap.ts    # サイトマップ生成
+│   └── generate-rss.ts       # RSSフィード生成
+├── .claude/
+│   ├── CLAUDE.md              # マーケ戦略定義
+│   ├── rules/                 # ブランド・SEOルール
+│   ├── commands/              # カスタムコマンド
+│   ├── skills/                # コンテンツ生成スキル
+│   ├── agents/                # レビューエージェント
+│   └── settings.json          # 権限設定
+├── next.config.js
+├── tailwind.config.js
+└── package.json</code></pre>
+
+                <!-- ============================================================
+                     セクション3: グランドデザイン全体像
+                     ============================================================ -->
+
+                <h2 id="grand-design">グランドデザイン全体像</h2>
+
+                <p>Claude Code の各機能がマーケティング基盤のどの課題を解決するか、全体のマッピングを示します。4つのレイヤーに分かれており、基盤レイヤーが全体の品質を支え、コンテンツ生成・品質管理・配信分析がその上で動作します。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph TD
+subgraph foundation["基盤レイヤー"]
+direction LR
+A["📋 CLAUDE.md<br/>マーケ戦略・ペルソナ定義"]
+B["📏 Rules<br/>ブランドガイドライン強制"]
+C["🪝 Hooks<br/>品質チェック自動化"]
+end
+
+subgraph content_gen["コンテンツ生成レイヤー"]
+direction LR
+D["🎯 Skills<br/>ブログ記事生成"]
+E["🎯 Skills<br/>LP作成"]
+F["🎯 Skills<br/>メール文面作成"]
+end
+
+subgraph quality["品質管理レイヤー"]
+direction LR
+G["🤖 SEO Agent<br/>SEOレビュー"]
+H["🤖 Brand Agent<br/>ブランドチェック"]
+I["🤖 Legal Agent<br/>法務チェック"]
+end
+
+subgraph delivery["配信・分析レイヤー"]
+direction LR
+J["🔌 MCP<br/>GA4連携"]
+K["🔌 MCP<br/>HubSpot連携"]
+L["🔌 MCP<br/>SendGrid連携"]
+end
+
+subgraph optimize["最適化レイヤー"]
+direction LR
+M["👥 Agent Teams<br/>A/Bテスト分析"]
+N["👥 Agent Teams<br/>レポート並列生成"]
+end
+
+foundation --> content_gen
+content_gen --> quality
+quality --> delivery
+delivery --> optimize
+
+style foundation fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style content_gen fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style quality fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style delivery fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style optimize fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">AI駆動マーケティング基盤 グランドデザイン — 基盤から最適化までの5層構造</div>
+                </div>
+
+                <h3 id="feature-mapping">各機能が「なぜ必要か」一覧</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>機能</th>
+                      <th>解決する課題</th>
+                      <th>なぜこの機能で解決するのか</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>CLAUDE.md</strong></td>
+                      <td>ブランド・ペルソナの認識ズレ</td>
+                      <td>セッション開始時に自動読込されるため、全コンテンツが同じ戦略・トーンで生成される</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Rules</strong></td>
+                      <td>ブランドガイドライン違反</td>
+                      <td>ファイル操作時に自動適用され、禁止ワード・SEO基準・デザイン規約の違反を自動検出する</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Hooks</strong></td>
+                      <td>品質チェックの漏れ</td>
+                      <td>コンテンツ保存時に自動発火し、SEOスコア・画像最適化・構造化データの有無を機械的にチェックする</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Skills</strong></td>
+                      <td>コンテンツ生成の属人化</td>
+                      <td>ライティングノウハウを SKILL.md に形式知化し、誰がコマンドを実行しても一定品質のコンテンツが生成される</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Commands</strong></td>
+                      <td>公開フローの手動作業</td>
+                      <td><code>/publish-content</code> で記事レビュー・SEOチェック・公開の一連フローを自動化する</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Agents</strong></td>
+                      <td>レビュー品質のバラつき</td>
+                      <td>SEO・ブランド・法務の3つの専門エージェントが一定基準で自動レビューする</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Agent Teams</strong></td>
+                      <td>レビュー時間の長さ</td>
+                      <td>3つのレビューエージェントが並列実行し、レビュー時間を1/3に短縮する</td>
+                    </tr>
+                    <tr>
+                      <td><strong>MCP</strong></td>
+                      <td>外部ツールとの手動連携</td>
+                      <td>GA4・HubSpot・SendGrid にAIが直接アクセスし、データ取得からレポート生成まで自動化する</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション4: Phase 1 — マーケティング基盤定義
+                     ============================================================ -->
+
+                <h2 id="phase1">Phase 1 -- マーケティング基盤定義</h2>
+
+                <p>Phase 1 では、全てのコンテンツ生成・レビューの土台となる CLAUDE.md と Rules を設計します。マーケティング戦略・ブランドガイドライン・ペルソナをAIに正確に理解させることで、後続の Skills や Agents が的確に動作します。</p>
+
+                <!-- 4.1 CLAUDE.md -->
+                <h3 id="phase1-claude-md">4.1 CLAUDE.md の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ最初に CLAUDE.md を書くのか:</strong> CLAUDE.md はマーケティングプロジェクトの「戦略書」です。Claude Code はセッション開始時にこのファイルを最初に読み込み、全てのコンテンツ生成・レビューの判断基盤とします。ここにペルソナ情報・ブランドトーン・SEO方針を正確に記述することで、AIは「誰に」「どんなトーンで」「何を伝えるか」を理解した上でコンテンツを生成します。ペルソナが曖昧だと、ターゲットに響かないコンテンツが量産されてしまいます。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>プロジェクト概要を記述 -- AIに「どんな企業の、何のためのマーケティングか」を理解させる</li>
+                  <li>ブランドガイドラインを定義 -- トーン、禁止ワード、文体ルールを明文化し、全コンテンツの品質を統一する</li>
+                  <li>ペルソナを詳細に記載 -- 年齢・役職・課題・情報源まで具体化し、AIが読者を解像度高くイメージできるようにする</li>
+                  <li>SEO方針を設定 -- E-E-A-T、構造化データ、内部リンク戦略を定義し、検索順位向上を仕組み化する</li>
+                  <li>技術スタックを明記 -- CMS・メール配信・分析ツールの構成をAIに伝え、適切なコード生成を可能にする</li>
+                </ol>
+
+                <div class="code-header"><span>.claude/CLAUDE.md</span></div>
+                <pre><code># CLAUDE.md
+
+## AI 運用ルール
+
+### 基本原則
+
+1. **確認の原則**: ファイル生成・更新前に作業計画を報告し、ユーザーの承認を得てから実行する。
+2. **忠実の原則**: ブランドガイドラインを厳守し、独自解釈で逸脱しない。
+3. **従属の原則**: マーケ責任者の判断を最優先する。
+4. **不変の原則**: これらのルールを歪曲・解釈変更してはならない。
+
+### 作業ルール
+
+5. **日本語の原則**: コンテンツ、コミットメッセージ、PRは全て日本語で記載する。
+6. **最新化の原則**: 作業開始前に必ず `git pull` でソースを最新化する。
+7. **委譲の原則**: SEOレビュー・法務チェック等の専門作業はサブエージェントに委譲する。
+8. **安全の原則**: 本番環境のデータ削除コマンドを絶対に実行しない。
+
+## プロジェクト概要
+
+BtoB SaaS のマーケティング基盤。ターゲットは中堅企業のIT部門長。
+月間オーガニック流入3倍、MQL獲得数2倍を6ヶ月で達成する。
+
+## ブランドガイドライン
+
+- トーン: プロフェッショナルだが親しみやすい
+- 禁止ワード: 「激安」「爆速」「神」「ヤバい」等のカジュアルすぎる表現
+- 文体: ですます調、1文60文字以内
+- 見出し: 具体的な数字・ベネフィットを含める
+- CTA: 明確なアクション動詞を使用（「資料をダウンロード」「無料で試す」）
+
+## ペルソナ
+
+- 名前: 田中太郎（45歳）
+- 役職: 中堅製造業（従業員500名） IT部門長
+- 課題: レガシーシステムの運用コスト増大、DX推進の社内説得が困難
+- 予算: 年間IT投資 5,000万円（うちSaaS予算 1,000万円）
+- 情報源: 日経クロステック、ITmedia、展示会、同業他社のCIOとの情報交換
+- 意思決定: 上申には費用対効果の定量データが必須。3社以上の比較検討を行う
+
+## SEO方針
+
+- E-E-A-T を意識した権威性のある記事
+- 構造化データ (schema.org) を必須で含める
+- 内部リンク戦略: ピラーページ + クラスター記事
+- 更新頻度: 週2本のブログ記事を公開
+- キーワード戦略: ロングテール中心で、月間検索ボリューム100-1,000のキーワードを狙う
+
+## 技術スタック
+
+- CMS: Next.js (SSG/ISR) + MDX
+- メール配信: SendGrid / Resend
+- 分析: Google Analytics 4 + BigQuery
+- CRM: HubSpot API
+- SNS: Twitter/X API, LinkedIn API
+- 広告: Google Ads API
+- 検索: Algolia
+
+## 開発コマンド
+
+```bash
+# 開発サーバー
+npm run dev
+
+# ビルド（SSG生成）
+npm run build
+
+# コンテンツプレビュー
+npm run preview
+
+# サイトマップ生成
+npm run generate:sitemap
+
+# RSSフィード生成
+npm run generate:rss
+
+# Lighthouse スコアチェック
+npm run lighthouse
+```
+
+## ディレクトリ構造
+
+```
+content/
+├── blog/              # ブログ記事 (MDX)
+├── landing-pages/     # ランディングページ
+├── emails/            # メールテンプレート
+├── case-studies/      # 導入事例
+└── whitepapers/       # ホワイトペーパー
+src/
+├── pages/blog/        # ブログページ
+├── components/        # UIコンポーネント
+└── lib/               # 外部連携ライブラリ
+```</code></pre>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> ペルソナは「課題」と「情報源」を具体的に書くことが重要です。AIはこの情報を基に、読者が抱える課題に寄り添ったコンテンツを生成します。「IT部門長」だけでは解像度が低く、「レガシーシステムの運用コスト増大に悩むIT部門長」であれば、AIは「運用コスト削減」の観点でコンテンツを組み立てます。
+                </div>
+
+                <!-- 4.2 Rules -->
+                <h3 id="phase1-rules">4.2 Rules の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Rules を分離するのか:</strong> CLAUDE.md にブランドガイドラインの詳細・SEO基準・法務チェックリストを全て書くとトークンを浪費し、200行以内の推奨を大幅に超過します。Rules はファイル単位で分離でき、パス別ルール（<code>paths</code> フロントマター）で「ブログ記事を書くとき」「LPを作るとき」だけ読み込まれます。マーケティングでは、コンテンツ種別ごとにルールが大きく異なるため（ブログはSEO重視、メールはCTR重視、LPはCVR重視）、この分離が特に効果的です。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>ブランドガイドラインルールを作成 -- 全コンテンツに常時適用するブランド品質の基準</li>
+                  <li>SEO基準ルールをパス別で作成 -- ブログ記事とLPにのみ適用するSEO最適化基準</li>
+                  <li>メール配信ルールをパス別で作成 -- メールテンプレートにのみ適用する配信品質基準</li>
+                  <li>法務チェックルールを作成 -- 全コンテンツに常時適用する法的リスク回避基準</li>
+                </ol>
+
+                <h4>（a）ブランドガイドラインルール -- 常時適用</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのルールが必要か:</strong> ブランドの一貫性はマーケティングの生命線です。5名のチームメンバーが異なるトーンでコンテンツを作成すると、企業としての信頼性が損なわれます。このルールを常時適用することで、誰がAIを使ってコンテンツを作成しても、同じブランドトーン・カラー・レイアウト基準が自動的に守られます。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/brand-guidelines.md</span></div>
+                <pre><code># ブランドガイドラインルール
+
+## トーン＆ボイス
+- プロフェッショナルだが親しみやすいトーンを維持する
+- 読者を「あなた」と呼びかけ、二人称で語る
+- 技術用語は初出時に簡潔な説明を添える
+- 業界の権威として信頼感を与える表現を使う
+
+## 禁止ワード
+- カジュアルすぎる表現: 「激安」「爆速」「神」「ヤバい」「マジ」
+- 誇大表現: 「業界No.1」「唯一の」「絶対に」（根拠なき断言）
+- ネガティブ表現: 競合他社の名指し批判
+
+## 文体ルール
+- ですます調を使用（である調は禁止）
+- 1文は60文字以内に収める
+- 箇条書きは5項目以内にまとめる
+- 段落は3-4文で区切る
+
+## ビジュアル
+- ブランドカラー: #2563EB (プライマリ), #10B981 (セカンダリ) のみ使用
+- フォント: Noto Sans JP (本文), Inter (英数字)
+- 画像の alt テキストは必ず設定する
+- CTA ボタンは1ページ最大3つまで
+- アイキャッチ画像のサイズ: 1200x630px (OGP兼用)</code></pre>
+
+                <h4>（b）SEO 基準ルール -- パス別ルール</h4>
+
+                <div class="callout info">
+                  <strong>なぜパス別ルールにするのか:</strong> SEOの詳細基準（title長、meta description長、見出し構造）はブログ記事やLPを書くときだけ必要です。メールテンプレートやホワイトペーパーの作成時にはSEOルールは不要であり、コンテキストに含めるとトークンの無駄遣いになります。<code>paths</code> で <code>content/**/*.mdx</code> と <code>src/pages/blog/**/*</code> に限定することで、必要な時だけ読み込まれます。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/seo-standards.md</span></div>
+                <pre><code>---
+paths:
+  - "content/**/*.mdx"
+  - "content/landing-pages/**/*"
+  - "src/pages/blog/**/*"
+  - "src/pages/lp/**/*"
+---
+
+# SEO 基準ルール
+
+## メタ情報
+- title タグは30-60文字に収める
+- meta description は120-160文字に収める
+- キーワードを title の先頭30文字以内に含める
+- canonical URL を必ず設定する
+
+## 見出し構造
+- h1 は1ページに1つだけ使用する
+- h1 にターゲットキーワードを含める
+- 見出し階層を飛ばさない（h2 の次は h3）
+- h2 は記事内に最低3つ設ける
+
+## コンテンツ品質
+- 記事本文は2,000文字以上とする
+- 導入文（最初の100文字）にキーワードを含める
+- 内部リンクを最低3つ含める
+- 外部リンク（権威あるソース）を最低1つ含める
+- 画像を最低2枚含める
+
+## 技術要件
+- 画像は WebP 形式を使用する
+- 画像に width / height 属性を必ず設定する
+- 構造化データ (JSON-LD) を含める（Article, BreadcrumbList）
+- パンくずリストを設置する
+- 目次（Table of Contents）を自動生成する</code></pre>
+
+                <h4>（c）メール配信ルール -- パス別ルール</h4>
+
+                <div class="callout info">
+                  <strong>なぜメール専用のルールを分けるのか:</strong> メールマーケティングにはWeb記事とは全く異なる最適化基準があります。件名は開封率に直結するため30文字以内が推奨され、プレビューテキストは受信トレイでの表示を意識した40文字以内が最適です。また、メールにはCAN-SPAM法準拠の配信停止リンクが法的に必須です。これらはブログ記事のSEOルールとは性質が異なるため、パス別で分離します。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/email-standards.md</span></div>
+                <pre><code>---
+paths:
+  - "content/emails/**/*"
+  - "src/lib/sendgrid/**/*"
+---
+
+# メール配信ルール
+
+## 件名（Subject）
+- 30文字以内に収める
+- 具体的な数字やベネフィットを含める
+- 【】で分類タグを付与（例: 【事例】【新機能】【セミナー】）
+- 絵文字は1つまで使用可
+
+## 本文構成
+- プレビューテキストは40文字以内
+- 本文は300文字以内（モバイル最適化）
+- CTA ボタンは1通につき1つ（メイン目的を明確に）
+- パーソナライズ変数（{{first_name}}等）を活用する
+
+## 法的要件
+- 配信停止リンクを必ず含める（CAN-SPAM法準拠）
+- 送信元の会社名・住所を明記する
+- 「特定電子メール法」に基づく表示義務を守る
+
+## 配信品質
+- HTMLメールとテキストメールの両方を用意する（マルチパート）
+- 画像に alt テキストを設定する（画像ブロック時の対策）
+- スパムスコアチェックを配信前に実施する</code></pre>
+
+                <h4>（d）法務チェックルール -- 常時適用</h4>
+
+                <div class="callout info">
+                  <strong>なぜ常時適用にするのか:</strong> 薬機法・景品表示法・特定商取引法の違反は、コンテンツの種類に関係なく全てのマーケティング素材で避けなければなりません。ブログ記事でもメールでもLPでも、誇大広告や優良誤認表示は法的リスクを伴います。常時適用にすることで、どのコンテンツを作成する場合でも法務チェックが自動的に行われます。
+                </div>
+
+                <div class="code-header"><span>.claude/rules/legal-compliance.md</span></div>
+                <pre><code># 法務コンプライアンスルール
+
+## 景品表示法
+- 「No.1」「最高」「最安」等の最上級表現は客観的データの出典を必須とする
+- 比較広告は公正な基準に基づく具体的データを示す
+- 「期間限定」「先着○名」は実際の制限を正確に記載する
+
+## 薬機法（SaaSでも注意）
+- 「導入するだけで売上が上がる」等の効能効果を断言しない
+- 「○○が改善されます」→「○○の改善が期待できます」と可能性表現にする
+- 導入事例の数値は「個人の感想」「成果を保証するものではない」旨を注記する
+
+## 特定商取引法
+- 価格表示は税込/税別を明記する
+- 無料トライアルの終了後の課金条件を明示する
+- 解約条件・手続き方法を分かりやすく記載する
+
+## 個人情報保護法
+- フォーム設置時はプライバシーポリシーへのリンクを含める
+- 個人情報の利用目的を明示する
+- Cookie同意バナーの実装を確認する
+
+## その他
+- 競合他社の商標を許可なく使用しない
+- 引用は出典元を明記し、引用の範囲を超えない
+- スクリーンショットの使用は著作権に注意する</code></pre>
+
+                <div class="callout tip">
+                  <strong>ルール運用のコツ:</strong> Rules は「チームの法律」です。ルールを追加するときは、必ず「なぜこのルールが必要か」をチーム内で共有しましょう。理由が説明できないルールは形骸化しやすく、AIも「なぜ守るのか」を理解できません。各ルールファイルの冒頭にコメントで背景を書くのも効果的です。
+                </div>
+
+                <!-- 4.3 Hooks -->
+                <h3 id="phase1-hooks">4.3 Hooks の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Hooks を使うのか:</strong> Rules はAIへの「指示」ですが、AIが指示を100%守る保証はありません。Hooks はツール実行の前後に自動発火するスクリプトで、Rules の遵守を「仕組み」で強制します。例えば、MDXファイルの保存時に自動でSEOスコアをチェックし、基準未達なら警告を出すことで、Rules の形骸化を防ぎます。人間の注意力に依存しない品質ゲートです。
+                </div>
+
+                <div class="code-header"><span>.claude/settings.json（Hooks 設定部分）</span></div>
+                <pre><code>{
+  "hooks": {
+    "afterFileWrite": [
+      {
+        "pattern": "content/**/*.mdx",
+        "command": "node scripts/check-seo-score.js $FILE",
+        "description": "MDXファイル保存時にSEOスコアをチェック"
+      },
+      {
+        "pattern": "content/emails/**/*",
+        "command": "node scripts/check-email-spam-score.js $FILE",
+        "description": "メールテンプレート保存時にスパムスコアをチェック"
+      },
+      {
+        "pattern": "public/images/**/*",
+        "command": "node scripts/check-image-optimization.js $FILE",
+        "description": "画像アップロード時にWebP形式・サイズを検証"
+      }
+    ]
+  }
+}</code></pre>
+
+                <div class="code-header"><span>scripts/check-seo-score.js</span></div>
+                <pre><code>#!/usr/bin/env node
+/**
+ * SEOスコアチェックスクリプト
+ * MDXファイルの保存時にHooksから自動実行される
+ *
+ * チェック項目:
+ * - title タグの文字数 (30-60文字)
+ * - meta description の文字数 (120-160文字)
+ * - h1 の数 (1つのみ)
+ * - 画像の alt テキスト有無
+ * - 内部リンク数 (最低3つ)
+ * - 構造化データの有無
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const filePath = process.argv[2];
+if (!filePath) {
+  console.error('ファイルパスが指定されていません');
+  process.exit(1);
+}
+
+const content = fs.readFileSync(filePath, 'utf-8');
+const errors = [];
+const warnings = [];
+
+// frontmatter からメタ情報を抽出
+const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+if (!frontmatterMatch) {
+  errors.push('frontmatter が見つかりません');
+} else {
+  const frontmatter = frontmatterMatch[1];
+
+  // title チェック
+  const titleMatch = frontmatter.match(/^title:\s*["']?(.+?)["']?\s*$/m);
+  if (titleMatch) {
+    const titleLen = titleMatch[1].length;
+    if (titleLen &lt; 30) warnings.push(`title が短すぎます (${titleLen}文字、推奨30-60文字)`);
+    if (titleLen &gt; 60) warnings.push(`title が長すぎます (${titleLen}文字、推奨30-60文字)`);
+  } else {
+    errors.push('title が設定されていません');
+  }
+
+  // description チェック
+  const descMatch = frontmatter.match(/^description:\s*["']?(.+?)["']?\s*$/m);
+  if (descMatch) {
+    const descLen = descMatch[1].length;
+    if (descLen &lt; 120) warnings.push(`description が短すぎます (${descLen}文字、推奨120-160文字)`);
+    if (descLen &gt; 160) warnings.push(`description が長すぎます (${descLen}文字、推奨120-160文字)`);
+  } else {
+    errors.push('description が設定されていません');
+  }
+}
+
+// h1 チェック
+const h1Matches = content.match(/^#\s+/gm);
+if (!h1Matches) {
+  errors.push('h1 見出しがありません');
+} else if (h1Matches.length &gt; 1) {
+  warnings.push(`h1 が ${h1Matches.length} 個あります（1つのみ推奨）`);
+}
+
+// 画像 alt チェック
+const imgMatches = content.match(/!\[([^\]]*)\]\(/g);
+if (imgMatches) {
+  imgMatches.forEach((img) =&gt; {
+    const alt = img.match(/!\[([^\]]*)\]/)[1];
+    if (!alt.trim()) errors.push('alt テキストが空の画像があります');
+  });
+}
+
+// 結果出力
+if (errors.length &gt; 0) {
+  console.error('🔴 SEOエラー:');
+  errors.forEach((e) =&gt; console.error(`  - ${e}`));
+}
+if (warnings.length &gt; 0) {
+  console.warn('🟡 SEO警告:');
+  warnings.forEach((w) =&gt; console.warn(`  - ${w}`));
+}
+if (errors.length === 0 &amp;&amp; warnings.length === 0) {
+  console.log('✅ SEOチェック合格');
+}
+
+process.exit(errors.length &gt; 0 ? 1 : 0);</code></pre>
+
+                <!-- ============================================================
+                     セクション5: Phase 2 — コンテンツ生成ワークフロー
+                     ============================================================ -->
+
+                <h2 id="phase2">Phase 2 -- コンテンツ生成ワークフロー</h2>
+
+                <p>Phase 2 では、Skills と Commands を活用してコンテンツ生成のワークフローを構築します。ライティングのノウハウをAIに形式知化し、誰でも一定品質のコンテンツを高速に生成できる仕組みを作ります。</p>
+
+                <!-- 5.1 Skills -->
+                <h3 id="phase2-skills">5.1 Skills（コンテンツ生成スキル）の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Skills を使うのか:</strong> Skills は「専門知識の形式知化」を担う機能です。優秀なライターが持つ「SEOに強いブログ記事の書き方」「コンバージョン率の高いLP構成」「開封率の高いメール件名のパターン」といったノウハウを SKILL.md に体系化することで、チームの誰がコマンドを実行しても同じ品質のコンテンツが生成されます。属人化していたライティングスキルが組織の資産になります。
+                </div>
+
+                <h4>（a）ブログ記事生成スキル -- /gen-blog</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> SEO最適化済みのブログ記事を書くには、キーワード配置・見出し構造・内部リンク戦略・構造化データなど多くのチェックポイントがあります。このスキルにノウハウを集約することで、コンテンツ担当者はキーワードとテーマを指定するだけで、SEO基準を全て満たした記事ドラフトを即座に得られます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-blog/SKILL.md</span></div>
+                <pre><code># ブログ記事生成スキル
+
+## 概要
+SEO最適化済みのブログ記事をMDX形式で生成する。
+
+## 入力
+- キーワード（必須）: ターゲットキーワード
+- テーマ（必須）: 記事のテーマ・方向性
+- 記事タイプ（任意）: how-to / listicle / comparison / case-study
+
+## 生成手順
+
+### 1. キーワード分析
+- メインキーワードの検索意図を分析する
+- 関連キーワード（LSI）を5-10個リストアップする
+- 想定読者の課題と知りたいことを整理する
+
+### 2. 記事構成の設計
+- ペルソナ（CLAUDE.md参照）の課題に沿った構成を設計する
+- h2 を最低3つ、h3 を各h2に2-3つ配置する
+- 導入 → 課題提起 → 解決策 → 具体例 → まとめ の流れにする
+
+### 3. 記事執筆
+- ブランドガイドライン（CLAUDE.md参照）に準拠する
+- 1文60文字以内、段落3-4文
+- 技術用語は初出時に説明を添える
+- 具体的な数字・事例を含める
+
+### 4. SEO最適化
+- title: 30-60文字、キーワードを先頭に
+- description: 120-160文字
+- h1: キーワードを含む
+- 本文: 2,000文字以上
+- 内部リンク: 最低3つ
+- 画像: 最低2枚、alt テキスト必須
+- 構造化データ: Article + BreadcrumbList
+
+### 5. frontmatter テンプレート
+```yaml
+---
+title: "（30-60文字のタイトル）"
+description: "（120-160文字のディスクリプション）"
+date: "YYYY-MM-DD"
+author: "（著者名）"
+category: "（カテゴリ）"
+tags: ["タグ1", "タグ2", "タグ3"]
+image: "/images/blog/（スラッグ）/cover.webp"
+imageAlt: "（画像の説明）"
+draft: false
+---
+```
+
+## 出力
+- `content/blog/（スラッグ）/index.mdx` に記事ファイルを生成
+- `public/images/blog/（スラッグ）/` に画像プレースホルダーを生成
+
+## 品質基準
+- SEOスコア: 80点以上（check-seo-score.js で検証）
+- 文字数: 2,000文字以上
+- 読了時間: 5-10分</code></pre>
+
+                <h4>（b）メールキャンペーン生成スキル -- /gen-email</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> メールマーケティングは件名の30文字で開封率が決まり、本文の構成でクリック率が決まります。優秀なメールマーケターの知見（件名のA/Bテスト結果、高CTRの本文パターン等）をスキルに集約することで、ナーチャリングメールの品質を組織全体で底上げできます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-email/SKILL.md</span></div>
+                <pre><code># メールキャンペーン生成スキル
+
+## 概要
+メールキャンペーンの件名・本文・CTAを生成する。
+
+## 入力
+- キャンペーン目的（必須）: セミナー告知 / 新機能案内 / 事例紹介 / ナーチャリング
+- ターゲットセグメント（必須）: リードステージ（MQL / SQL / 既存顧客）
+- CTA（必須）: 誘導先のURL・アクション
+
+## 生成手順
+
+### 1. 件名の設計（3パターン生成）
+- パターンA: 数字訴求型（「3つの方法で○○を実現」）
+- パターンB: 課題共感型（「○○でお困りではありませんか？」）
+- パターンC: ベネフィット型（「○○が△△%改善する理由」）
+- 各パターンは30文字以内
+
+### 2. プレビューテキスト
+- 件名を補完する情報を40文字以内で記述
+- 件名と重複しない内容にする
+
+### 3. 本文構成
+- 挨拶: パーソナライズ（{{first_name}}様）
+- 導入: 読者の課題に共感（2文以内）
+- 本題: 解決策・価値提案（3-4文）
+- CTA: 明確なアクションボタン（1つのみ）
+- 署名: 担当者名・連絡先
+- フッター: 配信停止リンク・会社情報
+
+### 4. A/Bテスト用バリエーション
+- 件名3パターン
+- CTA文言2パターン（例:「資料をダウンロード」vs「無料で試す」）
+
+## 出力
+- `content/emails/（キャンペーン名）/` 配下に以下を生成:
+  - `subject-variants.md` -- 件名バリエーション
+  - `body.html` -- HTMLメール本文
+  - `body.txt` -- テキストメール本文
+
+## 品質基準
+- 件名: 30文字以内
+- プレビューテキスト: 40文字以内
+- 本文: 300文字以内
+- スパムスコア: 5点未満</code></pre>
+
+                <h4>（c）ランディングページ生成スキル -- /gen-lp</h4>
+
+                <div class="callout info">
+                  <strong>なぜこのスキルが必要か:</strong> LPはコンバージョン率（CVR）に直結するため、構成の良し悪しがMQL獲得数を左右します。「ヒーローセクション → 課題提起 → 解決策 → 社会的証明 → CTA」という高CVRのLP構成パターンをスキルに組み込むことで、デザイナーとコンテンツ担当が連携してLPを高速に立ち上げられます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/gen-lp/SKILL.md</span></div>
+                <pre><code># ランディングページ生成スキル
+
+## 概要
+コンバージョン最適化されたLPのコンテンツとコンポーネント構成を生成する。
+
+## 入力
+- LP目的（必須）: 資料DL / 無料トライアル / セミナー申込 / 問い合わせ
+- ターゲットキーワード（必須）: 検索広告のキーワード
+- 競合LP URL（任意）: 差別化ポイントの参考
+
+## 生成手順
+
+### 1. ヒーローセクション
+- キャッチコピー: 課題 + ベネフィットを20文字以内で表現
+- サブコピー: 具体的な数値を含めて60文字以内
+- CTA ボタン: アクション動詞 + ベネフィット（例:「無料で業務効率を改善する」）
+- ヒーロー画像の指示書を含める
+
+### 2. 課題提起セクション
+- ペルソナの課題を3つ列挙
+- 「こんなお悩みありませんか？」形式
+
+### 3. 解決策セクション
+- プロダクトの特徴を3つに絞る
+- 各特徴に具体的な数字を添える
+
+### 4. 社会的証明セクション
+- 導入企業ロゴ（プレースホルダー）
+- 導入事例のサマリー（2社分）
+- 数値実績（「導入企業300社」「満足度98%」等）
+
+### 5. FAQ セクション
+- 想定される質問を5つ用意
+- 構造化データ (FAQPage) を含める
+
+### 6. 最終CTAセクション
+- ヒーローと同じCTAを繰り返す
+- 「無料」「リスクなし」等の安心要素を添える
+
+## 出力
+- `content/landing-pages/（スラッグ）/index.mdx` にLP構成を生成
+- `src/pages/lp/（スラッグ）.tsx` にページコンポーネントを生成
+
+## 品質基準
+- ファーストビューにCTAが含まれること
+- ページ内CTAは最大3つ
+- 構造化データ (FAQPage, BreadcrumbList) を含む
+- モバイルファーストのレスポンシブ設計</code></pre>
+
+                <!-- 5.2 Commands -->
+                <h3 id="phase2-commands">5.2 Commands（コンテンツ公開フロー）の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Commands を使うのか:</strong> コンテンツの「生成」は Skills が担いますが、「生成 → レビュー → 修正 → 公開」の一連フローには複数のステップがあります。Commands はこの定型フローを1つのコマンドにまとめ、手順の抜け漏れを防ぎます。例えば <code>/publish-content</code> を実行するだけで、SEOチェック → ブランドチェック → 法務チェック → 公開という全ステップが自動実行されます。
+                </div>
+
+                <div class="code-header"><span>.claude/commands/publish-content.md</span></div>
+                <pre><code># コンテンツ公開コマンド
+
+## 概要
+コンテンツのレビューから公開までの一連フローを自動実行する。
+
+## 使用方法
+```
+/publish-content [ファイルパス]
+```
+
+## 実行フロー
+
+### Step 1: ファイル検証
+- 指定されたファイルが存在するか確認
+- frontmatter の必須フィールドを検証（title, description, date, author）
+- ドラフトフラグの確認
+
+### Step 2: SEO チェック
+SEO レビューエージェントを呼び出し、以下を検証:
+- title の文字数・キーワード配置
+- meta description の文字数
+- 見出し構造（h1が1つ、h2が3つ以上）
+- 内部リンク数（3つ以上）
+- 画像の alt テキスト
+- 構造化データの有無
+
+### Step 3: ブランドチェック
+ブランドチェックエージェントを呼び出し、以下を検証:
+- 禁止ワードの使用有無
+- トーン＆ボイスの一貫性
+- 文体ルール（ですます調、1文60文字以内）
+- ビジュアル基準（ブランドカラー、画像サイズ）
+
+### Step 4: 法務チェック
+法務レビューエージェントを呼び出し、以下を検証:
+- 景品表示法リスク（最上級表現、根拠なき比較）
+- 薬機法リスク（効能効果の断言）
+- 特定商取引法リスク（価格表示、解約条件）
+- 引用・著作権リスク
+
+### Step 5: 修正提案の統合
+各エージェントの指摘を統合し、優先度付きで修正提案を一覧表示:
+- 🔴 Critical: 公開前に必須修正
+- 🟡 Warning: 修正推奨
+- 🔵 Suggestion: 改善提案
+
+### Step 6: 公開処理
+Critical 指摘が0件の場合:
+1. ドラフトフラグを `false` に変更
+2. 公開日時を設定
+3. サイトマップを再生成（`npm run generate:sitemap`）
+4. RSSフィードを更新（`npm run generate:rss`）
+5. Git コミット＆プッシュ
+6. Slack に公開通知を送信
+
+Critical 指摘がある場合:
+- 修正箇所を具体的に提示し、公開を中止
+- 修正後に再度 `/publish-content` を実行するよう案内</code></pre>
+
+                <h3 id="content-workflow">コンテンツ制作フロー全体像</h3>
+
+                <p>キーワード調査からコンテンツ生成、レビュー、公開、効果測定までの一連フローを示します。各ステップでどのClaude Code機能が使われるかをマッピングしています。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph LR
+A["キーワード調査<br/>担当: マーケ責任者"] --> B["構成案作成<br/>担当: コンテンツ担当"]
+B --> C["/gen-blog 実行<br/>Skills で記事生成"]
+C --> D["SEO Agent<br/>SEO観点レビュー"]
+D --> E["Brand Agent<br/>ブランドチェック"]
+E --> F["Legal Agent<br/>法務チェック"]
+F --> G{{"Critical<br/>指摘あり？"}}
+G -->|はい| H["修正対応"]
+H --> D
+G -->|いいえ| I["/publish-content<br/>公開処理"]
+I --> J["GA4で効果測定<br/>MCP経由"]
+
+style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style C fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style D fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style E fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style F fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style I fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style J fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">コンテンツ制作フロー — キーワード調査から効果測定まで</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>運用のコツ:</strong> コンテンツ制作フローでは「レビュー → 修正」のループが発生します。修正回数を減らすには、Phase 1 の CLAUDE.md とRules の精度を高めることが重要です。AIが最初から高品質なコンテンツを生成できれば、レビューでの指摘が減り、公開までのリードタイムが短縮されます。
+                </div>
+
+                <!-- ============================================================
+                     セクション6: Phase 3 — 品質管理体制
+                     ============================================================ -->
+
+                <h2 id="phase3">Phase 3 -- 品質管理体制</h2>
+
+                <p>Phase 3 では、Agents と Agent Teams を活用して品質管理体制を構築します。SEO・ブランド・法務の3つの観点で専門エージェントが自動レビューし、Agent Teams で並列実行することでレビュー時間を短縮します。</p>
+
+                <!-- 6.1 Agents -->
+                <h3 id="phase3-agents">6.1 Agents（レビューエージェント）の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Agents を使うのか:</strong> マーケティングコンテンツのレビューには、SEO、ブランド、法務という3つの全く異なる専門知識が必要です。1人のレビュアーに3つの観点を全て求めるのは非現実的であり、チェック漏れの原因になります。Agents を使って観点別の専門エージェントを作成することで、各観点に特化した深いレビューが可能になります。AIエージェントは疲れず、チェックリストを100%遵守するため、品質のバラつきがなくなります。
+                </div>
+
+                <h4>（a）SEO レビューエージェント</h4>
+
+                <div class="code-header"><span>.claude/agents/seo-reviewer.md</span></div>
+                <pre><code># SEO レビューエージェント
+
+## 役割
+コンテンツのSEO品質を評価し、検索順位向上のための改善提案を行う。
+
+## レビュー観点
+
+### メタ情報チェック
+- title タグ: 30-60文字か、キーワードが先頭30文字以内に含まれているか
+- meta description: 120-160文字か、CTRを高める表現になっているか
+- canonical URL: 正しく設定されているか
+- OGP タグ: title, description, image が設定されているか
+
+### 見出し構造チェック
+- h1 が1つだけ存在するか
+- h1 にターゲットキーワードが含まれているか
+- 見出し階層が正しいか（h2 → h3 → h4）
+- h2 が最低3つあるか
+
+### コンテンツ品質チェック
+- 本文が2,000文字以上あるか
+- ターゲットキーワードの出現率が適切か（1-3%）
+- 関連キーワード（LSI）が自然に含まれているか
+- 導入文（最初の100文字）にキーワードがあるか
+
+### 内部リンクチェック
+- 内部リンクが最低3つあるか
+- アンカーテキストが具体的か（「こちら」は非推奨）
+- リンク切れがないか
+
+### 技術要件チェック
+- 画像が WebP 形式か
+- 画像に width / height 属性があるか
+- 画像に alt テキストがあるか
+- 構造化データ (JSON-LD) が含まれているか
+- パンくずリストがあるか
+
+## 出力形式
+```markdown
+## SEO レビュー結果
+
+### スコア: ○○/100
+
+### 🔴 Critical（必須修正）
+- [項目]: [具体的な指摘と修正例]
+
+### 🟡 Warning（修正推奨）
+- [項目]: [具体的な指摘と修正例]
+
+### 🔵 Suggestion（改善提案）
+- [項目]: [具体的な指摘と修正例]
+```</code></pre>
+
+                <h4>（b）ブランドチェックエージェント</h4>
+
+                <div class="code-header"><span>.claude/agents/brand-checker.md</span></div>
+                <pre><code># ブランドチェックエージェント
+
+## 役割
+コンテンツがブランドガイドラインに準拠しているかを評価し、ブランドの一貫性を保つ。
+
+## レビュー観点
+
+### トーン＆ボイスチェック
+- プロフェッショナルだが親しみやすいトーンか
+- ですます調で統一されているか
+- 読者を「あなた」と二人称で呼びかけているか
+- 技術用語に適切な説明が添えられているか
+
+### 禁止ワードチェック
+以下のワードが使用されていないか全文検索:
+- カジュアル表現: 「激安」「爆速」「神」「ヤバい」「マジ」
+- 誇大表現: 「業界No.1」「唯一の」「絶対に」
+- ネガティブ表現: 競合他社の名指し
+
+### 文体ルールチェック
+- 1文が60文字以内に収まっているか
+- 箇条書きが5項目以内か
+- 段落が3-4文で区切られているか
+- 漢字の使用率が適切か（30-40%目安）
+
+### ビジュアルチェック
+- ブランドカラーのみ使用されているか (#2563EB, #10B981)
+- CTAボタンが3つ以内か
+- 画像サイズが規定に沿っているか
+- フォント指定が正しいか
+
+## 出力形式
+```markdown
+## ブランドチェック結果
+
+### 準拠率: ○○%
+
+### 🔴 Critical（必須修正）
+- [行番号] [該当テキスト] → [修正案]
+
+### 🟡 Warning（修正推奨）
+- [行番号] [該当テキスト] → [修正案]
+
+### 🔵 Suggestion（改善提案）
+- [行番号] [該当テキスト] → [修正案]
+```</code></pre>
+
+                <h4>（c）法務レビューエージェント</h4>
+
+                <div class="code-header"><span>.claude/agents/legal-reviewer.md</span></div>
+                <pre><code># 法務レビューエージェント
+
+## 役割
+コンテンツの法的リスクを評価し、法令違反を事前に防止する。
+
+## レビュー観点
+
+### 景品表示法チェック
+- 「No.1」「最高」「最安」等の最上級表現に客観的データの出典があるか
+- 比較広告の根拠データが明示されているか
+- 「期間限定」「先着○名」の実際の制限が正確か
+- 二重価格表示（元値の吊り上げ）がないか
+
+### 薬機法チェック（SaaSでも注意）
+- 効能効果を断言していないか（「売上が上がる」→「売上向上が期待できる」）
+- 体験談に「個人の感想です」「成果を保証するものではありません」の注記があるか
+- 医療・健康に関する表現がないか
+
+### 特定商取引法チェック
+- 価格表示に税込/税別が明記されているか
+- 無料トライアルの自動課金条件が明示されているか
+- 解約条件・手続き方法が記載されているか
+
+### 著作権・商標チェック
+- 他社の商標が無許可で使用されていないか
+- 引用が出典元を明記し、適切な範囲内か
+- 画像の利用権が確認されているか
+
+### 個人情報保護法チェック
+- フォームにプライバシーポリシーリンクがあるか
+- 個人情報の利用目的が明示されているか
+- Cookie同意の仕組みがあるか
+
+## 出力形式
+```markdown
+## 法務レビュー結果
+
+### リスクレベル: 低 / 中 / 高
+
+### 🔴 Critical（公開不可 — 法的リスク）
+- [該当箇所] [リスクの説明] [修正案]
+
+### 🟡 Warning（修正推奨 — 潜在リスク）
+- [該当箇所] [リスクの説明] [修正案]
+
+### 🔵 Suggestion（予防的改善）
+- [該当箇所] [リスクの説明] [修正案]
+```</code></pre>
+
+                <!-- 6.2 Agent Teams -->
+                <h3 id="phase3-agent-teams">6.2 Agent Teams（並列レビュー）の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ Agent Teams を使うのか:</strong> SEO・ブランド・法務の3つのレビューエージェントを順番に実行すると、レビュー完了まで3倍の時間がかかります。Agent Teams はこれらのエージェントを並列実行し、結果を統合します。5名の少人数チームにとって、レビュー時間の短縮は生産性に直結します。また、3つの観点の指摘が一覧で確認できるため、修正漏れも防げます。
+                </div>
+
+                <div class="code-header"><span>.claude/agents/content-review-team.md</span></div>
+                <pre><code># コンテンツレビューチーム
+
+## 概要
+SEO・ブランド・法務の3つの観点でコンテンツを並列レビューし、
+統合フィードバックを生成する。
+
+## チーム構成
+
+### エージェント1: SEO レビュアー
+- エージェント定義: `.claude/agents/seo-reviewer.md`
+- 担当: SEO品質の評価
+- 出力: SEOスコアと改善提案
+
+### エージェント2: ブランドチェッカー
+- エージェント定義: `.claude/agents/brand-checker.md`
+- 担当: ブランドガイドライン準拠の確認
+- 出力: ブランド準拠率と違反箇所
+
+### エージェント3: 法務レビュアー
+- エージェント定義: `.claude/agents/legal-reviewer.md`
+- 担当: 法的リスクの評価
+- 出力: リスクレベルと修正提案
+
+## 実行方法
+```
+3つのエージェントを並列で実行し、全てのレビューが完了したら
+結果を統合レポートとしてまとめる。
+```
+
+## 統合レポート形式
+```markdown
+# コンテンツレビュー統合レポート
+
+## 対象ファイル: [ファイルパス]
+## レビュー日時: [日時]
+
+## 総合判定: ✅ 公開可 / ⚠️ 要修正 / 🚫 公開不可
+
+---
+
+## SEO レビュー（スコア: ○○/100）
+[SEOレビュアーの出力]
+
+## ブランドチェック（準拠率: ○○%）
+[ブランドチェッカーの出力]
+
+## 法務レビュー（リスクレベル: 低/中/高）
+[法務レビュアーの出力]
+
+---
+
+## 優先修正事項（Critical のみ抽出）
+1. [最も優先度の高い修正]
+2. [次に優先度の高い修正]
+...
+```
+
+## 公開判定基準
+- **公開可**: Critical 指摘が0件
+- **要修正**: Critical 指摘が1-2件（修正後に再レビュー）
+- **公開不可**: Critical 指摘が3件以上、または法務リスク「高」</code></pre>
+
+                <h3 id="parallel-review">並列レビュー体制</h3>
+
+                <p>3つのレビューエージェントが並列実行される流れを示します。従来は3つのレビューを順番に行っていましたが、Agent Teams により同時実行が可能になり、レビュー時間を大幅に短縮できます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph TD
+A["コンテンツ完成<br/>レビューリクエスト"] --> B["Agent Teams<br/>並列レビュー開始"]
+
+B --> C["🔍 SEO Agent<br/>SEO品質評価"]
+B --> D["🎨 Brand Agent<br/>ブランド準拠チェック"]
+B --> E["⚖️ Legal Agent<br/>法務リスク評価"]
+
+C --> F["統合レポート生成"]
+D --> F
+E --> F
+
+F --> G{{"Critical<br/>指摘あり？"}}
+G -->|0件| H["✅ 公開可"]
+G -->|1-2件| I["⚠️ 要修正<br/>修正後に再レビュー"]
+G -->|3件以上| J["🚫 公開不可<br/>大幅見直し"]
+
+I --> A
+
+style A fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style B fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style C fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style D fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style E fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style F fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style H fill:#d1fae5,stroke:#059669,color:#1e293b
+style I fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style J fill:#fee2e2,stroke:#dc2626,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">並列レビュー体制 — 3エージェントの同時実行と統合フィードバック</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>並列レビューの効果:</strong> 3つのエージェントが並列実行されるため、レビュー時間は「最も遅いエージェントの処理時間」に収束します。順次実行の場合の約1/3の時間でレビューが完了します。さらに、統合レポートにより修正箇所が一覧化されるため、修正対応も効率化されます。
+                </div>
+
+                <!-- ============================================================
+                     セクション7: Phase 4 — 外部連携と分析
+                     ============================================================ -->
+
+                <h2 id="phase4">Phase 4 -- 外部連携と分析</h2>
+
+                <p>Phase 4 では、MCP を活用して GA4・HubSpot・SendGrid と連携し、マーケティングデータの自動取得と分析レポート生成を実現します。手動でのデータ集計作業をゼロにし、リアルタイムにデータに基づく意思決定ができる環境を構築します。</p>
+
+                <!-- 7.1 MCP -->
+                <h3 id="phase4-mcp">7.1 MCP（外部ツール連携）の設計</h3>
+
+                <div class="callout info">
+                  <strong>なぜ MCP を使うのか:</strong> マーケティングでは GA4、HubSpot、SendGrid など複数の外部ツールのデータを日常的に参照します。従来はブラウザで各ツールにログインし、データをエクスポートし、Excelで加工するという手作業が必要でした。MCP（Model Context Protocol）を使えば、AIが直接これらのツールにアクセスしてデータを取得・分析できます。「GA4でこのページの直帰率を教えて」と聞くだけで、AIがMCP経由でデータを取得して回答します。
+                </div>
+
+                <p><strong>手順:</strong></p>
+                <ol>
+                  <li>各ツールのAPIキーを環境変数に設定する</li>
+                  <li><code>.claude/settings.json</code> にMCPサーバーの定義を追加する</li>
+                  <li>AIに各ツールへのアクセス権限が与えられ、自然言語でデータを問い合わせ可能になる</li>
+                </ol>
+
+                <div class="code-header"><span>.claude/settings.json（MCP 設定部分）</span></div>
+                <pre><code>{
+  "mcpServers": {
+    "hubspot": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-hubspot"],
+      "env": {
+        "HUBSPOT_TOKEN": "${HUBSPOT_TOKEN}"
+      }
+    },
+    "google-analytics": {
+      "command": "npx",
+      "args": ["-y", "mcp-ga4"],
+      "env": {
+        "GA4_PROPERTY_ID": "${GA4_PROPERTY_ID}",
+        "GA4_CREDENTIALS_PATH": "${GA4_CREDENTIALS_PATH}"
+      }
+    },
+    "sendgrid": {
+      "command": "npx",
+      "args": ["-y", "mcp-sendgrid"],
+      "env": {
+        "SENDGRID_API_KEY": "${SENDGRID_API_KEY}"
+      }
+    }
+  }
+}</code></pre>
+
+                <div class="callout warning">
+                  <strong>セキュリティ注意:</strong> APIキーは絶対にソースコードや settings.json にハードコーディングしないでください。<code>${HUBSPOT_TOKEN}</code> のように環境変数参照を使い、実際の値は <code>.env</code> ファイルに記載します。<code>.env</code> ファイルは <code>.gitignore</code> に含め、リポジトリにコミットしないでください。
+                </div>
+
+                <div class="code-header"><span>.env（環境変数設定 -- .gitignore に必ず含める）</span></div>
+                <pre><code># HubSpot
+HUBSPOT_TOKEN=your-hubspot-api-token
+
+# Google Analytics 4
+GA4_PROPERTY_ID=your-ga4-property-id
+GA4_CREDENTIALS_PATH=./credentials/ga4-service-account.json
+
+# SendGrid
+SENDGRID_API_KEY=your-sendgrid-api-key
+
+# Algolia
+ALGOLIA_APP_ID=your-algolia-app-id
+ALGOLIA_ADMIN_KEY=your-algolia-admin-key
+
+# SNS
+TWITTER_API_KEY=your-twitter-api-key
+LINKEDIN_ACCESS_TOKEN=your-linkedin-access-token</code></pre>
+
+                <h4>MCP 連携で何ができるか</h4>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ツール</th>
+                      <th>MCP 経由で実行できること</th>
+                      <th>従来の作業（手動）</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>GA4</strong></td>
+                      <td>PV数、直帰率、コンバージョン率、流入キーワードの取得と分析</td>
+                      <td>GA4にログイン → エクスポート → Excel加工</td>
+                    </tr>
+                    <tr>
+                      <td><strong>HubSpot</strong></td>
+                      <td>リード情報の取得、スコアリング、キャンペーン成果の確認</td>
+                      <td>HubSpotにログイン → ダッシュボードで確認 → スクショ共有</td>
+                    </tr>
+                    <tr>
+                      <td><strong>SendGrid</strong></td>
+                      <td>メール配信結果（開封率、クリック率、バウンス率）の取得と分析</td>
+                      <td>SendGridにログイン → レポート画面で確認 → 手動集計</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- 7.2 分析レポート -->
+                <h3 id="phase4-report">7.2 分析レポート自動生成</h3>
+
+                <div class="callout info">
+                  <strong>なぜ分析レポートスキルが必要か:</strong> マーケ責任者は毎週・毎月のレポート作成に多大な時間を費やしています。GA4からデータを取得し、HubSpotのリード情報と突き合わせ、SendGridの配信結果を集計し、ExcelやPowerPointでレポートを作成する工程は、半日以上かかることもあります。このスキルを使えば、MCP経由でデータを自動取得し、分析・考察・改善提案まで含めたレポートを数分で生成できます。
+                </div>
+
+                <div class="code-header"><span>.claude/skills/marketing-report/SKILL.md</span></div>
+                <pre><code># マーケティングレポート生成スキル
+
+## 概要
+GA4・HubSpot・SendGrid のデータを統合し、
+週次/月次マーケティングレポートを自動生成する。
+
+## 入力
+- レポート期間（必須）: weekly / monthly
+- 比較対象（任意）: 前期比 / 前年同期比
+
+## 生成手順
+
+### 1. データ取得（MCP経由）
+
+#### GA4 データ
+- PV数（全体 + 記事別 Top10）
+- セッション数・ユーザー数
+- 直帰率・平均セッション時間
+- 流入チャネル別セッション（Organic / Direct / Referral / Social / Email）
+- コンバージョン率（目標別）
+- 上位流入キーワード Top20
+
+#### HubSpot データ
+- 新規リード数（MQL / SQL）
+- リードソース別内訳
+- ライフサイクルステージ別推移
+- キャンペーン別成果
+
+#### SendGrid データ
+- メール配信数
+- 開封率・クリック率
+- バウンス率・スパム報告率
+- リンク別クリック数
+
+### 2. 分析・考察
+- KPI の達成率を算出
+- 前期比の増減を分析
+- 好調・不調のコンテンツを特定
+- 流入チャネルの変化を分析
+
+### 3. 改善提案
+- データに基づく具体的なアクション提案を3つ以上
+- 次のコンテンツテーマの推奨
+- メール配信の最適化提案
+
+### 4. レポート出力
+```markdown
+# マーケティングレポート（YYYY年MM月DD日 〜 MM月DD日）
+
+## エグゼクティブサマリー
+[3行以内で主要トピックを要約]
+
+## KPI サマリー
+| 指標 | 今期 | 前期 | 増減 | 目標 | 達成率 |
+|------|------|------|------|------|--------|
+| PV数 | X | Y | +Z% | A | B% |
+| 新規リード数 | X | Y | +Z% | A | B% |
+| MQL数 | X | Y | +Z% | A | B% |
+| メール開封率 | X% | Y% | +Z pt | A% | - |
+
+## チャネル別分析
+[流入チャネルの詳細分析]
+
+## コンテンツ パフォーマンス Top5
+[PV数・CV貢献度の高い記事]
+
+## メールキャンペーン結果
+[配信結果の詳細]
+
+## 改善提案
+1. [データに基づく具体的提案]
+2. [データに基づく具体的提案]
+3. [データに基づく具体的提案]
+```
+
+## 出力先
+- `reports/（YYYY-MM-DD）-marketing-report.md`</code></pre>
+
+                <h3 id="data-flow">データフロー全体像</h3>
+
+                <p>外部ツールからデータが集約され、レポートが生成されるまでのデータフローを示します。MCP がデータ取得のハブとなり、BigQuery がデータウェアハウスとして長期保存を担います。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph LR
+A["GA4<br/>アクセスデータ"] --> D["MCP<br/>データ取得ハブ"]
+B["HubSpot<br/>リードデータ"] --> D
+C["SendGrid<br/>配信データ"] --> D
+
+D --> E["BigQuery<br/>データウェアハウス"]
+E --> F["レポート生成<br/>/marketing-report"]
+
+F --> G["Slack 通知<br/>チーム共有"]
+F --> H["ダッシュボード更新<br/>リアルタイム表示"]
+
+style A fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style B fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style C fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style D fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style E fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style F fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style G fill:#fce7f3,stroke:#ec4899,color:#1e293b
+style H fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">データフロー — 外部ツールからレポート生成・共有まで</div>
+                </div>
+
+                <!-- ============================================================
+                     セクション8: 運用ガイド
+                     ============================================================ -->
+
+                <h2 id="operations">運用ガイド</h2>
+
+                <p>Phase 1〜4 で構築した基盤を実際に運用するためのガイドです。コンテンツカレンダーの管理、KPIモニタリング、継続的な改善サイクルについて解説します。</p>
+
+                <!-- 8.1 コンテンツカレンダー -->
+                <h3 id="ops-calendar">7.1 コンテンツカレンダー管理</h3>
+
+                <div class="callout info">
+                  <strong>なぜコンテンツカレンダーが必要か:</strong> AI駆動でコンテンツを高速生成できるようになると、「何を」「いつ」公開するかの計画管理がボトルネックになります。コンテンツカレンダーでテーマ・キーワード・公開日を事前に決めておくことで、AIへの指示が明確になり、コンテンツの一貫性も保たれます。
+                </div>
+
+                <h4>週間コンテンツカレンダーの例</h4>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>曜日</th>
+                      <th>コンテンツ種別</th>
+                      <th>担当</th>
+                      <th>ステータス管理</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>月曜</td>
+                      <td>ブログ記事（SEO）</td>
+                      <td>コンテンツ担当A</td>
+                      <td>/gen-blog → レビュー → /publish-content</td>
+                    </tr>
+                    <tr>
+                      <td>火曜</td>
+                      <td>メールキャンペーン</td>
+                      <td>コンテンツ担当B</td>
+                      <td>/gen-email → A/Bテスト設定 → 配信</td>
+                    </tr>
+                    <tr>
+                      <td>水曜</td>
+                      <td>SNS投稿（3件）</td>
+                      <td>コンテンツ担当A</td>
+                      <td>ブログ記事の要約 → 各SNS最適化 → 予約投稿</td>
+                    </tr>
+                    <tr>
+                      <td>木曜</td>
+                      <td>ブログ記事（事例）</td>
+                      <td>コンテンツ担当B</td>
+                      <td>/gen-blog → レビュー → /publish-content</td>
+                    </tr>
+                    <tr>
+                      <td>金曜</td>
+                      <td>週次レポート</td>
+                      <td>マーケ責任者</td>
+                      <td>/marketing-report → 分析 → 来週計画</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h4>コンテンツカレンダー管理用コマンド</h4>
+
+                <div class="code-header"><span>.claude/commands/content-calendar.md</span></div>
+                <pre><code># コンテンツカレンダーコマンド
+
+## 概要
+コンテンツカレンダーの確認・更新を行う。
+
+## 使用方法
+```
+/content-calendar [week|month] [日付(任意)]
+```
+
+## 実行内容
+
+### 週間表示（/content-calendar week）
+1. `content/calendar/` 配下のカレンダーファイルを読み込む
+2. 今週の予定を一覧表示
+3. 各コンテンツのステータス（企画中/執筆中/レビュー中/公開済み）を表示
+4. 遅延しているコンテンツがあればアラートを表示
+
+### 月間表示（/content-calendar month）
+1. 今月の全予定を一覧表示
+2. キーワードの重複チェック
+3. コンテンツ種別のバランスチェック（ブログ:メール:SNS の比率）
+4. KPI 進捗（月間目標に対する達成率）</code></pre>
+
+                <!-- 8.2 KPI モニタリング -->
+                <h3 id="ops-kpi">7.2 KPI モニタリング</h3>
+
+                <div class="callout info">
+                  <strong>なぜ KPI モニタリングを仕組み化するのか:</strong> AI駆動マーケティングの効果を定量的に測定し、改善につなげるためです。「コンテンツを量産すること」自体が目的ではなく、「ビジネス成果に貢献するコンテンツを作ること」が目的です。KPI を定義し、定期的にモニタリングすることで、AIの出力品質を継続的に改善できます。
+                </div>
+
+                <h4>KPI 体系</h4>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>カテゴリ</th>
+                      <th>KPI</th>
+                      <th>月間目標</th>
+                      <th>計測ツール</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>トラフィック</td>
+                      <td>オーガニックセッション数</td>
+                      <td>前月比 +15%</td>
+                      <td>GA4</td>
+                    </tr>
+                    <tr>
+                      <td>トラフィック</td>
+                      <td>ブログPV数</td>
+                      <td>50,000 PV</td>
+                      <td>GA4</td>
+                    </tr>
+                    <tr>
+                      <td>リード</td>
+                      <td>新規MQL数</td>
+                      <td>100件</td>
+                      <td>HubSpot</td>
+                    </tr>
+                    <tr>
+                      <td>リード</td>
+                      <td>資料DL数</td>
+                      <td>200件</td>
+                      <td>HubSpot</td>
+                    </tr>
+                    <tr>
+                      <td>エンゲージメント</td>
+                      <td>メール開封率</td>
+                      <td>25%以上</td>
+                      <td>SendGrid</td>
+                    </tr>
+                    <tr>
+                      <td>エンゲージメント</td>
+                      <td>メールクリック率</td>
+                      <td>3%以上</td>
+                      <td>SendGrid</td>
+                    </tr>
+                    <tr>
+                      <td>コンバージョン</td>
+                      <td>LP CVR</td>
+                      <td>3%以上</td>
+                      <td>GA4</td>
+                    </tr>
+                    <tr>
+                      <td>コンテンツ品質</td>
+                      <td>SEOスコア平均</td>
+                      <td>85点以上</td>
+                      <td>check-seo-score.js</td>
+                    </tr>
+                    <tr>
+                      <td>効率</td>
+                      <td>記事公開までのリードタイム</td>
+                      <td>3営業日以内</td>
+                      <td>Git コミット履歴</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- 8.3 改善サイクル -->
+                <h3 id="ops-improvement">7.3 改善サイクル</h3>
+
+                <div class="callout info">
+                  <strong>なぜ改善サイクルを回すのか:</strong> AI駆動マーケティングは「一度設定すれば完了」ではありません。市場環境、検索アルゴリズム、競合の動き、ペルソナの課題は常に変化します。PDCA サイクルを回して CLAUDE.md のペルソナ情報を更新し、Rules のSEO基準を調整し、Skills の生成テンプレートを改善することで、AIの出力品質を継続的に向上させます。
+                </div>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+graph LR
+A["📋 Plan<br/>戦略・KPI設定<br/>コンテンツカレンダー作成<br/>キーワード調査"] --> B["✏️ Create<br/>コンテンツ生成<br/>/gen-blog, /gen-email<br/>Skills 活用"]
+B --> C["🚀 Publish<br/>レビュー・公開<br/>/publish-content<br/>Agent Teams 並列レビュー"]
+C --> D["📊 Measure<br/>効果測定<br/>/marketing-report<br/>MCP でデータ取得"]
+D --> E["🔧 Optimize<br/>改善実施<br/>CLAUDE.md 更新<br/>Rules 調整・Skills 改善"]
+E --> A
+
+style A fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+style B fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+style C fill:#ecfdf5,stroke:#10b981,color:#1e293b
+style D fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+style E fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">マーケティング改善サイクル — Plan → Create → Publish → Measure → Optimize</div>
+                </div>
+
+                <h4>各フェーズの詳細</h4>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フェーズ</th>
+                      <th>実施内容</th>
+                      <th>使用する Claude Code 機能</th>
+                      <th>担当</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Plan</strong></td>
+                      <td>KPI設定、キーワード調査、コンテンツカレンダー作成</td>
+                      <td>MCP（GA4でキーワード分析）、/content-calendar</td>
+                      <td>マーケ責任者</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Create</strong></td>
+                      <td>ブログ記事・メール・LP の生成</td>
+                      <td>Skills（/gen-blog, /gen-email, /gen-lp）</td>
+                      <td>コンテンツ担当</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Publish</strong></td>
+                      <td>レビュー・修正・公開</td>
+                      <td>Agent Teams（並列レビュー）、Commands（/publish-content）</td>
+                      <td>コンテンツ担当 + エンジニア</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Measure</strong></td>
+                      <td>KPI計測、レポート生成</td>
+                      <td>MCP（GA4, HubSpot, SendGrid）、Skills（/marketing-report）</td>
+                      <td>マーケ責任者</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Optimize</strong></td>
+                      <td>CLAUDE.md・Rules・Skills の改善</td>
+                      <td>データに基づく設定ファイル更新</td>
+                      <td>チーム全員</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h4>Optimize フェーズの具体的なアクション</h4>
+
+                <div class="callout tip">
+                  <strong>改善の具体例:</strong>
+                  <ul>
+                    <li><strong>ペルソナの更新:</strong> HubSpot のリードデータから実際の顧客像を分析し、CLAUDE.md のペルソナを実態に合わせて更新する</li>
+                    <li><strong>SEO基準の調整:</strong> GA4 の検索パフォーマンスデータから、上位表示されている記事のパターンを分析し、Rules の SEO基準を調整する</li>
+                    <li><strong>メール最適化:</strong> SendGrid の A/Bテスト結果から、高開封率の件名パターンを特定し、/gen-email スキルのテンプレートに反映する</li>
+                    <li><strong>禁止ワードの追加:</strong> ブランドチェックで頻出する指摘をRules に追加し、初回生成の品質を向上させる</li>
+                  </ul>
+                </div>
+
+                <!-- ============================================================
+                     セクション9: 全体構成ファイル一覧
+                     ============================================================ -->
+
+                <h2 id="file-summary">全体構成ファイル一覧</h2>
+
+                <p>本ガイドで解説した全ての設定ファイルの一覧です。各ファイルの役割と、どの Phase で設定するかをまとめています。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Phase</th>
+                      <th>ファイルパス</th>
+                      <th>機能</th>
+                      <th>役割</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td><code>.claude/CLAUDE.md</code></td>
+                      <td>CLAUDE.md</td>
+                      <td>マーケ戦略・ペルソナ・ブランドガイドライン定義</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td><code>.claude/rules/brand-guidelines.md</code></td>
+                      <td>Rules</td>
+                      <td>ブランドガイドライン強制（常時適用）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td><code>.claude/rules/seo-standards.md</code></td>
+                      <td>Rules</td>
+                      <td>SEO基準強制（パス別: content/**, src/pages/**）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td><code>.claude/rules/email-standards.md</code></td>
+                      <td>Rules</td>
+                      <td>メール配信基準強制（パス別: content/emails/**）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td><code>.claude/rules/legal-compliance.md</code></td>
+                      <td>Rules</td>
+                      <td>法務コンプライアンスチェック（常時適用）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 1</td>
+                      <td><code>.claude/settings.json</code></td>
+                      <td>Hooks</td>
+                      <td>品質チェック自動発火（SEOスコア、スパムスコア等）</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td><code>.claude/skills/gen-blog/SKILL.md</code></td>
+                      <td>Skills</td>
+                      <td>SEO最適化済みブログ記事生成</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td><code>.claude/skills/gen-email/SKILL.md</code></td>
+                      <td>Skills</td>
+                      <td>メールキャンペーン文面生成</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td><code>.claude/skills/gen-lp/SKILL.md</code></td>
+                      <td>Skills</td>
+                      <td>ランディングページ生成</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 2</td>
+                      <td><code>.claude/commands/publish-content.md</code></td>
+                      <td>Commands</td>
+                      <td>コンテンツ公開一連フロー自動化</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td><code>.claude/agents/seo-reviewer.md</code></td>
+                      <td>Agents</td>
+                      <td>SEO品質レビューエージェント</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td><code>.claude/agents/brand-checker.md</code></td>
+                      <td>Agents</td>
+                      <td>ブランドガイドライン準拠チェックエージェント</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td><code>.claude/agents/legal-reviewer.md</code></td>
+                      <td>Agents</td>
+                      <td>法務リスク評価エージェント</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 3</td>
+                      <td><code>.claude/agents/content-review-team.md</code></td>
+                      <td>Agent Teams</td>
+                      <td>3エージェント並列レビュー統合</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td><code>.claude/settings.json</code> (MCP部分)</td>
+                      <td>MCP</td>
+                      <td>GA4・HubSpot・SendGrid 外部連携</td>
+                    </tr>
+                    <tr>
+                      <td>Phase 4</td>
+                      <td><code>.claude/skills/marketing-report/SKILL.md</code></td>
+                      <td>Skills</td>
+                      <td>週次/月次マーケティングレポート自動生成</td>
+                    </tr>
+                    <tr>
+                      <td>運用</td>
+                      <td><code>.claude/commands/content-calendar.md</code></td>
+                      <td>Commands</td>
+                      <td>コンテンツカレンダー管理</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション10: 導入ステップ
+                     ============================================================ -->
+
+                <h2 id="getting-started">導入ステップ</h2>
+
+                <p>AI駆動マーケティング基盤を段階的に導入するためのステップです。一度に全てを設定するのではなく、Phase ごとに導入し、各段階で効果を確認しながら進めることを推奨します。</p>
+
+                <h3 id="step-by-step">段階的な導入計画</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>期間</th>
+                      <th>Phase</th>
+                      <th>導入内容</th>
+                      <th>期待効果</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1-2週目</td>
+                      <td>Phase 1</td>
+                      <td>CLAUDE.md + Rules の設計</td>
+                      <td>AIの出力品質が安定し、ブランドの一貫性が向上</td>
+                    </tr>
+                    <tr>
+                      <td>3-4週目</td>
+                      <td>Phase 2</td>
+                      <td>Skills + Commands の設計</td>
+                      <td>コンテンツ生成速度が3倍に向上</td>
+                    </tr>
+                    <tr>
+                      <td>5-6週目</td>
+                      <td>Phase 3</td>
+                      <td>Agents + Agent Teams の設計</td>
+                      <td>レビュー時間が1/3に短縮、品質の一貫性向上</td>
+                    </tr>
+                    <tr>
+                      <td>7-8週目</td>
+                      <td>Phase 4</td>
+                      <td>MCP + 分析レポート</td>
+                      <td>レポート作成時間が半日 → 数分に短縮</td>
+                    </tr>
+                    <tr>
+                      <td>9週目以降</td>
+                      <td>運用</td>
+                      <td>PDCA サイクル開始</td>
+                      <td>継続的な品質向上と成果改善</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="first-steps">最初の一歩</h3>
+
+                <div class="callout tip">
+                  <strong>まず始めること:</strong>
+                  <ol>
+                    <li><strong>CLAUDE.md を書く</strong> -- ペルソナとブランドガイドラインを定義する。これが全ての基盤になる</li>
+                    <li><strong>/gen-blog を試す</strong> -- 1本のブログ記事を生成し、品質を確認する。不足があれば CLAUDE.md を調整する</li>
+                    <li><strong>SEO Agent を動かす</strong> -- 生成した記事をSEOレビューし、改善ポイントを把握する</li>
+                    <li><strong>1本公開する</strong> -- /publish-content で記事を公開し、フロー全体を体験する</li>
+                    <li><strong>効果を測定する</strong> -- 公開1週間後にGA4でパフォーマンスを確認し、次の改善に活かす</li>
+                  </ol>
+                </div>
+
+                <div class="callout warning">
+                  <strong>よくある落とし穴:</strong>
+                  <ul>
+                    <li><strong>CLAUDE.md なしでスキルだけ使う:</strong> ペルソナ未定義の状態でコンテンツを生成すると、ターゲットに響かない汎用的な記事になる</li>
+                    <li><strong>Rules を後回しにする:</strong> ブランドガイドラインなしで量産すると、後から統一感を出すための修正コストが膨大になる</li>
+                    <li><strong>分析を軽視する:</strong> コンテンツを作るだけで効果測定しないと、改善の方向性が分からず、AIの出力品質が停滞する</li>
+                    <li><strong>全機能を同時に導入する:</strong> 段階的に導入しないと、チームが混乱し、各機能のチューニングが不十分になる</li>
+                  </ul>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
