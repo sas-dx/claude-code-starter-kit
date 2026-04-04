@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>Skills（スキル）</h1>
+                <p>Skills は、Claude Code に<strong>新しい能力を教える仕組み</strong>です。<code>SKILL.md</code> ファイルに指示を書くと、Claude のツールキットに追加され、<code>/スキル名</code> で呼び出したり、会話の流れに応じて Claude が自動的に使ったりできます。</p>
+
+                <h2>Skills とは</h2>
+
+                <h3>身近な例えで理解する</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>Claude 本体 = シェフ</h4>
+                    <p>料理の基礎スキルを持っているので何でもそこそこ作れる。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>Skills = レシピカード</h4>
+                    <p>「うちの店のカレーの作り方」というレシピカードを渡せば、毎回同じ品質のカレーを出せるようになる。お客さんが「カレーお願い」と言えば自動的にそのレシピを使う。</p>
+                  </div>
+                </div>
+
+                <h2>なぜ Skills が必要なのか</h2>
+
+                <h3>1. カスタムコマンドの上位互換</h3>
+                <p>Skills は <code>.claude/commands/</code> のカスタムコマンドを包含する機能です。公式ドキュメントでも「Custom commands have been merged into skills」と明記されています。カスタムコマンドに加えて以下ができます:</p>
+                <ul>
+                  <li><strong>ディレクトリ内に複数ファイルを持てる</strong>（テンプレート、スクリプト、参考資料）</li>
+                  <li><strong>Claude が自動的に呼び出せる</strong>（手動 <code>/コマンド</code> だけでなく）</li>
+                  <li><strong>サブエージェントで隔離実行できる</strong>（<code>context: fork</code>）</li>
+                  <li><strong>ツール制限ができる</strong>（<code>allowed-tools</code>）</li>
+                </ul>
+
+                <h3>2. Claude が状況に応じて自動で使ってくれる</h3>
+                <p>カスタムコマンドは <code>/コマンド名</code> と明示的に打つ必要がありますが、Skills は <code>description</code> を元に Claude が「今この場面で使うべきだ」と判断して自動的に適用できます。</p>
+                <p>例えば <code>explain-code</code> スキルの description に「コードの仕組みを解説する」と書いておけば、ユーザーが「この関数どう動くの？」と聞いただけで自動的に図解付きの解説を返します。</p>
+
+                <h3>3. テンプレートやスクリプトを同梱できる</h3>
+                <p>1つのスキルがディレクトリになるので、SKILL.md（本体）に加えて、テンプレートファイル、サンプル出力、ヘルパースクリプトなどをまとめて管理できます。</p>
+
+                <h2>Skills の公式フォーマット</h2>
+
+                <h3>ディレクトリ構成</h3>
+                <pre><code>.claude/skills/
+└── my-skill/
+    ├── SKILL.md           # メイン指示ファイル（必須）
+    ├── template.md        # テンプレート（任意）
+    ├── examples/
+    │   └── sample.md      # サンプル出力（任意）
+    └── scripts/
+        └── helper.sh      # ヘルパースクリプト（任意）</code></pre>
+                <p><code>SKILL.md</code> のみ必須です。他のファイルは任意で、SKILL.md から参照します。</p>
+
+                <h3>SKILL.md の構造</h3>
+                <div class="code-header"><span>SKILL.md の基本構造</span></div>
+                <pre><code>---
+name: my-skill
+description: このスキルが何をするか、いつ使うか
+---
+
+ここにスキルの指示をマークダウンで記述</code></pre>
+                <p>YAML フロントマター（<code>---</code> で囲まれた部分）+ マークダウン本文の構成です。</p>
+
+                <h3>フロントマターフィールド</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>フィールド</th>
+                      <th>必須</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>name</code></td>
+                      <td>いいえ</td>
+                      <td>スキル名。省略時はディレクトリ名を使用</td>
+                    </tr>
+                    <tr>
+                      <td><code>description</code></td>
+                      <td>推奨</td>
+                      <td>スキルの説明。Claude が自動呼び出しの判断に使う</td>
+                    </tr>
+                    <tr>
+                      <td><code>argument-hint</code></td>
+                      <td>いいえ</td>
+                      <td>引数のヒント。<code>[issue-number]</code> のように表示される</td>
+                    </tr>
+                    <tr>
+                      <td><code>disable-model-invocation</code></td>
+                      <td>いいえ</td>
+                      <td><code>true</code> で Claude の自動呼び出しを禁止（手動のみ）</td>
+                    </tr>
+                    <tr>
+                      <td><code>user-invocable</code></td>
+                      <td>いいえ</td>
+                      <td><code>false</code> で <code>/</code> メニューから非表示（Claude のみ使用）</td>
+                    </tr>
+                    <tr>
+                      <td><code>allowed-tools</code></td>
+                      <td>いいえ</td>
+                      <td>スキル実行中に許可するツール</td>
+                    </tr>
+                    <tr>
+                      <td><code>model</code></td>
+                      <td>いいえ</td>
+                      <td>使用するモデル</td>
+                    </tr>
+                    <tr>
+                      <td><code>context</code></td>
+                      <td>いいえ</td>
+                      <td><code>fork</code> でサブエージェントとして隔離実行</td>
+                    </tr>
+                    <tr>
+                      <td><code>agent</code></td>
+                      <td>いいえ</td>
+                      <td><code>context: fork</code> 時のエージェント種別（<code>Explore</code>, <code>Plan</code> 等）</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3>引数の受け渡し</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>変数</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>$ARGUMENTS</code></td>
+                      <td>ユーザーが渡した全引数</td>
+                    </tr>
+                    <tr>
+                      <td><code>$ARGUMENTS[0]</code>, <code>$ARGUMENTS[1]</code></td>
+                      <td>位置引数（0始まり）</td>
+                    </tr>
+                    <tr>
+                      <td><code>$0</code>, <code>$1</code>, <code>$2</code></td>
+                      <td>位置引数の短縮形</td>
+                    </tr>
+                    <tr>
+                      <td><code>${CLAUDE_SKILL_DIR}</code></td>
+                      <td>SKILL.md があるディレクトリのパス</td>
+                    </tr>
+                    <tr>
+                      <td><code>${CLAUDE_SESSION_ID}</code></td>
+                      <td>現在のセッション ID</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3>動的コンテキスト注入</h3>
+                <p><code>!`command`</code> 構文でシェルコマンドの出力をスキル内容に埋め込めます。コマンドはスキル送信前に実行され、出力で置換されます。</p>
+                <div class="code-header"><span>動的コンテキスト注入の例</span></div>
+                <pre><code>---
+name: pr-summary
+context: fork
+agent: Explore
+---
+
+PR の差分: !`gh pr diff`
+変更ファイル: !`gh pr diff --name-only`</code></pre>
+
+                <h3>呼び出し制御</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>設定</th>
+                      <th>ユーザー呼び出し</th>
+                      <th>Claude 自動呼び出し</th>
+                      <th>用途</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>（デフォルト）</td>
+                      <td>可</td>
+                      <td>可</td>
+                      <td>汎用スキル</td>
+                    </tr>
+                    <tr>
+                      <td><code>disable-model-invocation: true</code></td>
+                      <td>可</td>
+                      <td>不可</td>
+                      <td>デプロイ等の副作用があるタスク</td>
+                    </tr>
+                    <tr>
+                      <td><code>user-invocable: false</code></td>
+                      <td>不可</td>
+                      <td>可</td>
+                      <td>背景知識（ユーザーが直接実行する意味がないもの）</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h2>Commands との違い</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>カスタムコマンド</th>
+                      <th>Skills</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>配置</strong></td>
+                      <td><code>.claude/commands/name.md</code></td>
+                      <td><code>.claude/skills/name/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>同名時の優先</strong></td>
+                      <td>-</td>
+                      <td>Skills が優先</td>
+                    </tr>
+                    <tr>
+                      <td><strong>ディレクトリ構成</strong></td>
+                      <td>単一ファイル</td>
+                      <td>ディレクトリ（テンプレート、スクリプト同梱可）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>自動呼び出し</strong></td>
+                      <td>不可</td>
+                      <td><code>description</code> に基づき Claude が自動判定</td>
+                    </tr>
+                    <tr>
+                      <td><strong>サブエージェント実行</strong></td>
+                      <td>不可</td>
+                      <td><code>context: fork</code> で隔離実行可能</td>
+                    </tr>
+                    <tr>
+                      <td><strong>ツール制限</strong></td>
+                      <td>不可</td>
+                      <td><code>allowed-tools</code> で制限可能</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>カスタムコマンドは引き続き動作しますが、新規作成は Skills が推奨されています。</p>
+
+                <h2>本リポジトリで提供しているスキル</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>スキル</th>
+                      <th>呼び出し</th>
+                      <th>自動呼び出し</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>gen-doc</code></td>
+                      <td><code>/gen-doc &lt;パス&gt;</code></td>
+                      <td>不可</td>
+                      <td>ソースコードからドキュメントを自動生成</td>
+                    </tr>
+                    <tr>
+                      <td><code>pr-summary</code></td>
+                      <td><code>/pr-summary [PR番号]</code></td>
+                      <td>不可</td>
+                      <td>PR の差分を分析して構造化サマリーを作成</td>
+                    </tr>
+                    <tr>
+                      <td><code>explain-code</code></td>
+                      <td><code>/explain-code [パス]</code></td>
+                      <td>可</td>
+                      <td>コードの仕組みを図解と例え話で解説</td>
+                    </tr>
+                    <tr>
+                      <td><code>fix-issue</code></td>
+                      <td><code>/fix-issue &lt;Issue番号&gt;</code></td>
+                      <td>不可</td>
+                      <td>GitHub Issue に基づいて実装〜PR 作成</td>
+                    </tr>
+                    <tr>
+                      <td><code>scaffold-feature</code></td>
+                      <td><code>/scaffold-feature &lt;機能名&gt;</code></td>
+                      <td>不可</td>
+                      <td>Claude Code 機能ディレクトリの雛形生成</td>
+                    </tr>
+                    <tr>
+                      <td><code>gen-site</code></td>
+                      <td><code>/gen-site</code></td>
+                      <td>不可</td>
+                      <td>.claude/ のマークダウンから docs/ の HTML ドキュメントサイトを生成</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>gen-doc</h4>
+                    <p>ソースコードを解析し、関数・クラスの一覧、引数、戻り値、使用例を含むマークダウンドキュメントを生成。<code>disable-model-invocation: true</code> で手動呼び出しのみ。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>pr-summary</h4>
+                    <p><code>context: fork</code> + <code>agent: Explore</code> で隔離実行。<code>!`gh pr diff`</code> で動的にPR情報を取得し、変更概要・影響範囲・レビュー注目ポイントを含むサマリーを生成。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>explain-code</h4>
+                    <p>Claude が自動呼び出し可能。「この関数どう動くの？」のような質問で自動的に図解・例え話付きの解説を返す。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>fix-issue</h4>
+                    <p>GitHub Issue の取得から、ブランチ作成、TDD 実装、PR 作成まで一気通貫で実行。<code>.claude/rules/</code> のルールを参照して規約に準拠。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>scaffold-feature</h4>
+                    <p>command, agent, skill, rule, hook, mcp の雛形を一括生成。既存ファイルのフォーマットに合わせたサンプルファイルを作成。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>gen-site</h4>
+                    <p>.claude/ 配下のマークダウンファイルを読み込み、docs/ 配下に HTML ドキュメントサイトを生成・更新。</p>
+                  </div>
+                </div>
+
+                <h2>サンプルスキル全文</h2>
+                <p>以下に本リポジトリで提供している全スキルの SKILL.md 全文を掲載します。</p>
+
+                <h3>explain-code</h3>
+                <div class="code-header"><span>.claude/skills/explain-code/SKILL.md</span></div>
+                <pre><code>---
+name: explain-code
+description: コードの仕組みを図解と例え話で解説する。「これはどう動くの？」「この処理の流れを教えて」のような質問に使用する。
+argument-hint: [ファイルパス or コード概念]
+---
+
+$ARGUMENTS について、以下の構成で分かりやすく解説してください。
+
+## 解説の構成
+
+1. **身近な例えから始める**: コードの仕組みを日常のものに例える
+2. **図を描く**: ASCII アートでデータの流れ、構造、関係性を表現する
+3. **ステップごとの説明**: 処理の流れを順番に解説する
+4. **ハマりポイント**: よくある間違いや誤解しやすい点を指摘する
+
+## ルール
+
+- 専門用語を使う場合は必ず簡単な説明を添える
+- 複雑な概念は段階的に分解して説明する
+- 具体的なコード例を含める
+- 解説は日本語で行う</code></pre>
+
+                <h3>fix-issue</h3>
+                <div class="code-header"><span>.claude/skills/fix-issue/SKILL.md</span></div>
+                <pre><code>---
+name: fix-issue
+description: GitHub Issue の内容を読み取り、実装を行う。
+argument-hint: &lt;Issue番号&gt;
+disable-model-invocation: true
+---
+
+GitHub Issue $ARGUMENTS に基づいて修正・実装を行ってください。
+
+## 手順
+
+1. `gh issue view $ARGUMENTS` で Issue の内容を取得・解析する
+2. 関連するコードベースの既存実装を調査する
+3. CLAUDE.md や .claude/rules/ のプロジェクトルールを確認する
+4. メインブランチで `git pull` してソースを最新化する
+5. `feature/#$ARGUMENTS-概要` または `fix/#$ARGUMENTS-概要` のブランチを作成する
+6. TDD でテストを先に書き、実装する
+7. 影響範囲のテストを実行して通ることを確認する
+8. 日本語のコミットメッセージでコミットする
+9. リモートにプッシュする
+10. `gh pr create` で日本語の PR を作成し、`Closes #$ARGUMENTS` で Issue を連携する
+
+## 完了報告
+
+実装・更新されたファイルパスと内容を日本語で要約して報告する。</code></pre>
+
+                <h3>gen-doc</h3>
+                <div class="code-header"><span>.claude/skills/gen-doc/SKILL.md</span></div>
+                <pre><code>---
+name: gen-doc
+description: ソースコードからドキュメントを自動生成する。関数・クラスの一覧、引数、戻り値、使用例を含むマークダウン形式のドキュメントを作成する。
+argument-hint: &lt;ファイルパス or ディレクトリパス&gt;
+disable-model-invocation: true
+---
+
+$ARGUMENTS で指定されたファイルまたはディレクトリのソースコードを解析し、ドキュメントを生成してください。
+
+## 手順
+
+1. 対象ファイルを読み取り、言語を特定する
+2. 全ての関数・クラス・メソッドを抽出する
+3. 以下のフォーマットでドキュメントを生成する
+4. 対象ファイルと同じディレクトリに `&lt;ファイル名&gt;.docs.md` として出力する
+
+## 出力フォーマット
+
+```markdown
+# &lt;ファイル名&gt;
+
+## 概要
+[ファイルの役割を1〜2文で説明]
+
+## 関数一覧
+
+### `functionName(param1, param2)`
+[関数の説明]
+
+**引数:**
+| 名前 | 型 | 説明 |
+|-----|-----|------|
+| param1 | string | ... |
+
+**戻り値:** `型` - 説明
+
+**使用例:**
+```言語
+// コード例
+```
+```
+
+## 注意事項
+
+- 既存のドキュメントコメント（JSDoc、docstring 等）があれば活用する
+- 内部実装の詳細ではなく、利用者視点で記述する
+- ディレクトリが指定された場合は、各ファイルごとにドキュメントを生成する</code></pre>
+
+                <h3>pr-summary</h3>
+                <div class="code-header"><span>.claude/skills/pr-summary/SKILL.md</span></div>
+                <pre><code>---
+name: pr-summary
+description: プルリクエストの変更内容を要約する。差分、コメント、変更ファイルを取得して構造化されたサマリーを作成する。
+argument-hint: [PR番号]
+context: fork
+agent: Explore
+disable-model-invocation: true
+allowed-tools: Bash(gh *)
+---
+
+## PR コンテキスト
+
+- PR の差分: !`gh pr diff $ARGUMENTS`
+- PR のコメント: !`gh pr view $ARGUMENTS --comments`
+- 変更ファイル一覧: !`gh pr diff $ARGUMENTS --name-only`
+
+## タスク
+
+上記の PR 情報を分析し、以下のフォーマットで日本語の要約を作成してください。
+
+### 出力フォーマット
+
+```markdown
+# PR サマリー
+
+## 変更の概要
+[この PR が何をするのか、なぜ必要なのかを2〜3文で説明]
+
+## 変更ファイル
+| ファイル | 変更種別 | 概要 |
+|---------|---------|------|
+| path/to/file | 追加/修正/削除 | 変更内容の要約 |
+
+## 主な変更点
+- [変更点1]
+- [変更点2]
+
+## 影響範囲
+[この変更が影響する機能やモジュール]
+
+## レビュー時の注目ポイント
+- [レビュアーが特に確認すべき点]
+```</code></pre>
+
+                <h3>scaffold-feature</h3>
+                <div class="code-header"><span>.claude/skills/scaffold-feature/SKILL.md</span></div>
+                <pre><code>---
+name: scaffold-feature
+description: Claude Code の機能ディレクトリ（commands, agents, skills, rules, hooks, mcp 等）のスキャフォールドを生成する。ディレクトリ作成、サンプルファイル配置、README.md 生成を一括で行う。
+argument-hint: &lt;機能名&gt; [オプション]
+disable-model-invocation: true
+---
+
+$ARGUMENTS で指定された Claude Code の機能ディレクトリを `.claude/` 配下にスキャフォールド（雛形生成）してください。
+
+## 対応する機能タイプ
+
+以下のタイプを認識し、適切なディレクトリ構成とサンプルを生成します。
+
+### `command &lt;コマンド名&gt;`
+`.claude/commands/&lt;コマンド名&gt;.md` を作成する。
+- `$ARGUMENTS` を使った引数受け取りのサンプル
+- 使用方法セクション
+
+### `agent &lt;エージェント名&gt;`
+`.claude/agents/&lt;エージェント名&gt;.md` を作成する。
+- YAML フロントマター（name, description, model）
+- 基本方針、ワークフロー、出力フォーマットのテンプレート
+
+### `skill &lt;スキル名&gt;`
+`.claude/skills/&lt;スキル名&gt;/SKILL.md` を作成する。
+- YAML フロントマター（name, description, argument-hint）
+- 手順、出力フォーマットのテンプレート
+
+### `rule &lt;ルール名&gt;`
+`.claude/rules/&lt;ルール名&gt;.md` を作成する。
+- パス別ルールが必要か確認し、必要なら `paths` フロントマターを含める
+- 簡潔な箇条書き形式
+
+### `hook &lt;フック名&gt;`
+`.claude/hooks/&lt;フック名&gt;.sh` を作成する。
+- `jq` で stdin を解析するテンプレート
+- 終了コード 0（許可）/ 2（ブロック）のサンプル
+- 実行権限を付与する（`chmod +x`）
+
+### `mcp &lt;サーバー名&gt;`
+`.mcp.json` にサーバー設定を追加する（既存設定がある場合はマージ）。
+- stdio / http のどちらかを確認
+- `.claude/mcp/README.md` にサーバー情報を追記
+
+## 共通ルール
+
+1. 既にファイルが存在する場合は上書きせず、ユーザーに確認する
+2. 作成するファイルには日本語でコメント・説明を記述する
+3. 本リポジトリの既存ファイル（同ディレクトリの README.md や他のサンプル）のフォーマットに合わせる
+4. 作成完了後、作成したファイル一覧と次にやるべきこと（内容のカスタマイズ等）を報告する
+
+## 使用例
+
+```
+/scaffold-feature command deploy
+/scaffold-feature agent test-runner
+/scaffold-feature skill generate-migration
+/scaffold-feature rule api-design
+/scaffold-feature hook block-dangerous-commands
+/scaffold-feature mcp github
+```
+
+## 複数同時生成
+
+スペース区切りで複数指定も可能：
+
+```
+/scaffold-feature command deploy agent deployer skill deploy-check
+```</code></pre>
+
+                <h2>スキルの作り方</h2>
+
+                <h3>1. ディレクトリを作成する</h3>
+                <pre><code>mkdir -p .claude/skills/my-skill</code></pre>
+
+                <h3>2. SKILL.md を作成する</h3>
+                <div class="code-header"><span>SKILL.md の最小テンプレート</span></div>
+                <pre><code>---
+name: my-skill
+description: このスキルが何をするか、いつ使うかを書く
+---
+
+## タスク
+$ARGUMENTS に対して以下を実施してください。
+
+1. ステップ1
+2. ステップ2
+3. ステップ3</code></pre>
+
+                <h3>3. テスト</h3>
+                <pre><code># 直接呼び出し
+/my-skill 引数
+
+# 自動呼び出し（description にマッチする質問をする）
+「○○について教えて」</code></pre>
+
+                <h2>スキル作成のコツ</h2>
+                <ul>
+                  <li><strong>description を具体的に書く</strong> - Claude が自動呼び出しの判断材料にする。キーワードを含める</li>
+                  <li><strong>副作用があるスキルは <code>disable-model-invocation: true</code></strong> - デプロイ、コミット、メッセージ送信など</li>
+                  <li><strong>読み取り専用スキルは <code>allowed-tools</code> で制限</strong> - <code>allowed-tools: Read, Grep, Glob</code></li>
+                  <li><strong>重い処理は <code>context: fork</code> で隔離</strong> - メインの会話コンテキストを消費しない</li>
+                  <li><strong>SKILL.md は 500行以内</strong> - 詳細な参考資料は別ファイルに分けて参照する</li>
+                  <li><strong>引数のヒントを <code>argument-hint</code> に書く</strong> - ユーザーが何を渡すべきかわかる</li>
+                </ul>
+
+                <h2>配置場所</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>スコープ</th>
+                      <th>パス</th>
+                      <th>対象</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>プロジェクト</td>
+                      <td><code>.claude/skills/name/SKILL.md</code></td>
+                      <td>このプロジェクトのみ</td>
+                    </tr>
+                    <tr>
+                      <td>個人</td>
+                      <td><code>~/.claude/skills/name/SKILL.md</code></td>
+                      <td>全プロジェクト共通</td>
+                    </tr>
+                    <tr>
+                      <td>組織</td>
+                      <td>マネージド設定で配布</td>
+                      <td>組織全員</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>同名スキルがある場合の優先度: <strong>組織 &gt; 個人 &gt; プロジェクト</strong></p>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> 新しいワークフローを追加する場合は、まずカスタムコマンドではなく Skills で作成しましょう。Skills はカスタムコマンドの上位互換であり、後から自動呼び出し、ツール制限、隔離実行といった機能を追加できます。カスタムコマンドから Skills への移行も、SKILL.md にコマンドの内容をコピーしてフロントマターを追加するだけで完了します。
+                </div>
+
+              </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>

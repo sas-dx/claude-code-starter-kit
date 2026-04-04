@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Claude Code Starter Kit</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+        <span class="light-icon">🌙</span>
+        <span class="dark-icon">☀️</span>
+      </button>
+      <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 ホーム</a></li>
+        <li class="nav-section-title">基本設定</li>
+        <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+        <li><a href="rules.html">📏 Rules</a></li>
+        <li><a href="settings.html">⚙️ Settings</a></li>
+        <li class="nav-section-title">コマンド・スキル</li>
+        <li><a href="commands.html">⌨️ Commands</a></li>
+        <li><a href="skills.html">🎯 Skills</a></li>
+        <li class="nav-section-title">エージェント</li>
+        <li><a href="agents.html">🤖 Agents</a></li>
+        <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+        <li class="nav-section-title">拡張・連携</li>
+        <li><a href="hooks.html">🪝 Hooks</a></li>
+        <li><a href="mcp.html">🔌 MCP</a></li>
+        <li><a href="plugins.html">🧩 Plugins</a></li>
+        <li class="nav-section-title">その他</li>
+        <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+      </ul>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="toc"></div>
+
+        <h1>Settings（設定）</h1>
+        <p>Settings は、Claude Code の<strong>動作・権限・フック・環境変数を制御する設定ファイル</strong>です。チームで共通の権限設定を共有したり、個人のローカル設定を分離したりできます。</p>
+
+        <h2>Settings とは</h2>
+
+        <h3>身近な例えで理解する</h3>
+        <p>スマホの「設定」アプリで例えると：</p>
+        <table>
+          <thead>
+            <tr>
+              <th>スマホの設定</th>
+              <th>Claude Code の設定</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>通知設定</td>
+              <td>どのツールの実行を許可/拒否するか（permissions）</td>
+            </tr>
+            <tr>
+              <td>アクセシビリティ</td>
+              <td>環境変数やモデルの設定（env, model）</td>
+            </tr>
+            <tr>
+              <td>セキュリティ</td>
+              <td>実行前チェックの設定（hooks）</td>
+            </tr>
+            <tr>
+              <td>ペアレンタルコントロール</td>
+              <td>管理者が組織全体に強制する設定（managed policy）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>なぜ Settings を理解する必要があるのか</h2>
+
+        <h3>1. チームで共通の権限設定ができる</h3>
+        <p>「<code>Bash</code> コマンドは許可するけど <code>rm -rf *</code> は拒否する」のようなルールを設定ファイルに書けば、チーム全員が同じ安全設定で Claude を使えます。</p>
+
+        <h3>2. Hooks の設定場所になる</h3>
+        <p>Hooks（フック）は settings.json に定義します。Settings を理解していないと、Hooks を設定できません。</p>
+
+        <h3>3. 環境ごとに設定を分けられる</h3>
+        <p>チーム共有の設定（<code>.claude/settings.json</code>）と、個人のローカル設定（<code>.claude/settings.local.json</code>）を分離できます。API キーなど個人固有の設定をリポジトリにコミットしてしまう事故を防げます。</p>
+
+        <h2>設定ファイルの種類と優先度</h2>
+        <p>Claude Code は複数の設定ファイルを読み込み、優先度に従ってマージします。</p>
+
+        <pre><code>優先度: 高 → 低
+1. /etc/claude-code/settings.json       # 管理者ポリシー（組織全体に強制）
+2. ~/.claude/settings.json              # ユーザーレベル（全プロジェクト共通）
+3. .claude/settings.json                # プロジェクトレベル（チーム共有）
+4. .claude/settings.local.json          # ローカル（gitignore 対象）</code></pre>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ファイル</th>
+              <th>共有範囲</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/etc/claude-code/settings.json</code></td>
+              <td>組織全体</td>
+              <td>セキュリティポリシーの強制</td>
+            </tr>
+            <tr>
+              <td><code>~/.claude/settings.json</code></td>
+              <td>個人（全プロジェクト）</td>
+              <td>個人の共通設定</td>
+            </tr>
+            <tr>
+              <td><code>.claude/settings.json</code></td>
+              <td>チーム（リポジトリにコミット）</td>
+              <td>プロジェクト共通の設定</td>
+            </tr>
+            <tr>
+              <td><code>.claude/settings.local.json</code></td>
+              <td>個人（gitignore）</td>
+              <td>個人の API キー等</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>settings.json と settings.local.json の違い</h2>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th><code>settings.json</code></th>
+              <th><code>settings.local.json</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>バージョン管理</strong></td>
+              <td>リポジトリにコミットする</td>
+              <td>.gitignore に含める</td>
+            </tr>
+            <tr>
+              <td><strong>チーム共有</strong></td>
+              <td>全メンバーに適用</td>
+              <td>個人のみ</td>
+            </tr>
+            <tr>
+              <td><strong>主な用途</strong></td>
+              <td>Hooks、環境変数、機能フラグ</td>
+              <td>権限許可、MCP サーバー有効化、個人設定</td>
+            </tr>
+            <tr>
+              <td><strong>機密情報</strong></td>
+              <td>含めない</td>
+              <td>API キー等を含めてOK</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>主な設定項目</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>説明</th>
+              <th>例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>permissions.allow</code></td>
+              <td>許可するツール</td>
+              <td><code>["Bash", "Read", "Edit"]</code></td>
+            </tr>
+            <tr>
+              <td><code>permissions.deny</code></td>
+              <td>拒否するツール/パターン</td>
+              <td><code>["Bash(rm -rf *)"]</code></td>
+            </tr>
+            <tr>
+              <td><code>env</code></td>
+              <td>環境変数</td>
+              <td><code>{"NODE_ENV": "development"}</code></td>
+            </tr>
+            <tr>
+              <td><code>hooks</code></td>
+              <td>ライフサイクルフック</td>
+              <td><a href="hooks.html">Hooks ガイド参照</a></td>
+            </tr>
+            <tr>
+              <td><code>disallowedTools</code></td>
+              <td>使用禁止ツール</td>
+              <td><code>["Agent(Explore)"]</code></td>
+            </tr>
+            <tr>
+              <td><code>sandbox.enabled</code></td>
+              <td>サンドボックス化</td>
+              <td><code>true</code> / <code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>alwaysThinkingEnabled</code></td>
+              <td>常に思考モードを有効化</td>
+              <td><code>true</code> / <code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>effortLevel</code></td>
+              <td>思考の深さレベル</td>
+              <td><code>"high"</code> / <code>"medium"</code> / <code>"low"</code></td>
+            </tr>
+            <tr>
+              <td><code>teammateMode</code></td>
+              <td>Agent Teams の表示モード</td>
+              <td><code>"in-process"</code> / <code>"tmux"</code></td>
+            </tr>
+            <tr>
+              <td><code>enabledMcpjsonServers</code></td>
+              <td>有効化する MCP サーバー</td>
+              <td><code>["serena", "context7"]</code></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>本リポジトリの実際の設定</h2>
+
+        <h3>settings.json（チーム共有）</h3>
+        <div class="code-header"><span>.claude/settings.json</span></div>
+        <pre><code>{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high"
+}</code></pre>
+        <p>この設定では以下を有効にしています：</p>
+        <ul>
+          <li><strong>Agent Teams</strong> - 実験的機能の Agent Teams を有効化</li>
+          <li><strong>常時思考モード</strong> - Claude が常に深く考えてから回答</li>
+          <li><strong>高努力レベル</strong> - 最大限の品質で作業</li>
+        </ul>
+
+        <h3>settings.local.json（個人設定）</h3>
+        <div class="code-header"><span>.claude/settings.local.json</span></div>
+        <pre><code>{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "WebSearch",
+      "Bash(claude mcp:*)",
+      "Bash(which uvx:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git commit:*)",
+      "Bash(chmod:*)",
+      "Bash(git pull:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "serena",
+    "context7"
+  ]
+}</code></pre>
+        <p>この設定では以下を行っています：</p>
+        <ul>
+          <li><strong>Git 操作の許可</strong> - <code>git add</code>, <code>git commit</code>, <code>git push</code>, <code>git pull</code> を自動許可</li>
+          <li><strong>Web 検索の許可</strong> - WebSearch を自動許可</li>
+          <li><strong>Claude MCP コマンドの許可</strong> - MCP 関連のコマンドを自動許可</li>
+          <li><strong>MCP サーバーの有効化</strong> - serena と context7 を明示的に有効化</li>
+        </ul>
+
+        <div class="callout info">
+          <p><strong>注意:</strong> <code>settings.local.json</code> は <code>.gitignore</code> に含めるべきファイルです。個人の権限設定や API キーが含まれるため、リポジトリにコミットしないでください。</p>
+        </div>
+
+        <h2>設定サンプル（参考例）</h2>
+        <p>以下は主要な設定項目の参考例です。</p>
+
+        <h3>権限設定</h3>
+        <div class="code-header"><span>permissions の設定例</span></div>
+        <pre><code>{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | bash)"
+    ]
+  }
+}</code></pre>
+
+        <h3>環境変数設定</h3>
+        <div class="code-header"><span>env の設定例</span></div>
+        <pre><code>{
+  "env": {
+    "NODE_ENV": "development",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}</code></pre>
+
+        <h3>使用禁止ツール</h3>
+        <div class="code-header"><span>disallowedTools の設定例</span></div>
+        <pre><code>{
+  "disallowedTools": [
+    "Agent(Explore)"
+  ]
+}</code></pre>
+
+        <h3>フック設定</h3>
+        <div class="code-header"><span>hooks の設定例</span></div>
+        <pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/protect-files.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/auto-format.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/setup-env.sh"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+        <h3>サンドボックス設定</h3>
+        <div class="code-header"><span>sandbox の設定例</span></div>
+        <pre><code>{
+  "sandbox": {
+    "enabled": true,
+    "pathPrefixes": [
+      "/home/user/project"
+    ]
+  }
+}</code></pre>
+
+        <h2>設定の確認方法</h2>
+        <pre><code># セッション内で現在の設定を確認
+/config
+
+# 権限設定を確認
+/permissions</code></pre>
+
+        <div class="callout tip">
+          <p><strong>ベストプラクティス:</strong></p>
+          <ul>
+            <li><strong>チーム共通設定は <code>settings.json</code> に</strong> - Hooks、環境変数、機能フラグなど全メンバーに適用すべき設定を記述</li>
+            <li><strong>個人設定は <code>settings.local.json</code> に</strong> - 権限の自動許可、MCP サーバーの有効化など個人ごとに異なる設定を記述</li>
+            <li><strong><code>settings.local.json</code> は .gitignore に含める</strong> - 機密情報の漏洩を防止</li>
+            <li><strong><code>deny</code> で危険なコマンドをブロック</strong> - <code>rm -rf *</code>、<code>sudo *</code> など破壊的コマンドは deny リストに追加</li>
+            <li><strong>最小権限の原則</strong> - 必要なツールだけを許可し、不要なものは許可しない</li>
+            <li><strong>設定変更後は <code>/config</code> で確認</strong> - 意図通りに設定が反映されているか確認しましょう</li>
+          </ul>
+        </div>
+
+      </div>
+    </main>
+  </div>
+  <script src="../js/main.js"></script>
+</body>
+</html>

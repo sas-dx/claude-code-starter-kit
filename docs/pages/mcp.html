@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP - Claude Code Starter Kit</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+        <span class="light-icon">🌙</span>
+        <span class="dark-icon">☀️</span>
+      </button>
+      <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 ホーム</a></li>
+        <li class="nav-section-title">基本設定</li>
+        <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+        <li><a href="rules.html">📏 Rules</a></li>
+        <li><a href="settings.html">⚙️ Settings</a></li>
+        <li class="nav-section-title">コマンド・スキル</li>
+        <li><a href="commands.html">⌨️ Commands</a></li>
+        <li><a href="skills.html">🎯 Skills</a></li>
+        <li class="nav-section-title">エージェント</li>
+        <li><a href="agents.html">🤖 Agents</a></li>
+        <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+        <li class="nav-section-title">拡張・連携</li>
+        <li><a href="hooks.html">🪝 Hooks</a></li>
+        <li><a href="mcp.html">🔌 MCP</a></li>
+        <li><a href="plugins.html">🧩 Plugins</a></li>
+        <li class="nav-section-title">その他</li>
+        <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+      </ul>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="toc"></div>
+
+        <h1>MCP（Model Context Protocol）</h1>
+        <p><strong>MCP (Model Context Protocol)</strong> は、<strong>AI に「手足」を与える仕組み</strong>です。Claude Code に MCP サーバーを追加することで、GitHub 操作やデータベース接続など様々な外部サービスと連携できるようになります。</p>
+
+        <h2>MCP とは</h2>
+
+        <h3>身近な例えで理解する</h3>
+        <p>スマートフォンの「アプリ」をイメージしてください。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>スマホの世界</th>
+              <th>MCP の世界</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>スマホ本体</td>
+              <td><strong>AI（Claude Code）</strong></td>
+            </tr>
+            <tr>
+              <td>アプリ</td>
+              <td><strong>MCP サーバー</strong></td>
+            </tr>
+            <tr>
+              <td>App Store</td>
+              <td><strong>MCP エコシステム</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>スマホは本体だけでも電話やカメラが使えますが、アプリをインストールすると地図、決済、SNS など様々なことができるようになります。同じように、Claude Code も MCP サーバーを追加することで、GitHub 操作やデータベース接続など様々な外部サービスと連携できるようになります。</p>
+        <p>さらに、1つのアプリが iPhone でも Android でも使えるように、1つの MCP サーバーは Claude でも ChatGPT でも Copilot でも使えます。これが「標準プロトコル」であることの大きなメリットです。</p>
+
+        <h3>MCP がない場合とある場合</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div class="feature-card">
+            <h4>MCP がない場合</h4>
+            <p>あなた → Claude に質問 → Claude は自分の知識だけで回答<br>あなた → 自分で GitHub を開いて確認 → 結果を Claude にコピペ → また質問...</p>
+          </div>
+          <div class="feature-card">
+            <h4>MCP がある場合</h4>
+            <p>あなた → Claude に質問 → Claude が GitHub MCP 経由で直接 PR を確認 → 回答</p>
+          </div>
+        </div>
+
+        <h3>仕組み</h3>
+        <p>MCP は3つの登場人物で成り立っています。</p>
+        <pre><code>┌──────────────────────────────────────────────┐
+│          Host（AI アプリケーション）             │
+│      Claude Code / VS Code / ChatGPT          │
+│                                               │
+│  ┌────────────┬────────────┬────────────┐    │
+│  │   Client   │   Client   │   Client   │    │
+│  │ (GitHub用) │  (DB用)    │ (Slack用)  │    │
+│  └─────┬──────┴─────┬──────┴─────┬──────┘    │
+└────────┼────────────┼────────────┼────────────┘
+         │            │            │
+      接続           接続         接続
+         │            │            │
+┌────────┴───┐ ┌──────┴────┐ ┌────┴──────┐
+│ MCP Server │ │MCP Server │ │MCP Server │
+│  GitHub    │ │PostgreSQL │ │  Slack    │
+└────────────┘ └───────────┘ └───────────┘</code></pre>
+
+        <table>
+          <thead>
+            <tr>
+              <th>登場人物</th>
+              <th>何をするか</th>
+              <th>身近な例え</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Host</strong></td>
+              <td>AI アプリ本体。Client を管理する</td>
+              <td>スマホ本体</td>
+            </tr>
+            <tr>
+              <td><strong>Client</strong></td>
+              <td>各 Server との接続を維持する</td>
+              <td>アプリの通信部分</td>
+            </tr>
+            <tr>
+              <td><strong>Server</strong></td>
+              <td>外部サービスへのアクセスを提供する</td>
+              <td>インストールしたアプリ</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>MCP サーバーが AI に提供するもの</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>提供するもの</th>
+              <th>何ができるか</th>
+              <th>具体例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Tools（ツール）</strong></td>
+              <td>AI が実行できる「操作」</td>
+              <td>ファイルを作成する、PR を作る、メッセージを送る</td>
+            </tr>
+            <tr>
+              <td><strong>Resources（リソース）</strong></td>
+              <td>AI が読み取れる「データ」</td>
+              <td>ファイルの中身、DB のレコード、API のレスポンス</td>
+            </tr>
+            <tr>
+              <td><strong>Prompts（プロンプト）</strong></td>
+              <td>定型の「指示テンプレート」</td>
+              <td>コードレビュー用のプロンプト、分析用のテンプレート</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>接続方式</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>方式</th>
+              <th>接続先</th>
+              <th>イメージ</th>
+              <th>主な用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>stdio</strong></td>
+              <td>自分の PC 内</td>
+              <td>PC にインストールしたアプリを直接起動</td>
+              <td>ファイル操作、Git、ローカル DB</td>
+            </tr>
+            <tr>
+              <td><strong>HTTP</strong></td>
+              <td>インターネット経由</td>
+              <td>Web サービスに接続</td>
+              <td>クラウド API、SaaS 連携</td>
+            </tr>
+            <tr>
+              <td><strong>SSE</strong></td>
+              <td>インターネット経由</td>
+              <td>（旧方式。HTTP に移行中）</td>
+              <td>レガシー連携</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>.mcp.json の設定方法</h2>
+        <p>MCP サーバーの設定はプロジェクトルートの <code>.mcp.json</code> に定義します。Claude Code はプロジェクトルート直下の <code>.mcp.json</code> のみを認識するため、このファイルは移動できません。</p>
+
+        <div class="callout info">
+          <p><strong>注意:</strong> <code>.mcp.json</code> はプロジェクトルート直下に配置する必要があります。サブディレクトリに置いても認識されません。</p>
+        </div>
+
+        <h3>基本構造</h3>
+        <div class="code-header"><span>.mcp.json</span></div>
+        <pre><code>{
+  "mcpServers": {
+    "サーバー名": {
+      "type": "stdio",
+      "command": "コマンドの絶対パス",
+      "args": ["引数1", "引数2"],
+      "env": {}
+    }
+  }
+}</code></pre>
+
+        <h3>本リポジトリの実際の設定</h3>
+        <div class="code-header"><span>.mcp.json</span></div>
+        <pre><code>{
+  "mcpServers": {
+    "serena": {
+      "type": "stdio",
+      "command": "/home/sasao020211/.local/bin/uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--project",
+        "."
+      ],
+      "env": {}
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--yes",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    }
+  }
+}</code></pre>
+
+        <h2>導入済み MCP サーバー</h2>
+
+        <h3>1. Serena（セマンティックコード解析）</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>リポジトリ</td>
+              <td><a href="https://github.com/oraios/serena" target="_blank" rel="noopener">https://github.com/oraios/serena</a></td>
+            </tr>
+            <tr>
+              <td>トランスポート</td>
+              <td>stdio</td>
+            </tr>
+            <tr>
+              <td>前提条件</td>
+              <td><code>uv</code> パッケージマネージャー</td>
+            </tr>
+            <tr>
+              <td>ライセンス</td>
+              <td>OSS（無料）</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>機能:</strong></p>
+        <ul>
+          <li>セマンティックなコード解析・検索</li>
+          <li>シンボルレベルでのコード編集</li>
+          <li>複数言語対応</li>
+          <li>IDE ライクなコードナビゲーション</li>
+        </ul>
+        <p><strong>前提条件のインストール:</strong></p>
+        <pre><code># uv のインストール（Linux/macOS）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# インストール確認
+uvx --version</code></pre>
+
+        <div class="callout warning">
+          <p><strong>注意:</strong> <code>.mcp.json</code> 内の <code>command</code> フィールドは <code>uvx</code> の絶対パスを指定しています。環境に合わせてパスを変更してください（例: <code>/home/&lt;user&gt;/.local/bin/uvx</code>）。</p>
+        </div>
+
+        <h3>2. Context7（リアルタイムドキュメント取得）</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>リポジトリ</td>
+              <td><a href="https://github.com/upstash/context7" target="_blank" rel="noopener">https://github.com/upstash/context7</a></td>
+            </tr>
+            <tr>
+              <td>トランスポート</td>
+              <td>stdio</td>
+            </tr>
+            <tr>
+              <td>前提条件</td>
+              <td>Node.js / npm</td>
+            </tr>
+            <tr>
+              <td>ライセンス</td>
+              <td>OSS（無料）</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>機能:</strong></p>
+        <ul>
+          <li>最新のライブラリ・フレームワークのドキュメントをリアルタイム取得</li>
+          <li>バージョン固有のコード例を提供</li>
+          <li>Claude の知識カットオフを補完し、最新の API 仕様に基づいたコード生成を支援</li>
+        </ul>
+        <p><strong>使い方:</strong> プロンプトに <code>use context7</code> を含めると、Claude が最新ドキュメントを取得してからコードを生成します。</p>
+        <pre><code>FastAPI で非同期エンドポイントを作成して use context7</code></pre>
+
+        <h2>MCP サーバーの追加方法</h2>
+        <p>新しい MCP サーバーを追加する場合は、<code>.mcp.json</code> を直接編集するか、CLI で追加します。</p>
+
+        <h3>CLI で追加する場合</h3>
+        <pre><code># HTTP サーバーの追加（プロジェクトスコープ）
+claude mcp add --transport http --scope project &lt;name&gt; &lt;url&gt;
+
+# stdio サーバーの追加
+claude mcp add --transport stdio --scope project &lt;name&gt; -- &lt;command&gt; &lt;args...&gt;</code></pre>
+
+        <h3>設定例: stdio 方式</h3>
+        <div class="code-header"><span>.mcp.json（stdio 方式の例）</span></div>
+        <pre><code>{
+  "mcpServers": {
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--yes",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/user/project"
+      ],
+      "env": {}
+    }
+  }
+}</code></pre>
+
+        <h3>設定例: HTTP 方式</h3>
+        <div class="code-header"><span>.mcp.json（HTTP 方式の例）</span></div>
+        <pre><code>{
+  "mcpServers": {
+    "remote-api": {
+      "type": "http",
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${MCP_API_TOKEN}"
+      }
+    }
+  }
+}</code></pre>
+
+        <h2>接続確認とトラブルシューティング</h2>
+        <pre><code># MCP サーバーの接続状態を確認
+claude mcp list</code></pre>
+
+        <table>
+          <thead>
+            <tr>
+              <th>症状</th>
+              <th>対処法</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Failed to connect</code></td>
+              <td><code>command</code> の絶対パスが正しいか確認。<code>which uvx</code> や <code>which npx</code> で確認</td>
+            </tr>
+            <tr>
+              <td><code>Needs authentication</code></td>
+              <td><code>claude mcp</code> でサーバーに接続後、認証フローを完了する</td>
+            </tr>
+            <tr>
+              <td>サーバーが認識されない</td>
+              <td><code>.mcp.json</code> がプロジェクトルート直下にあるか確認</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>世の中の主要な MCP サーバー</h2>
+
+        <h3>公式リファレンスサーバー</h3>
+        <p><a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">github.com/modelcontextprotocol/servers</a> で提供されている公式実装です。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Filesystem</strong></td>
+              <td>ファイルの読み書き・検索（アクセス制御付き）</td>
+            </tr>
+            <tr>
+              <td><strong>Git</strong></td>
+              <td>Git リポジトリの読み取り・検索・操作</td>
+            </tr>
+            <tr>
+              <td><strong>Fetch</strong></td>
+              <td>Web コンテンツの取得・変換</td>
+            </tr>
+            <tr>
+              <td><strong>Memory</strong></td>
+              <td>ナレッジグラフベースの永続メモリ</td>
+            </tr>
+            <tr>
+              <td><strong>Sequential Thinking</strong></td>
+              <td>思考の連鎖による動的な問題解決</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>エンタープライズ・主要プラットフォーム</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>提供元</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener">GitHub MCP</a></td>
+              <td>GitHub</td>
+              <td>リポジトリ操作、Issue/PR 管理、コード解析</td>
+            </tr>
+            <tr>
+              <td><a href="https://github.com/microsoft/mcp" target="_blank" rel="noopener">Microsoft MCP</a></td>
+              <td>Microsoft</td>
+              <td>Azure サービス、Microsoft 365 連携</td>
+            </tr>
+            <tr>
+              <td>Google Calendar / Gmail</td>
+              <td>Google</td>
+              <td>カレンダー・メール連携</td>
+            </tr>
+            <tr>
+              <td>Slack MCP</td>
+              <td>Slack</td>
+              <td>メッセージ作成、チャンネル要約、ワークスペース操作</td>
+            </tr>
+            <tr>
+              <td>Notion MCP</td>
+              <td>Notion</td>
+              <td>ページ・データベースの読み書き</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>データベース</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Supabase</strong></td>
+              <td>スキーマ設計、マイグレーション、認証管理、TypeScript 型生成</td>
+            </tr>
+            <tr>
+              <td><strong>PostgreSQL</strong></td>
+              <td>PostgreSQL のクエリ・スキーマ操作</td>
+            </tr>
+            <tr>
+              <td><strong>SQLite</strong></td>
+              <td>SQLite データベース操作と分析</td>
+            </tr>
+            <tr>
+              <td><strong>Neo4j</strong></td>
+              <td>グラフデータベースの Cypher クエリ</td>
+            </tr>
+            <tr>
+              <td><strong>Redis</strong></td>
+              <td>自然言語インターフェースによるデータ管理・検索</td>
+            </tr>
+            <tr>
+              <td><strong>MongoDB</strong></td>
+              <td>MongoDB のクエリ・データ操作</td>
+            </tr>
+            <tr>
+              <td><strong>ClickHouse</strong></td>
+              <td>大規模データセットの高速分析</td>
+            </tr>
+            <tr>
+              <td><strong>Milvus</strong></td>
+              <td>ベクトルデータベース統合</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>オブザーバビリティ・監視</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Datadog</strong></td>
+              <td>ログ・トレース・メトリクスへのリアルタイムアクセス</td>
+            </tr>
+            <tr>
+              <td><strong>Sentry</strong></td>
+              <td>エラートラッキング連携</td>
+            </tr>
+            <tr>
+              <td><strong>Prometheus</strong></td>
+              <td>監視データの統合・分析</td>
+            </tr>
+            <tr>
+              <td><strong>Grafana Loki</strong></td>
+              <td>ログ集約・分析</td>
+            </tr>
+            <tr>
+              <td><strong>CloudWatch Logs</strong></td>
+              <td>AWS CloudWatch ログの AI 駆動分析</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>開発・DevOps ツール</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Terraform Cloud</strong></td>
+              <td>自然言語による IaC 操作・プロバイダドキュメント参照</td>
+            </tr>
+            <tr>
+              <td><strong>Testkube</strong></td>
+              <td>テストワークフローの実行・監視</td>
+            </tr>
+            <tr>
+              <td><strong>Puppeteer</strong></td>
+              <td>Web 自動化・スクレイピング・スクリーンショット</td>
+            </tr>
+            <tr>
+              <td><strong>Brave Search</strong></td>
+              <td>Brave Search API による Web 検索</td>
+            </tr>
+            <tr>
+              <td><strong>Semgrep</strong></td>
+              <td>静的解析・セキュリティスキャン</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>プロダクティビティ・連携</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Google Drive</strong></td>
+              <td>Google Docs / Sheets / Slides へのアクセス</td>
+            </tr>
+            <tr>
+              <td><strong>Figma</strong></td>
+              <td>デザインシステム連携。デザインからコード生成</td>
+            </tr>
+            <tr>
+              <td><strong>Stripe</strong></td>
+              <td>決済連携・管理</td>
+            </tr>
+            <tr>
+              <td><strong>Asana</strong></td>
+              <td>プロジェクト管理・タスク追跡</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>統合プラットフォーム</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>サーバー</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Pipedream</strong></td>
+              <td>2,500 以上の API、8,000 以上のプリビルトツールへのアクセス</td>
+            </tr>
+            <tr>
+              <td><strong>MetaMCP</strong></td>
+              <td>GUI ベースの MCP 接続管理ミドルウェア</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>セキュリティ上の注意点</h2>
+        <div class="callout danger">
+          <p><strong>セキュリティに関する重要事項:</strong></p>
+          <ul>
+            <li><strong>API キーを <code>.mcp.json</code> に直接記載しない</strong> - 環境変数（<code>${ENV_VAR}</code>）を使用してください</li>
+            <li><strong><code>.mcp.json</code> をコミットする際は機密情報がないか確認する</strong> - コマンドパスにユーザー名が含まれる場合があります</li>
+            <li><strong>信頼できるソースの MCP サーバーのみを使用する</strong> - 公式リポジトリやメジャーなプロジェクトのものを優先してください</li>
+            <li><strong>MCP サーバーに過度な権限を付与しない</strong> - 必要最小限のアクセス範囲に制限してください</li>
+          </ul>
+        </div>
+
+        <div class="callout tip">
+          <p><strong>ベストプラクティス:</strong></p>
+          <ul>
+            <li>まずは公式リファレンスサーバーから試して、MCP の仕組みに慣れましょう</li>
+            <li><code>claude mcp list</code> で接続状態を定期的に確認しましょう</li>
+            <li><code>settings.local.json</code> の <code>enabledMcpjsonServers</code> で、使用する MCP サーバーを明示的に許可しましょう</li>
+            <li>MCP サーバーの <code>command</code> には絶対パスを指定すると、環境差異によるトラブルを防げます</li>
+            <li>チームで共有する場合、<code>.mcp.json</code> のコマンドパスを汎用的に記述するか、README に環境依存の設定変更手順を記載しましょう</li>
+          </ul>
+        </div>
+
+        <h2>参考リンク</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>リソース</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MCP 公式サイト</td>
+              <td><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">https://modelcontextprotocol.io/</a></td>
+            </tr>
+            <tr>
+              <td>MCP 仕様</td>
+              <td><a href="https://modelcontextprotocol.io/specification/latest" target="_blank" rel="noopener">https://modelcontextprotocol.io/specification/latest</a></td>
+            </tr>
+            <tr>
+              <td>公式サーバーリポジトリ</td>
+              <td><a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">https://github.com/modelcontextprotocol/servers</a></td>
+            </tr>
+            <tr>
+              <td>Awesome MCP Servers</td>
+              <td><a href="https://github.com/punkpeye/awesome-mcp-servers" target="_blank" rel="noopener">https://github.com/punkpeye/awesome-mcp-servers</a></td>
+            </tr>
+            <tr>
+              <td>MCP Inspector（デバッグツール）</td>
+              <td><a href="https://github.com/modelcontextprotocol/inspector" target="_blank" rel="noopener">https://github.com/modelcontextprotocol/inspector</a></td>
+            </tr>
+            <tr>
+              <td>Claude Code MCP ドキュメント</td>
+              <td><a href="https://code.claude.com/docs/en/mcp" target="_blank" rel="noopener">https://code.claude.com/docs/en/mcp</a></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </main>
+  </div>
+  <script src="../js/main.js"></script>
+</body>
+</html>

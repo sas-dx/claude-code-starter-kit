@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keybindings - Claude Code Starter Kit</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+        <span class="light-icon">🌙</span>
+        <span class="dark-icon">☀️</span>
+      </button>
+      <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 ホーム</a></li>
+        <li class="nav-section-title">基本設定</li>
+        <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+        <li><a href="rules.html">📏 Rules</a></li>
+        <li><a href="settings.html">⚙️ Settings</a></li>
+        <li class="nav-section-title">コマンド・スキル</li>
+        <li><a href="commands.html">⌨️ Commands</a></li>
+        <li><a href="skills.html">🎯 Skills</a></li>
+        <li class="nav-section-title">エージェント</li>
+        <li><a href="agents.html">🤖 Agents</a></li>
+        <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+        <li class="nav-section-title">拡張・連携</li>
+        <li><a href="hooks.html">🪝 Hooks</a></li>
+        <li><a href="mcp.html">🔌 MCP</a></li>
+        <li><a href="plugins.html">🧩 Plugins</a></li>
+        <li class="nav-section-title">その他</li>
+        <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+      </ul>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="toc"></div>
+
+        <h1>Keybindings（キーバインド）</h1>
+        <p>Keybindings は、Claude Code の<strong>キーボードショートカットをカスタマイズする仕組み</strong>です。自分の好みに合わせてキー配置を変更し、操作効率を向上させられます。</p>
+
+        <h2>Keybindings とは</h2>
+
+        <h3>身近な例えで理解する</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div class="feature-card">
+            <h4>デフォルト設定</h4>
+            <p>WASD で移動、スペースでジャンプ。多くの人に合うけど、自分の好みとは違うかもしれない。</p>
+          </div>
+          <div class="feature-card">
+            <h4>カスタマイズ後</h4>
+            <p>自分がやりやすいキー配置に変更。操作が速くなり、ストレスが減る。</p>
+          </div>
+        </div>
+
+        <h2>なぜ Keybindings を設定するのか</h2>
+
+        <h3>1. 操作スピードが上がる</h3>
+        <p>よく使う操作を押しやすいキーに割り当てれば、マウスやメニューを使わずに素早く操作できます。</p>
+
+        <h3>2. 他のエディタと統一できる</h3>
+        <p>普段 VS Code や Vim を使っている人は、同じキーバインドに揃えることで混乱を防げます。</p>
+
+        <h3>3. 誤操作を防げる</h3>
+        <p>押し間違えやすいキーの割り当てを解除（<code>null</code>）して、意図しない操作を防ぐこともできます。</p>
+
+        <h2>設定方法</h2>
+
+        <h3>設定ファイル</h3>
+        <p><code>~/.claude/keybindings.json</code> に記述します。</p>
+        <pre><code># セッション内で設定ファイルを開く
+/keybindings</code></pre>
+
+        <h2>keybindings.json の書き方</h2>
+
+        <h3>基本構造</h3>
+        <div class="code-header"><span>~/.claude/keybindings.json</span></div>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "コンテキスト名",
+      "bindings": {
+        "キーストローク": "アクション名",
+        "キーストローク": "アクション名"
+      }
+    }
+  ]
+}</code></pre>
+
+        <h3>キーストロークの書き方</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>記法</th>
+              <th>意味</th>
+              <th>例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ctrl+k</code></td>
+              <td>Control + K</td>
+              <td><code>"ctrl+k": "chat:submit"</code></td>
+            </tr>
+            <tr>
+              <td><code>shift+tab</code></td>
+              <td>Shift + Tab</td>
+              <td><code>"shift+tab": "chat:cancel"</code></td>
+            </tr>
+            <tr>
+              <td><code>meta+p</code></td>
+              <td>Command/Meta + P</td>
+              <td><code>"meta+p": "app:exit"</code></td>
+            </tr>
+            <tr>
+              <td><code>ctrl+shift+c</code></td>
+              <td>複数修飾キー</td>
+              <td>2つ以上の修飾キーを組み合わせ</td>
+            </tr>
+            <tr>
+              <td><code>ctrl+k ctrl+s</code></td>
+              <td>コード（2段打ち）</td>
+              <td>1つ目を押してから2つ目を押す</td>
+            </tr>
+            <tr>
+              <td><code>null</code></td>
+              <td>割り当て解除</td>
+              <td>既存のショートカットを無効化</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>コンテキスト</h2>
+        <p>キーバインドは画面（コンテキスト）ごとに設定できます。同じキーでもコンテキストによって異なるアクションを割り当てられます。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>コンテキスト</th>
+              <th>適用される場面</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Global</code></td>
+              <td>すべての画面</td>
+            </tr>
+            <tr>
+              <td><code>Chat</code></td>
+              <td>メイン入力エリア</td>
+            </tr>
+            <tr>
+              <td><code>Autocomplete</code></td>
+              <td>自動補完メニュー</td>
+            </tr>
+            <tr>
+              <td><code>Confirmation</code></td>
+              <td>権限ダイアログ</td>
+            </tr>
+            <tr>
+              <td><code>Transcript</code></td>
+              <td>トランスクリプトビューア</td>
+            </tr>
+            <tr>
+              <td><code>Tabs</code></td>
+              <td>タブ操作</td>
+            </tr>
+            <tr>
+              <td><code>Help</code></td>
+              <td>ヘルプ画面</td>
+            </tr>
+            <tr>
+              <td><code>Settings</code></td>
+              <td>設定画面</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>主なアクション</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>アクション</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>chat:submit</code></td>
+              <td>メッセージを送信</td>
+            </tr>
+            <tr>
+              <td><code>chat:cancel</code></td>
+              <td>入力をキャンセル</td>
+            </tr>
+            <tr>
+              <td><code>chat:externalEditor</code></td>
+              <td>外部エディタで開く</td>
+            </tr>
+            <tr>
+              <td><code>chat:undo</code></td>
+              <td>元に戻す</td>
+            </tr>
+            <tr>
+              <td><code>app:toggleTodos</code></td>
+              <td>タスクリスト表示</td>
+            </tr>
+            <tr>
+              <td><code>app:toggleTranscript</code></td>
+              <td>トランスクリプト表示</td>
+            </tr>
+            <tr>
+              <td><code>app:exit</code></td>
+              <td>Claude Code を終了</td>
+            </tr>
+            <tr>
+              <td><code>confirmation:accept</code></td>
+              <td>権限ダイアログで許可</td>
+            </tr>
+            <tr>
+              <td><code>confirmation:deny</code></td>
+              <td>権限ダイアログで拒否</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>デフォルトのキーバインド一覧</h2>
+        <p>Claude Code のデフォルトキーバインドは以下の通りです。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>キー</th>
+              <th>コンテキスト</th>
+              <th>アクション</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Enter</code></td>
+              <td>Chat</td>
+              <td>メッセージ送信</td>
+            </tr>
+            <tr>
+              <td><code>Escape</code></td>
+              <td>Chat</td>
+              <td>入力キャンセル</td>
+            </tr>
+            <tr>
+              <td><code>Ctrl+C</code></td>
+              <td>Global</td>
+              <td>実行中の処理を中断</td>
+            </tr>
+            <tr>
+              <td><code>Ctrl+O</code></td>
+              <td>Global</td>
+              <td>Verbose モード切替</td>
+            </tr>
+            <tr>
+              <td><code>Shift+Down</code></td>
+              <td>Global</td>
+              <td>チームメイト切り替え（Agent Teams）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>カスタマイズ例</h2>
+
+        <h3>例1: メイン入力エリアのカスタマイズ</h3>
+        <div class="code-header"><span>~/.claude/keybindings.json</span></div>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "ctrl+j": "chat:submit",
+        "ctrl+e": "chat:externalEditor",
+        "ctrl+z": "chat:undo",
+        "escape": "chat:cancel",
+        "ctrl+u": null
+      }
+    }
+  ]
+}</code></pre>
+        <p>この設定では：</p>
+        <ul>
+          <li><code>Ctrl+J</code> でメッセージ送信（デフォルトの Enter の代わりに）</li>
+          <li><code>Ctrl+E</code> で外部エディタを起動</li>
+          <li><code>Ctrl+Z</code> で元に戻す</li>
+          <li><code>Escape</code> でキャンセル</li>
+          <li><code>Ctrl+U</code> を無効化（誤操作防止）</li>
+        </ul>
+
+        <h3>例2: グローバルキーバインドの設定</h3>
+        <div class="code-header"><span>~/.claude/keybindings.json</span></div>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "Global",
+      "bindings": {
+        "ctrl+t": "app:toggleTodos",
+        "ctrl+l": "app:toggleTranscript"
+      }
+    }
+  ]
+}</code></pre>
+        <p>この設定では：</p>
+        <ul>
+          <li><code>Ctrl+T</code> でタスクリストの表示/非表示を切り替え</li>
+          <li><code>Ctrl+L</code> でトランスクリプトの表示/非表示を切り替え</li>
+        </ul>
+
+        <h3>例3: 権限ダイアログのキーバインド</h3>
+        <div class="code-header"><span>~/.claude/keybindings.json</span></div>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "Confirmation",
+      "bindings": {
+        "enter": "confirmation:accept",
+        "escape": "confirmation:deny"
+      }
+    }
+  ]
+}</code></pre>
+
+        <h3>例4: 複数コンテキストをまとめて設定</h3>
+        <div class="code-header"><span>~/.claude/keybindings.json（完全な設定例）</span></div>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "ctrl+j": "chat:submit",
+        "ctrl+e": "chat:externalEditor",
+        "ctrl+z": "chat:undo",
+        "escape": "chat:cancel",
+        "ctrl+u": null
+      }
+    },
+    {
+      "context": "Global",
+      "bindings": {
+        "ctrl+t": "app:toggleTodos",
+        "ctrl+l": "app:toggleTranscript"
+      }
+    },
+    {
+      "context": "Confirmation",
+      "bindings": {
+        "enter": "confirmation:accept",
+        "escape": "confirmation:deny"
+      }
+    }
+  ]
+}</code></pre>
+
+        <h2>コード（Chord）バインド</h2>
+        <p>コードバインドは、<strong>2つのキーストロークを連続して押す</strong>ことでアクションを実行する仕組みです。VS Code の <code>Ctrl+K Ctrl+S</code> と同じ考え方です。</p>
+
+        <h3>書き方</h3>
+        <p>2つのキーストロークをスペースで区切って記述します。</p>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "ctrl+k ctrl+s": "chat:submit",
+        "ctrl+k ctrl+e": "chat:externalEditor"
+      }
+    }
+  ]
+}</code></pre>
+
+        <h3>動作の流れ</h3>
+        <ol>
+          <li><code>Ctrl+K</code> を押す（1段目：リーダーキー）</li>
+          <li>一定時間内に <code>Ctrl+S</code> を押す（2段目：アクションキー）</li>
+          <li>割り当てられたアクションが実行される</li>
+        </ol>
+
+        <div class="callout info">
+          <p><strong>コードバインドのメリット:</strong> 単一キーのショートカットでは足りない場合や、論理的なグループ化をしたい場合に有効です。例えば <code>Ctrl+K</code> をプレフィックスとして、<code>Ctrl+K Ctrl+S</code> で送信、<code>Ctrl+K Ctrl+E</code> でエディタ、のようにグループ化できます。</p>
+        </div>
+
+        <h2>割り当て解除（null）</h2>
+        <p>既存のキーバインドを無効化するには、アクションに <code>null</code> を指定します。</p>
+        <pre><code>{
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "ctrl+u": null,
+        "ctrl+w": null
+      }
+    }
+  ]
+}</code></pre>
+        <p>これにより、<code>Ctrl+U</code> と <code>Ctrl+W</code> を押しても何も起きなくなります。ターミナルで行削除やウィンドウ閉じるなどの誤操作を防ぐのに有効です。</p>
+
+        <div class="callout tip">
+          <p><strong>ベストプラクティス:</strong></p>
+          <ul>
+            <li><strong>まずデフォルトで使ってみる</strong> - 不便を感じたところだけカスタマイズしましょう</li>
+            <li><strong>他のツールと統一する</strong> - VS Code や Vim で使い慣れたキーバインドに合わせると混乱が減ります</li>
+            <li><strong>誤操作しやすいキーは <code>null</code> で無効化</strong> - <code>Ctrl+U</code>（行削除）や <code>Ctrl+W</code>（ウィンドウ閉じ）など</li>
+            <li><strong>コードバインドでグループ化</strong> - 関連する操作を同じプレフィックスキーでまとめると覚えやすくなります</li>
+            <li><strong>コンテキストを活用する</strong> - 同じキーでもコンテキストによって異なるアクションを割り当てられます</li>
+            <li><strong>設定はバックアップを取る</strong> - <code>~/.claude/keybindings.json</code> を dotfiles リポジトリで管理すると、環境移行が楽になります</li>
+          </ul>
+        </div>
+
+      </div>
+    </main>
+  </div>
+  <script src="../js/main.js"></script>
+</body>
+</html>

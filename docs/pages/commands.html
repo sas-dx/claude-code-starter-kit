@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>Commands（カスタムスラッシュコマンド）</h1>
+                <p>カスタムコマンドは、Claude Code で<strong>よく行う作業を <code>/コマンド名</code> の一言で実行できる仕組み</strong>です。</p>
+
+                <h2>カスタムコマンドとは</h2>
+
+                <h3>身近な例えで理解する</h3>
+                <p>料理で例えると:</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>カスタムコマンドなし</h4>
+                    <p>毎回「冷蔵庫からトマトを出して、洗って、切って、塩を振って...」と全手順を説明する</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>カスタムコマンドあり</h4>
+                    <p>「サラダ作って」の一言で、決められたレシピ通りに作ってくれる</p>
+                  </div>
+                </div>
+                <p>開発作業も同じです。コードレビューのたびに「セキュリティを確認して、テストを見て、品質をチェックして...」と毎回指示する代わりに、<code>/code-review #42</code> の一言で全てを実行できます。</p>
+
+                <h2>なぜカスタムコマンドを使うのか</h2>
+
+                <h3>1. 作業品質が安定する</h3>
+                <p>人が毎回手で指示を書くと、日によって観点が抜けたり、手順が変わったりします。カスタムコマンドはレシピが固定されているので、<strong>誰がいつ使っても同じ品質の作業</strong>が行われます。</p>
+
+                <h3>2. 時間を大幅に節約できる</h3>
+                <p>コードレビューの指示を毎回書くと数分かかりますが、<code>/code-review</code> なら1秒です。1日に何度も行う作業なら、その差は大きくなります。</p>
+
+                <h3>3. チームの知見が蓄積される</h3>
+                <p>「うちのチームではレビュー時にセキュリティも必ず見る」といったルールをコマンドに組み込めば、新メンバーも最初から同じ品質で作業できます。ベテランの暗黙知がコマンドとして形式知化されます。</p>
+
+                <h3>4. ミスが減る</h3>
+                <p>「PR 作るときに Issue を連携し忘れた」「コミット前に git pull するの忘れた」といったうっかりミスをコマンドが防いでくれます。</p>
+
+                <h2>コマンドの呼び出し方</h2>
+                <p>Claude Code のチャット入力欄で <code>/</code> に続けてコマンド名を入力します。引数がある場合はスペース区切りで渡します。</p>
+                <pre><code>/code-review #42
+/dev-issue #123
+/resolve-conflict</code></pre>
+
+                <div class="callout tip">
+                  <strong>ヒント:</strong> <code>/</code> を入力すると、利用可能なコマンドの一覧が表示されます。コマンド名の一部を入力して絞り込むこともできます。
+                </div>
+
+                <h2>カスタムコマンドの作り方</h2>
+
+                <h3>1. ファイルを作成する</h3>
+                <p><code>.claude/commands/</code> 配下に <code>コマンド名.md</code> ファイルを作成します。</p>
+                <pre><code>.claude/commands/
+└── my-command.md    → /my-command で呼び出せる</code></pre>
+
+                <h3>2. 内容を記述する</h3>
+                <p>マークダウン形式で AI への指示を記述します。<code>$ARGUMENTS</code> でユーザーからの引数を受け取れます。</p>
+                <div class="code-header"><span>コマンドファイルの例</span></div>
+                <pre><code>$ARGUMENTS で指定されたファイルのドキュメントを生成してください。
+
+## あなたのタスク
+
+1. 対象ファイルを読み取る
+2. 関数・クラスの一覧を抽出
+3. 各関数の説明を日本語で記述
+4. マークダウン形式で出力
+
+## 使用方法
+
+/my-command src/utils/helper.ts</code></pre>
+
+                <h3>3. 使用する</h3>
+                <pre><code>/my-command src/utils/helper.ts</code></pre>
+
+                <h2>$ARGUMENTS 変数</h2>
+                <p><code>$ARGUMENTS</code> は、ユーザーがコマンド呼び出し時に渡した引数を受け取るための特殊変数です。コマンドファイル内のどこでも使用できます。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>呼び出し例</th>
+                      <th><code>$ARGUMENTS</code> の値</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>/code-review #42</code></td>
+                      <td><code>#42</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/dev-issue #123</code></td>
+                      <td><code>#123</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/fix-pr-review #456 "変数名を修正"</code></td>
+                      <td><code>#456 "変数名を修正"</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/resolve-conflict</code></td>
+                      <td>（空文字列）</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h2>カスタムコマンドとスキルの違い</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>カスタムコマンド</th>
+                      <th>スキル</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>場所</strong></td>
+                      <td><code>.claude/commands/名前.md</code></td>
+                      <td><code>.claude/skills/名前/SKILL.md</code></td>
+                    </tr>
+                    <tr>
+                      <td><strong>呼び出し</strong></td>
+                      <td><code>/名前</code></td>
+                      <td><code>/名前</code> または AI が自動判定</td>
+                    </tr>
+                    <tr>
+                      <td><strong>機能</strong></td>
+                      <td>シンプルなプロンプト定義</td>
+                      <td>フロントマター（メタデータ）、テンプレート、スクリプト対応</td>
+                    </tr>
+                    <tr>
+                      <td><strong>向いている用途</strong></td>
+                      <td>定型ワークフローの実行</td>
+                      <td>高度な制御が必要な再利用可能ロジック</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>シンプルな定型作業にはカスタムコマンド、より高度な制御が必要な場合はスキルを使います。</p>
+
+                <h2>本リポジトリで提供しているコマンド</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>コマンド</th>
+                      <th>用途</th>
+                      <th>使い方</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>/code-review</code></td>
+                      <td>コード品質・セキュリティの包括的レビュー</td>
+                      <td><code>/code-review #42</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/dev-issue</code></td>
+                      <td>Issue ベースの実装〜PR 作成まで一括実行</td>
+                      <td><code>/dev-issue #42</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/dev-issue-team</code></td>
+                      <td>Agent Teams による Issue の並列実装</td>
+                      <td><code>/dev-issue-team #42</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/fix-pr-review</code></td>
+                      <td>PR レビュー指摘の分析・修正・完了報告</td>
+                      <td><code>/fix-pr-review #456</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>/resolve-conflict</code></td>
+                      <td>Git マージコンフリクトの分析・解決</td>
+                      <td><code>/resolve-conflict</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3>/code-review - コードレビュー</h3>
+                <p>Issue番号、PR番号、またはブランチ名を指定して包括的なコードレビューを実施します。コード品質（ロジック正確性、コーディング規約、エラーハンドリング、パフォーマンス、テスト）とセキュリティ（認証・認可、インジェクション、機密情報、入力バリデーション）の両面からレビューし、総合サマリーを出力します。PR が存在する場合はコメントを直接投稿します。</p>
+                <pre><code>/code-review #42
+/code-review feature/user-auth</code></pre>
+
+                <h3>/dev-issue - Issue ベース実装</h3>
+                <p>GitHub Issue の内容を解析し、ブランチ作成 → 実装 → テスト → コミット → PR 作成を一気通貫で実行します。メインブランチで <code>git pull</code> を行い最新化した上で作業を開始します。</p>
+                <pre><code>/dev-issue #42
+/dev-issue #123</code></pre>
+
+                <h3>/dev-issue-team - Agent Teams による並列実装</h3>
+                <p>Agent Teams を使い、解析・実装・レビューの3フェーズを分担して並列処理します。規模の大きい Issue に適しています。analyzer（解析）、developer（実装）、reviewer（テスト・レビュー・Git操作）の3エージェントで構成されます。</p>
+                <pre><code>/dev-issue-team #42
+/dev-issue-team #123</code></pre>
+
+                <h3>/fix-pr-review - レビュー指摘対応</h3>
+                <p>PR のレビューコメントを全て取得し、指摘事項を修正。修正後に PR へ対応完了コメントを投稿します。特定のコメントを引数で指定することも可能です。</p>
+                <pre><code>/fix-pr-review #456
+/fix-pr-review #456 "変数名をキャメルケースに修正してください"</code></pre>
+
+                <h3>/resolve-conflict - コンフリクト解消</h3>
+                <p>現在のブランチのコンフリクトを自動検出し、コードベース全体との整合性を評価した上で解決します。コミットはユーザー確認後に手動で行います。引数は不要です。</p>
+                <pre><code>/resolve-conflict</code></pre>
+
+                <h2>サンプルコマンド全文</h2>
+                <p>以下に本リポジトリで提供している全コマンドの全文を掲載します。</p>
+
+                <h3>code-review.md</h3>
+                <div class="code-header"><span>.claude/commands/code-review.md</span></div>
+                <pre><code>$ARGUMENTS で指定された対象（Issue番号、PR番号、またはブランチ名）に対して、実装されたコードの包括的レビューを実施します。
+
+## あなたのタスク
+
+以下の観点で順次レビューを実施してください。各レビューでは y/n 確認は求めず、直接作業を実施して結果を返すこと。
+
+### 1. コード品質レビュー
+
+対象コードの差分を確認し、以下を分析：
+- ロジックの正確性と潜在的なバグ
+- コーディング規約への準拠（CLAUDE.md や .claude/rules/ のルールがあれば参照）
+- エラーハンドリングの適切さ
+- パフォーマンスへの影響
+- テストの十分性
+
+### 2. セキュリティレビュー
+
+以下のセキュリティ観点でチェック：
+- 認証・認可の適切な実装
+- SQL インジェクション / XSS / CSRF 等の脆弱性
+- 機密情報（API キー、パスワード等）のハードコーディング
+- 入力値バリデーションの適切さ
+- 依存パッケージの既知の脆弱性
+
+### 3. 総合レビューサマリー作成
+
+レビュー結果を統合し、以下の形式で報告：
+
+```markdown
+# コードレビュー完了サマリー
+
+## コード品質レビュー結果
+[品質レビューの結果を要約]
+
+## セキュリティレビュー結果
+[セキュリティレビューの結果を要約]
+
+## 総合評価
+- クリティカルな問題: [件数]
+- 警告レベルの問題: [件数]
+- 改善提案: [件数]
+
+## 推奨アクション
+[次に実施すべきアクションを優先順位順にリスト]
+```
+
+### 4. PR へのコメント投稿（PR が存在する場合）
+
+プルリクエストが存在する場合、`gh` コマンドでレビューコメントを投稿。
+
+## 使用方法
+
+```
+/code-review &lt;Issue番号 or PR番号 or ブランチ名&gt;
+```
+
+例:
+```
+/code-review #42
+/code-review feature/user-auth
+```</code></pre>
+
+                <h3>dev-issue.md</h3>
+                <div class="code-header"><span>.claude/commands/dev-issue.md</span></div>
+                <pre><code>$ARGUMENTS の GitHub Issue に基づいて、実装からプルリクエスト作成までを一括で実施します。
+
+## 絶対原則
+- ブランチを作成する前に、必ずメインブランチ（main または master）に移動して `git pull` を実行し、ソースを最新化すること
+- Issue は連携済みのため新規作成不要
+
+## あなたのタスク
+
+以下の手順で作業を実施してください。y/n 確認は求めず、直接作業を実施すること。
+
+### 1. Issue の解析
+- `gh issue view $ARGUMENTS` で Issue の内容を取得・解析
+- 実装に必要な要件を整理
+
+### 2. 既存実装の調査
+- Issue に関連するコードベースの既存実装を調査
+- 影響範囲を特定
+
+### 3. ブランチ作成
+- メインブランチに移動し `git pull` でソースを最新化
+- `feature/` または `fix/` プレフィックスのブランチを作成（Issue 番号を含める）
+
+### 4. 実装
+- CLAUDE.md や .claude/rules/ のルールがあれば準拠して実装
+- テストも合わせて作成・実行
+
+### 5. コミット・プッシュ
+- 日本語のコミットメッセージで変更をコミット
+- リモートにプッシュ
+
+### 6. プルリクエスト作成
+- 日本語で PR を作成
+- Issue を連携（`Closes #番号`）
+
+### 7. 結果報告
+- 実装・更新されたファイルパスと内容を日本語で要約して報告
+
+## 使用方法
+
+```
+/dev-issue &lt;Issue番号&gt;
+```
+
+例:
+```
+/dev-issue #42
+/dev-issue #123
+```</code></pre>
+
+                <h3>dev-issue-team.md</h3>
+                <div class="code-header"><span>.claude/commands/dev-issue-team.md</span></div>
+                <pre><code>$ARGUMENTS の GitHub Issue 実装を agent-teams を使用して複数エージェントで並列実行してください。
+
+## 絶対原則
+- 必ず agent-teams（TeamCreate）を使用してチームを構成し、複数エージェントで並列処理すること
+- サブエージェントに y/n 確認は求めず、直接作業を実施して結果を返すよう指示すること
+- ブランチを作成する前に、必ずメインブランチ（main または master）に移動して `git pull` を実行し、ソースを最新化すること
+- Issue は連携済みのため新規作成不要
+
+## チーム構成
+
+以下の3エージェント構成でチームを作成してください：
+
+### 1. analyzer（Issue 解析・既存実装調査担当）
+- **subagent_type**: general-purpose
+- **役割**: GitHub Issue の解析と関連する既存実装の調査
+- **作業内容**:
+  - `gh issue view` で Issue の内容を取得・解析
+  - プロジェクト内の既存実装を調査
+  - CLAUDE.md や .claude/rules/ のルールを確認
+  - 実装すべき内容と影響範囲を整理
+  - 調査結果をチームリーダーに報告
+
+### 2. developer（実装担当）
+- **subagent_type**: general-purpose
+- **役割**: コードの実装
+- **作業内容**:
+  - analyzer の調査結果を受けて実装を実施
+  - CLAUDE.md や .claude/rules/ のルールに準拠
+  - テストも合わせて作成
+  - 実装完了をチームリーダーに報告
+
+### 3. reviewer（テスト・レビュー・Git 担当）
+- **subagent_type**: general-purpose
+- **役割**: コードレビュー、テスト実行、Git 操作
+- **作業内容**:
+  - developer の実装完了後に実施
+  - テスト実行
+  - コードレビュー（ルール準拠、整合性チェック）
+  - Git 操作:
+    - ブランチ作成（feature/ または fix/ 形式、Issue 番号含む）
+    - コミット（日本語メッセージ）
+    - プッシュ
+    - プルリクエスト作成（日本語、Issue 連携）
+
+## 実行フロー
+
+```
+Phase 1: 解析（単体）
+  analyzer → Issue 解析・既存実装調査
+
+Phase 2: 実装（Phase 1 完了後）
+  developer → コード実装・テスト作成
+
+Phase 3: レビュー・Git（Phase 2 完了後）
+  reviewer → テスト実行・コードレビュー・Git 操作
+```
+
+## タスク管理
+
+TaskCreate/TaskUpdate/TaskList を使用してタスクの進捗を管理してください：
+1. 各エージェントの作業を TaskCreate で登録
+2. 依存関係を addBlockedBy で設定
+3. 作業開始時に in_progress、完了時に completed に更新
+
+## 作業指示の共通事項
+
+全エージェントに以下を指示してください：
+- y/n 確認は一切不要、直接作業を実施すること
+- 作業完了後はチームリーダーに SendMessage で報告すること
+- 日本語で回答すること
+
+## あなた（チームリーダー）のタスク
+
+1. TeamCreate でチーム作成
+2. TaskCreate でタスク登録・依存関係設定
+3. 各 Phase 順にエージェントを起動・調整
+4. analyzer の結果を developer に共有
+5. 全エージェントの作業完了後、結果サマリーをユーザーに報告
+   - 実装・更新されたファイルパスと内容を日本語で要約して説明
+6. チーム解散（TeamDelete）
+
+## 使用方法
+
+```
+/dev-issue-team &lt;Issue番号&gt;
+```
+
+例:
+```
+/dev-issue-team #42
+/dev-issue-team #123
+```</code></pre>
+
+                <h3>fix-pr-review.md</h3>
+                <div class="code-header"><span>.claude/commands/fix-pr-review.md</span></div>
+                <pre><code>$ARGUMENTS で指定されたプルリクエストのレビューコメントを分析し、指摘事項を修正します。
+
+**引数（$ARGUMENTS）:**
+- プルリクエスト番号または URL
+- （任意）特定のレビューコメント
+
+## あなたのタスク
+
+以下の作業を y/n 確認なしで直接実施してください。
+
+### 1. レビューコメントの取得・分析
+- `gh pr view` で PR の内容を確認
+- `gh api` で PR の全レビューコメントを取得
+- 各コメントの指摘内容を解釈・分類（バグ修正、コード品質、命名規則、セキュリティ等）
+
+### 2. 指摘事項の修正
+各レビューコメントに対して：
+- 指摘内容を正確に理解
+- CLAUDE.md や .claude/rules/ のルールがあれば準拠して修正
+- 影響範囲の確認
+- 修正の実装
+
+### 3. コミット・プッシュ
+- 日本語のコミットメッセージで変更をコミット
+- 対象ブランチにプッシュ
+
+### 4. 完了コメントの投稿
+
+PR に以下の形式で完了コメントを投稿：
+
+```markdown
+## レビュー指摘対応完了
+
+以下のレビューコメントに対応しました:
+
+### [レビューコメント1の要約]
+- **対応内容**: [実装した修正の説明]
+- **変更ファイル**: [修正したファイルのリスト]
+
+### [レビューコメント2の要約]
+- **対応内容**: [実装した修正の説明]
+- **変更ファイル**: [修正したファイルのリスト]
+
+全ての指摘事項に対応完了しました。再レビューをお願いいたします。
+```
+
+## 注意事項
+- レビューコメントが曖昧な場合は最良の解釈で修正し、完了コメントで解釈内容を明示します
+- プロジェクトのルールとレビューコメントが競合する場合、ルールを優先しその理由を説明します
+
+## 使用方法
+
+```
+/fix-pr-review &lt;PR番号 or PR URL&gt;
+```
+
+例:
+```
+/fix-pr-review #456
+/fix-pr-review https://github.com/org/repo/pull/456
+/fix-pr-review #456 "変数名をキャメルケースに修正してください"
+```</code></pre>
+
+                <h3>resolve-conflict.md</h3>
+                <div class="code-header"><span>.claude/commands/resolve-conflict.md</span></div>
+                <pre><code>現在のブランチで発生している Git マージコンフリクトを分析・解決します。
+
+## あなたのタスク
+
+以下の作業を y/n 確認なしで直接実施してください。
+
+### 1. コンフリクトの特定
+- `git status` でコンフリクトが発生しているファイルを特定
+- `git diff` と `git log --merge` でコンフリクトの原因を解析
+
+### 2. コンフリクトの分析
+- 両方のブランチ（ours/theirs）のコード内容を読み取り、意図を理解
+- コンフリクト対象ファイルの周辺実装を読み取り、現時点のコードベース全体の構造を理解
+- 両ブランチの変更が現時点の実装とどちらがより整合性が高いかを評価・判断
+
+### 3. コンフリクトの解決
+- CLAUDE.md や .claude/rules/ のルールがあれば準拠して解決策を決定
+- コンフリクトマーカー（`&lt;&lt;&lt;&lt;&lt;&lt;&lt;`, `=======`, `&gt;&gt;&gt;&gt;&gt;&gt;&gt;`）を削除し、整合性の高い方を優先してマージ
+- 両ブランチの意図を可能な限り保持する
+
+### 4. ステージング
+- 解決済みファイルを `git add` でステージング
+
+### 5. 完了報告
+
+以下の形式で報告：
+
+```markdown
+# コンフリクト解消完了
+
+## 解析結果
+- コンフリクトファイル数: X件
+- 原因: [説明]
+
+## 整合性評価
+- 現時点の実装との整合性が高い方: [ours/theirs/両方マージ]
+- 評価理由: [コードベース全体との整合性分析結果]
+
+## 解決方針
+[採用した解決策の説明]
+
+## 変更サマリー
+[ファイルごとの変更内容]
+
+## ステータス
+解消完了（コミットはユーザーが実施してください）
+```
+
+## 注意事項
+- コンフリクト解消後のコミットは自動では行いません（ユーザーが内容を確認してからコミットしてください）
+- 複雑なロジックのコンフリクトは、詳細な説明とともにユーザーの判断を求めます
+- 両ブランチの意図が矛盾する場合は報告で明示します
+
+## 使用方法
+
+```
+/resolve-conflict
+```
+
+引数は不要です。現在のブランチのコンフリクトを自動検出します。</code></pre>
+
+                <h2>コマンド作成のコツ</h2>
+                <ul>
+                  <li><strong>「あなたのタスク」を明確にする</strong> - AI が何をすべきか具体的に書く</li>
+                  <li><strong>出力フォーマットを指定する</strong> - 毎回同じ形式で結果を得られる</li>
+                  <li><strong>使用方法と例を書く</strong> - 他のメンバーが迷わず使える</li>
+                  <li><strong>y/n 確認不要と明記する</strong> - 自動で作業を進めさせたい場合に記述</li>
+                </ul>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> コマンドのプロンプトに「CLAUDE.md や .claude/rules/ のルールがあれば参照」と記述しておくと、コマンド実行時にプロジェクトのルールが自動的に反映されます。ルールの整備とコマンドの整備を並行して行うことで、出力品質が相乗的に向上します。
+                </div>
+
+              </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>

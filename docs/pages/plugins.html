@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plugins - Claude Code Starter Kit</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+        <span class="light-icon">🌙</span>
+        <span class="dark-icon">☀️</span>
+      </button>
+      <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 ホーム</a></li>
+        <li class="nav-section-title">基本設定</li>
+        <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+        <li><a href="rules.html">📏 Rules</a></li>
+        <li><a href="settings.html">⚙️ Settings</a></li>
+        <li class="nav-section-title">コマンド・スキル</li>
+        <li><a href="commands.html">⌨️ Commands</a></li>
+        <li><a href="skills.html">🎯 Skills</a></li>
+        <li class="nav-section-title">エージェント</li>
+        <li><a href="agents.html">🤖 Agents</a></li>
+        <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+        <li class="nav-section-title">拡張・連携</li>
+        <li><a href="hooks.html">🪝 Hooks</a></li>
+        <li><a href="mcp.html">🔌 MCP</a></li>
+        <li><a href="plugins.html">🧩 Plugins</a></li>
+        <li class="nav-section-title">その他</li>
+        <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+      </ul>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="toc"></div>
+
+        <h1>Plugins（プラグイン）</h1>
+        <p>Plugins は、Claude Code の機能拡張（Skills、Agents、Hooks、MCP サーバー等）を<strong>1つのパッケージにまとめて配布・共有できる仕組み</strong>です。ブラウザの拡張機能のように、誰でも簡単にインストールして同じ機能を使えます。</p>
+
+        <h2>Plugins とは</h2>
+
+        <h3>身近な例えで理解する</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div class="feature-card">
+            <h4>.claude/ ディレクトリの設定</h4>
+            <p>ブラウザの設定を手動で変更する。そのブラウザでしか使えない。</p>
+          </div>
+          <div class="feature-card">
+            <h4>Plugins</h4>
+            <p>Chrome ウェブストアから拡張機能をインストールする。誰でもワンクリックで同じ機能が使える。アップデートも自動。</p>
+          </div>
+        </div>
+        <p>Claude Code も同じです。<code>.claude/</code> に直接書いた Skills や Hooks はそのプロジェクトでしか使えませんが、Plugin にすれば<strong>チームメンバーや他のプロジェクトに簡単に配布</strong>できます。</p>
+
+        <h2>なぜ Plugins が必要なのか</h2>
+
+        <h3>1. .claude/ の設定との使い分け</h3>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th><code>.claude/</code> 直接配置</th>
+              <th>Plugins</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>スコープ</strong></td>
+              <td>そのプロジェクトのみ</td>
+              <td>複数プロジェクトで共有可能</td>
+            </tr>
+            <tr>
+              <td><strong>スキル名</strong></td>
+              <td><code>/hello</code></td>
+              <td><code>/plugin-name:hello</code>（名前空間で衝突防止）</td>
+            </tr>
+            <tr>
+              <td><strong>配布</strong></td>
+              <td>手動コピー</td>
+              <td>マーケットプレイスからインストール</td>
+            </tr>
+            <tr>
+              <td><strong>向いている場面</strong></td>
+              <td>個人用、プロジェクト固有、実験段階</td>
+              <td>チーム共有、コミュニティ配布、バージョン管理</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout info">
+          <p><strong>推奨フロー:</strong> まず <code>.claude/</code> で試して、共有したくなったら Plugin に変換するのが推奨の流れです。</p>
+        </div>
+
+        <h3>2. 名前空間で衝突を防ぐ</h3>
+        <p>複数のプラグインが同じ名前のスキルを持っていても、<code>/plugin-a:deploy</code> と <code>/plugin-b:deploy</code> のように名前空間で区別されるため衝突しません。</p>
+
+        <h3>3. バージョン管理と更新</h3>
+        <p><code>plugin.json</code> にバージョンを記載することで、セマンティックバージョニングによる管理ができます。更新も <code>/plugin install</code> で簡単です。</p>
+
+        <h2>Plugin の構成</h2>
+        <p>Plugin は以下のディレクトリ構造で構成されます。</p>
+        <div class="code-header"><span>プラグインのディレクトリ構造</span></div>
+        <pre><code>my-plugin/
+├── .claude-plugin/
+│   └── plugin.json        # マニフェスト（必須）
+├── commands/               # カスタムコマンド
+│   └── hello.md
+├── skills/                 # スキル
+│   └── code-review/
+│       └── SKILL.md
+├── agents/                 # サブエージェント
+│   └── reviewer.md
+├── hooks/                  # フック
+│   └── hooks.json
+├── .mcp.json               # MCP サーバー設定
+├── .lsp.json               # LSP サーバー設定
+├── settings.json           # デフォルト設定
+└── README.md               # プラグイン説明</code></pre>
+
+        <div class="callout warning">
+          <p><strong>重要:</strong> <code>commands/</code>, <code>skills/</code>, <code>agents/</code> 等は<strong>プラグインルート直下</strong>に配置してください。<code>.claude-plugin/</code> の中に入れないでください。</p>
+        </div>
+
+        <h2>plugin.json（マニフェスト）</h2>
+        <p>マニフェストファイルはプラグインのメタ情報を定義します。<code>.claude-plugin/plugin.json</code> に配置します。</p>
+
+        <div class="code-header"><span>.claude-plugin/plugin.json</span></div>
+        <pre><code>{
+  "name": "my-plugin",
+  "description": "プラグインの説明",
+  "version": "1.0.0",
+  "author": {
+    "name": "作者名"
+  }
+}</code></pre>
+
+        <table>
+          <thead>
+            <tr>
+              <th>フィールド</th>
+              <th>必須</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>name</code></td>
+              <td>Yes</td>
+              <td>プラグイン名。スキルの名前空間になる</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td>Yes</td>
+              <td>プラグインマネージャーに表示される説明</td>
+            </tr>
+            <tr>
+              <td><code>version</code></td>
+              <td>Yes</td>
+              <td>セマンティックバージョニング（<code>1.0.0</code>）</td>
+            </tr>
+            <tr>
+              <td><code>author</code></td>
+              <td>-</td>
+              <td>作者情報</td>
+            </tr>
+            <tr>
+              <td><code>homepage</code></td>
+              <td>-</td>
+              <td>プラグインのホームページ URL</td>
+            </tr>
+            <tr>
+              <td><code>repository</code></td>
+              <td>-</td>
+              <td>ソースコードのリポジトリ URL</td>
+            </tr>
+            <tr>
+              <td><code>license</code></td>
+              <td>-</td>
+              <td>ライセンス</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>サンプルプラグイン</h2>
+        <p>本リポジトリの <code>.claude/plugins/sample-plugin/</code> に最小構成のサンプルプラグインがあります。これはあくまでも<strong>構成の参考例</strong>です。</p>
+
+        <h3>ディレクトリ構造</h3>
+        <div class="code-header"><span>sample-plugin/</span></div>
+        <pre><code>sample-plugin/
+├── .claude-plugin/
+│   └── plugin.json          # マニフェスト
+└── skills/
+    └── hello/
+        └── SKILL.md         # サンプルスキル</code></pre>
+
+        <h3>plugin.json</h3>
+        <div class="code-header"><span>sample-plugin/.claude-plugin/plugin.json</span></div>
+        <pre><code>{
+  "name": "sample-plugin",
+  "description": "Claude Code Plugin の構成を示すサンプルプラグインです。実際のプラグイン作成の参考にしてください。",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Name"
+  }
+}</code></pre>
+
+        <h3>SKILL.md（サンプルスキル）</h3>
+        <div class="code-header"><span>sample-plugin/skills/hello/SKILL.md</span></div>
+        <pre><code>---
+name: hello
+description: ユーザーに挨拶して、どんなお手伝いができるか尋ねるサンプルスキル
+disable-model-invocation: true
+---
+
+$ARGUMENTS さんに親しみを込めて挨拶し、今日どんなお手伝いができるか尋ねてください。
+
+名前が指定されていない場合は「こんにちは！」と一般的な挨拶をしてください。</code></pre>
+
+        <p>このスキルはプラグイン経由で読み込まれた場合、<code>/sample-plugin:hello</code> として名前空間付きで利用できます。</p>
+
+        <h2>プラグインの作り方（ステップバイステップ）</h2>
+
+        <h3>ステップ1: ディレクトリ作成</h3>
+        <pre><code># プラグインディレクトリを作成
+mkdir -p my-plugin/.claude-plugin</code></pre>
+
+        <h3>ステップ2: マニフェスト作成</h3>
+        <div class="code-header"><span>my-plugin/.claude-plugin/plugin.json</span></div>
+        <pre><code>{
+  "name": "my-plugin",
+  "description": "マイプラグインの説明",
+  "version": "1.0.0",
+  "author": {
+    "name": "あなたの名前"
+  }
+}</code></pre>
+
+        <h3>ステップ3: スキルを追加</h3>
+        <pre><code># スキルディレクトリを作成
+mkdir -p my-plugin/skills/greet</code></pre>
+
+        <div class="code-header"><span>my-plugin/skills/greet/SKILL.md</span></div>
+        <pre><code>---
+name: greet
+description: チームメンバーに挨拶するスキル
+---
+
+$ARGUMENTS さんにチームの一員として挨拶し、
+今日の作業予定を確認してください。</code></pre>
+
+        <h3>ステップ4: ローカルテスト</h3>
+        <pre><code># プラグインを読み込んでClaude Codeを起動
+claude --plugin-dir ./my-plugin
+
+# 変更を反映（再起動不要）
+/reload-plugins
+
+# スキルのテスト（名前空間付き）
+/my-plugin:greet 田中さん</code></pre>
+
+        <h3>ステップ5: カスタムコマンドやエージェントを追加（任意）</h3>
+        <pre><code># コマンドを追加
+mkdir -p my-plugin/commands
+echo "レビューの指示内容..." &gt; my-plugin/commands/review.md
+
+# エージェントを追加
+mkdir -p my-plugin/agents
+echo "セキュリティレビューの指示..." &gt; my-plugin/agents/security-reviewer.md</code></pre>
+
+        <h2>.claude/ からの変換手順</h2>
+        <p>既に <code>.claude/</code> に Skills や Hooks がある場合、以下の手順で Plugin に変換できます。</p>
+        <pre><code># 1. プラグインディレクトリを作成
+mkdir -p my-plugin/.claude-plugin
+
+# 2. マニフェストを作成
+echo '{"name":"my-plugin","description":"説明","version":"1.0.0"}' &gt; my-plugin/.claude-plugin/plugin.json
+
+# 3. 既存ファイルをコピー
+cp -r .claude/commands my-plugin/
+cp -r .claude/skills my-plugin/
+cp -r .claude/agents my-plugin/
+
+# 4. テスト
+claude --plugin-dir ./my-plugin</code></pre>
+
+        <h2>Skills との関係</h2>
+        <p>Skills は Plugin の中核的な構成要素です。<code>.claude/skills/</code> に直接配置したスキルとプラグイン内のスキルの違いを理解しましょう。</p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th><code>.claude/skills/</code> 直接配置</th>
+              <th>Plugin 内のスキル</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>呼び出し方</strong></td>
+              <td><code>/hello</code></td>
+              <td><code>/plugin-name:hello</code></td>
+            </tr>
+            <tr>
+              <td><strong>名前空間</strong></td>
+              <td>なし（衝突の可能性あり）</td>
+              <td>あり（衝突しない）</td>
+            </tr>
+            <tr>
+              <td><strong>共有</strong></td>
+              <td>手動でファイルコピー</td>
+              <td>プラグインとしてインストール</td>
+            </tr>
+            <tr>
+              <td><strong>更新</strong></td>
+              <td>手動</td>
+              <td><code>/plugin install</code> で更新</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>配布方法</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>方法</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>チーム内</strong></td>
+              <td>リポジトリにプラグインディレクトリをコミット</td>
+            </tr>
+            <tr>
+              <td><strong>マーケットプレイス</strong></td>
+              <td><code>/plugin install</code> で他のユーザーがインストール可能</td>
+            </tr>
+            <tr>
+              <td><strong>公式マーケットプレイス</strong></td>
+              <td><a href="https://claude.ai/settings/plugins/submit" target="_blank" rel="noopener">claude.ai/settings/plugins/submit</a> から申請</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout tip">
+          <p><strong>ベストプラクティス:</strong></p>
+          <ul>
+            <li><strong>まず <code>.claude/</code> で試す</strong> - プロジェクト内で動作確認してから Plugin に変換しましょう</li>
+            <li><strong>名前空間を活かす</strong> - プラグイン名は簡潔で分かりやすいものにしましょう（スキル名のプレフィックスになります）</li>
+            <li><strong>README.md を充実させる</strong> - プラグインの使い方、前提条件、設定方法を記載しましょう</li>
+            <li><strong>セマンティックバージョニングを守る</strong> - 破壊的変更はメジャーバージョンを上げましょう</li>
+            <li><strong>最小構成から始める</strong> - 必要な機能だけをパッケージに含め、段階的に拡張しましょう</li>
+            <li><strong>設定のデフォルト値を提供する</strong> - <code>settings.json</code> にデフォルト設定を含めると、導入の手間が減ります</li>
+          </ul>
+        </div>
+
+      </div>
+    </main>
+  </div>
+  <script src="../js/main.js"></script>
+</body>
+</html>

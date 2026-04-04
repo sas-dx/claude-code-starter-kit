@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>Rules（ルール）</h1>
+                <p>Rules は、<code>.claude/rules/</code> ディレクトリに配置するマークダウンファイルで、Claude Code が作業中に自動的に参照する<strong>プロジェクトのルールブック</strong>です。CLAUDE.md がプロジェクト全体の「業務マニュアル」だとすると、Rules は<strong>業務ごとの詳細な手順書</strong>です。</p>
+
+                <h2>Rules とは</h2>
+                <p>Rules を使うと、プロジェクト固有のコーディング規約、Git ワークフロー、セキュリティポリシーなどを個別のファイルに分けて管理でき、Claude Code がそれらを自動的に読み込んで遵守します。</p>
+
+                <div class="callout tip">
+                  <strong>ポイント:</strong> Rules は <code>.claude/rules/</code> 配下にマークダウンファイルを置くだけで有効になります。特別な設定やインストール作業は不要です。
+                </div>
+
+                <h3>身近な例えで理解する</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>CLAUDE.md = 校則</h4>
+                    <p>全校生徒が常に守る基本ルール。いつでも適用されます。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>Rules = 各教科のテストの注意事項</h4>
+                    <p>数学では関数電卓使用可、英語では辞書持ち込み不可 ── そのテストを受けるときだけ必要なルールです。</p>
+                  </div>
+                </div>
+                <p>校則はいつでも適用されますが、教科ごとの注意事項は「そのテストを受けるとき」だけ必要です。同じように、Rules は <code>paths</code> フロントマターを使えば「特定のファイルを触るとき」だけ適用させることができます。</p>
+
+                <h2>なぜ Rules が必要なのか</h2>
+
+                <h3>1. CLAUDE.md を短く保てる</h3>
+                <p>公式ドキュメントでは CLAUDE.md は <strong>200行以内</strong> が推奨されています。全てのルールを CLAUDE.md に書くと超過しやすいため、Rules に分割して CLAUDE.md をコンパクトに保ちます。</p>
+
+                <h3>2. トピックごとに整理できる</h3>
+                <p>Git のルール、コーディング規約、セキュリティルールが1ファイルに混在すると管理しにくくなります。1ファイル1トピックに分けることで、追加・修正・削除が簡単になります。</p>
+
+                <h3>3. パス別にルールを適用できる</h3>
+                <p><code>paths</code> フロントマターで特定のファイルパスに絞ったルール適用ができます。不要なルールがコンテキストに入らないので、AI の判断精度が上がり、トークンも節約できます。</p>
+
+                <h3>4. カスタムコマンド・サブエージェントと連動する</h3>
+                <p>本リポジトリのコマンド・エージェントは「CLAUDE.md や .claude/rules/ のルールに準拠」と設計されており、ルールを整備するほど出力品質が向上します。</p>
+
+                <h2>Rules の公式フォーマット</h2>
+
+                <h3>基本構造</h3>
+                <p><code>.claude/rules/</code> 配下にマークダウンファイルを配置します。ファイル名はトピックを表す名前にします（<code>testing.md</code>、<code>security.md</code> 等）。サブディレクトリも再帰的に読み込まれます。</p>
+                <pre><code>.claude/rules/
+├── git-workflow.md       # Git ワークフロー
+├── coding-standards.md   # コーディング規約
+├── testing.md            # テストルール（パス別）
+├── security.md           # セキュリティルール
+└── review-process.md     # コードレビュールール</code></pre>
+
+                <h3>無条件ルール（全ファイルに適用）</h3>
+                <p><code>paths</code> フロントマターを付けないルールは、セッション開始時に無条件で読み込まれます。プロジェクト全体に常に適用されるルールに使います。</p>
+
+                <div class="code-header"><span>無条件ルールの例</span></div>
+                <pre><code># セキュリティルール
+
+- 機密情報をソースコードにハードコーディングしない
+- `.env` ファイルをコミットしない
+- データベースの削除コマンドを実行しない</code></pre>
+
+                <h3>パス別ルール（特定ファイルにのみ適用）</h3>
+                <p>YAML フロントマターの <code>paths</code> フィールドでグロブパターンを指定すると、マッチするファイルを Claude が操作するときだけ読み込まれます。不要なルールがコンテキストに入らないため、トークンの節約と判断精度の向上につながります。</p>
+
+                <div class="code-header"><span>パス別ルールの例</span></div>
+                <pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API 開発ルール
+
+- 全エンドポイントに入力バリデーションを実装する
+- 統一されたエラーレスポンス形式を使用する</code></pre>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>無条件ルール</h4>
+                    <p><code>paths</code> フロントマターなし。セッション開始時に常に読み込まれる。例: セキュリティルール、Git ワークフロー</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>パス別ルール</h4>
+                    <p><code>paths</code> フロントマターでグロブパターンを指定。マッチするファイルを操作するときだけ読み込まれる。例: テストルール、API ルール</p>
+                  </div>
+                </div>
+
+                <h3>グロブパターン</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>パターン</th>
+                      <th>マッチするファイル</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>**/*.ts</code></td>
+                      <td>全ディレクトリの TypeScript ファイル</td>
+                    </tr>
+                    <tr>
+                      <td><code>src/**/*</code></td>
+                      <td>src 配下の全ファイル</td>
+                    </tr>
+                    <tr>
+                      <td><code>*.md</code></td>
+                      <td>プロジェクトルート直下のマークダウンファイル</td>
+                    </tr>
+                    <tr>
+                      <td><code>src/components/*.tsx</code></td>
+                      <td>特定ディレクトリの TSX ファイル</td>
+                    </tr>
+                    <tr>
+                      <td><code>**/*.{ts,tsx}</code></td>
+                      <td>ブレース展開で複数拡張子をマッチ</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <p>複数パターンを指定可能です:</p>
+                <pre><code>---
+paths:
+  - "src/**/*.{ts,tsx}"
+  - "lib/**/*.ts"
+  - "tests/**/*.test.ts"
+---</code></pre>
+
+                <h2>サンプルルール</h2>
+                <p>本リポジトリには5つのサンプルルールが含まれています。以下にそれぞれの全文を掲載します。</p>
+
+                <h3>coding-standards.md</h3>
+                <div class="code-header"><span>.claude/rules/coding-standards.md</span></div>
+                <pre><code># コーディング規約
+
+- 同じロジックを複数箇所に書かない（DRY）。3回以上繰り返すコードは共通化を検討する
+- 現時点で必要のない機能を先回り実装しない（YAGNI）
+- 変数・関数はキャメルケース、クラス・型はパスカルケース、定数はアッパースネークケースで命名する
+- マジックナンバーは定数に置き換える（`if (status === 3)` → `if (status === STATUS_COMPLETED)`）
+- 1つの関数は1つの責務に限定し、50行以内を目安にする
+- ネストは3段階以内に抑え、早期リターンを活用する
+- エラーを黙って握りつぶさない（空の catch ブロック禁止）。ユーザー向けメッセージとシステムログを区別する
+- 使用していないインポートは削除する
+- インポート順序を統一する（標準ライブラリ → 外部ライブラリ → プロジェクト内）</code></pre>
+
+                <h3>git-workflow.md</h3>
+                <div class="code-header"><span>.claude/rules/git-workflow.md</span></div>
+                <pre><code># Git ワークフロー
+
+- ブランチ作成前に必ずメインブランチで `git pull` してソースを最新化する
+- ブランチ名は `feature/#42-user-auth`、`fix/#123-login-error`、`docs/#45-api-spec` の形式にする（プレフィックス + Issue 番号 + 概要）
+- コミットメッセージは日本語で記述し、Issue 番号がある場合は先頭に含める（例: `#42 ユーザー認証のログイン機能を実装`）
+- 1つの論理的な変更を1コミットにまとめ、関連しない変更を混ぜない
+- PR のタイトルと説明は日本語で記述し、`Closes #番号` で Issue を連携する
+- 本番ブランチ（main / master）に直接プッシュしない</code></pre>
+
+                <h3>review-process.md</h3>
+                <div class="code-header"><span>.claude/rules/review-process.md</span></div>
+                <pre><code># コードレビュールール
+
+- 全ての問題を報告する。エラーを見過ごしたり軽視しない
+- 指摘にはファイルパス、行番号、具体的な修正コード例を含める
+- 指摘レベルを分類する: 🔴 Critical（本番障害・セキュリティ問題、マージ前に必須修正）、🟡 Warning（品質上の問題、修正推奨）、🔵 Suggestion（改善提案、対応任意）
+- レビュー観点: ロジック正確性、セキュリティ（security.md 参照）、テスト（testing.md 参照）、コーディング規約（coding-standards.md 参照）、パフォーマンス、エラー処理
+- レビュー指摘には全て対応する（明示的にスキップ指示がない限り）
+- プロジェクトルールとレビューコメントが競合する場合はプロジェクトルールを優先し、理由を説明する
+- 修正完了後は PR に対応内容のサマリーをコメントとして投稿する</code></pre>
+
+                <h3>security.md</h3>
+                <div class="code-header"><span>.claude/rules/security.md</span></div>
+                <pre><code># セキュリティルール
+
+## 禁止事項
+
+- データベースの削除・初期化コマンド（`flush`、`drop`、`reset` 等）を絶対に実行しない
+- 機密情報（API キー、パスワード、シークレット）をソースコードにハードコーディングしない。環境変数を使用する
+- `.env` ファイルをコミットしない
+
+## 実装時のチェック項目
+
+- 全ての API エンドポイントに認証チェックを入れる
+- SQL クエリは ORM を使用する。生 SQL の場合はパラメータバインディングを使う
+- ユーザー入力をそのまま HTML に出力しない（XSS 対策）
+- シェルコマンドにユーザー入力を直接渡さない
+- API レスポンスに不要な機密データを含めない
+- ログにパスワード・トークン等の機密情報を出力しない
+- ファイルアップロードには拡張子・サイズの制限を設ける</code></pre>
+
+                <h3>testing.md</h3>
+                <div class="code-header"><span>.claude/rules/testing.md</span></div>
+                <pre><code>---
+paths:
+  - "tests/**/*"
+  - "test/**/*"
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/*_test.*"
+---
+
+# テストルール
+
+- TDD を実践する: テストを先に書き、テストを通す実装を書く
+- テストコードを修正・削除してテストを通すことは絶対に禁止。テストが失敗したら実装コードを直す
+- 全テストを毎回実行せず、修正内容に影響するテストファイル・テストクラスのみを対象に実行する
+- テスト名は「何をテストしているか」がわかるように命名する（`test('ユーザー名が空の場合にバリデーションエラーを返す')` ）
+- 正常系、異常系（不正入力でエラー）、境界値（最大文字数ちょうど / +1）、エッジケース（null、空文字、特殊文字）を網羅する
+- テスト間の依存関係を作らない。各テストは独立して実行可能にする</code></pre>
+
+                <div class="callout info">
+                  <strong>注目:</strong> <code>testing.md</code> だけが <code>paths</code> フロントマターを持つパス別ルールです。テスト関連ファイル（<code>tests/**/*</code>, <code>**/*.test.*</code>, <code>**/*.spec.*</code> 等）を操作するときだけ読み込まれます。
+                </div>
+
+                <h2>本リポジトリで提供しているルール</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ファイル</th>
+                      <th><code>paths</code></th>
+                      <th>内容</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>git-workflow.md</code></td>
+                      <td>なし（常時適用）</td>
+                      <td>ブランチ命名、コミットメッセージ、PR 作成</td>
+                    </tr>
+                    <tr>
+                      <td><code>coding-standards.md</code></td>
+                      <td>なし（常時適用）</td>
+                      <td>DRY/YAGNI、命名規則、エラー処理、可読性</td>
+                    </tr>
+                    <tr>
+                      <td><code>testing.md</code></td>
+                      <td><code>tests/**/*</code>, <code>**/*.test.*</code> 等</td>
+                      <td>TDD、テストコード不可侵性、最小テスト原則</td>
+                    </tr>
+                    <tr>
+                      <td><code>security.md</code></td>
+                      <td>なし（常時適用）</td>
+                      <td>禁止事項、セキュリティチェック項目</td>
+                    </tr>
+                    <tr>
+                      <td><code>review-process.md</code></td>
+                      <td>なし（常時適用）</td>
+                      <td>レビュー観点、指摘レベル、対応ルール</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h2>ルール作成のコツ</h2>
+                <ul>
+                  <li><strong>簡潔に書く</strong> - ルールはガイドではない。具体的で検証可能な指示を箇条書きにする</li>
+                  <li><strong>1ファイル1トピック</strong> - ファイル名がトピックを表すようにする</li>
+                  <li><strong>パス別ルールを活用する</strong> - 全ファイルに不要なルールは <code>paths</code> で絞り、コンテキストを節約する</li>
+                  <li><strong>CLAUDE.md と重複させない</strong> - ルールは CLAUDE.md の詳細版。同じ内容を両方に書かない</li>
+                  <li><strong>シンボリックリンクで共有可能</strong> - 複数プロジェクトで共通のルールは <code>ln -s</code> でリンクできる</li>
+                </ul>
+
+                <div class="callout tip">
+                  <strong>ベストプラクティス:</strong> ルールは「ガイド」ではなく「チェックリスト」として書きましょう。「〜を心がける」ではなく「〜する / 〜しない」と断言形で記述すると、Claude がルールを明確に理解し遵守率が高まります。また、各ルールに「なぜ」を付記すると、エッジケースでの判断が安定します。
+                </div>
+
+                <h2>ユーザーレベルのルール</h2>
+                <p><code>~/.claude/rules/</code> に配置したルールは、全プロジェクトで個人的に適用されます。プロジェクト固有でない個人の好みはここに置きます。</p>
+                <pre><code>~/.claude/rules/
+├── preferences.md    # 個人のコーディング好み
+└── workflows.md      # 個人のワークフロー</code></pre>
+                <p>ユーザーレベルのルールはプロジェクトルールより先に読み込まれ、<strong>プロジェクトルールが優先</strong>されます。個人のルールとプロジェクトのルールが矛盾する場合は、プロジェクト側が採用されます。</p>
+
+                <div class="callout info">
+                  <strong>まとめ:</strong> Rules は CLAUDE.md の補完として、トピック別にルールを分割管理できる仕組みです。無条件ルールとパス別ルールを使い分けることで、必要な場面で必要なルールだけを AI に読み込ませ、精度とコスト効率を両立できます。
+                </div>
+
+              </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>

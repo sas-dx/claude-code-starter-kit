@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Teams - Claude Code Starter Kit</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+        <span class="light-icon">🌙</span>
+        <span class="dark-icon">☀️</span>
+      </button>
+      <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 ホーム</a></li>
+        <li class="nav-section-title">基本設定</li>
+        <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+        <li><a href="rules.html">📏 Rules</a></li>
+        <li><a href="settings.html">⚙️ Settings</a></li>
+        <li class="nav-section-title">コマンド・スキル</li>
+        <li><a href="commands.html">⌨️ Commands</a></li>
+        <li><a href="skills.html">🎯 Skills</a></li>
+        <li class="nav-section-title">エージェント</li>
+        <li><a href="agents.html">🤖 Agents</a></li>
+        <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+        <li class="nav-section-title">拡張・連携</li>
+        <li><a href="hooks.html">🪝 Hooks</a></li>
+        <li><a href="mcp.html">🔌 MCP</a></li>
+        <li><a href="plugins.html">🧩 Plugins</a></li>
+        <li class="nav-section-title">その他</li>
+        <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+      </ul>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="toc"></div>
+
+        <h1>Agent Teams（エージェントチーム）</h1>
+        <p>Agent Teams は、<strong>複数の Claude Code を同時に動かしてチームのように協力させる仕組み</strong>です。各メンバーが並列で動き、お互いにメッセージを送り合いながら協調作業できます。</p>
+
+        <h2>Agent Teams とは</h2>
+
+        <h3>身近な例えで理解する</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div class="feature-card">
+            <h4>Agent Teams なし</h4>
+            <p>1人で荷造り → 運搬 → 荷ほどき → 掃除を順番にやる。全部終わるまで時間がかかる。</p>
+          </div>
+          <div class="feature-card">
+            <h4>Agent Teams あり</h4>
+            <p>「荷造り担当」「運搬担当」「荷ほどき担当」「掃除担当」の4人チームで同時に作業する。さらにメンバー同士が「荷造り終わったよ」「じゃあ運ぶね」と直接やり取りできる。</p>
+          </div>
+        </div>
+
+        <h2>なぜ Agent Teams が必要なのか</h2>
+
+        <h3>1. 並列で作業が進む</h3>
+        <p>1人が順番にやると時間がかかる作業も、3〜5人で分担すれば大幅に短縮できます。特に「調査」「実装」「レビュー」のように独立性の高い作業に効果的です。</p>
+
+        <h3>2. 専門性を分けられる</h3>
+        <p>「セキュリティ担当」「パフォーマンス担当」「テスト担当」のように、それぞれ異なる観点に集中させることで、1人で全部見るより品質が上がります。</p>
+
+        <h3>3. チームメイト同士が議論できる</h3>
+        <p>サブエージェントはメインエージェントに結果を返すだけですが、Agent Teams のメンバーはお互いにメッセージを送り合い、発見を共有したり、お互いの仮説に反証を試みたりできます。</p>
+
+        <h2>サブエージェントとの違い</h2>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>サブエージェント</th>
+              <th>Agent Teams</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>コミュニケーション</strong></td>
+              <td>メインに結果を返すだけ</td>
+              <td>メンバー同士が直接やり取り</td>
+            </tr>
+            <tr>
+              <td><strong>コーディネーション</strong></td>
+              <td>メインが全管理</td>
+              <td>共有タスクリストで自己調整</td>
+            </tr>
+            <tr>
+              <td><strong>コスト</strong></td>
+              <td>低い</td>
+              <td>高い（各メンバーが独立インスタンス）</td>
+            </tr>
+            <tr>
+              <td><strong>向いている場面</strong></td>
+              <td>結果だけ欲しい単純なタスク</td>
+              <td>議論・協調が必要な複雑なタスク</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout info">
+          <p><strong>使い分けの目安:</strong> 結果だけ欲しい → サブエージェント、議論させたい → Agent Teams</p>
+        </div>
+
+        <h2>有効化</h2>
+
+        <div class="callout warning">
+          <p><strong>注意:</strong> Agent Teams は実験的機能です。Claude Code v2.1.32 以降が必要です。</p>
+        </div>
+
+        <p><code>settings.json</code> に以下を追加します（本リポジトリの <code>.claude/settings.json</code> には設定済み）。</p>
+
+        <div class="code-header"><span>.claude/settings.json</span></div>
+        <pre><code>{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}</code></pre>
+
+        <h2>チーム設計の方法</h2>
+        <p>効果的なチームを設計するには、タスクの性質に応じてメンバーの役割を決めます。</p>
+
+        <h3>設計のポイント</h3>
+        <ul>
+          <li><strong>独立した作業単位に分割する</strong> - 各メンバーが他のメンバーの完了を待たずに作業開始できるようにする</li>
+          <li><strong>明確な責任範囲を定義する</strong> - 同一ファイルの並行編集を避けるため、担当領域を明確に分ける</li>
+          <li><strong>3〜5名が最適</strong> - 多すぎるとコーディネーションコストが増加する</li>
+          <li><strong>1人あたり5〜6タスク</strong> - 多すぎず少なすぎない粒度にする</li>
+        </ul>
+
+        <h2>活用シーン</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>シーン</th>
+              <th>チーム構成例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>PR レビュー</strong></td>
+              <td>セキュリティ担当 + パフォーマンス担当 + テスト担当</td>
+            </tr>
+            <tr>
+              <td><strong>バグ調査</strong></td>
+              <td>仮説A調査 + 仮説B調査 + 仮説C調査（互いに反証）</td>
+            </tr>
+            <tr>
+              <td><strong>新機能実装</strong></td>
+              <td>フロントエンド担当 + バックエンド担当 + テスト担当</td>
+            </tr>
+            <tr>
+              <td><strong>リサーチ</strong></td>
+              <td>UX調査 + 技術調査 + 競合調査</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>並列実行のメリット</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+          <div class="feature-card">
+            <h4>時間の短縮</h4>
+            <p>3つの独立したレビューを順番にやると30分かかるところ、並列で10分に短縮。作業時間は人数分の1に近づきます。</p>
+          </div>
+          <div class="feature-card">
+            <h4>多角的な視点</h4>
+            <p>セキュリティ、パフォーマンス、テストの3つの視点で同時にレビュー。1人では見落とすポイントもカバーできます。</p>
+          </div>
+          <div class="feature-card">
+            <h4>相互フィードバック</h4>
+            <p>メンバー同士がお互いの発見を共有。「バックエンドの修正がフロントに影響する」といった横断的な問題も早期に発見。</p>
+          </div>
+        </div>
+
+        <h2>チームの起動方法</h2>
+        <p>自然言語で Claude に指示するだけでチームを起動できます。</p>
+
+        <h3>PR レビューの例</h3>
+        <div class="code-header"><span>プロンプト例</span></div>
+        <pre><code>エージェントチームを作成して PR #42 をレビューしてください。
+3つのレビュアーを起動:
+- セキュリティに焦点を当てたレビュアー
+- パフォーマンスをチェックするレビュアー
+- テストを検証するレビュアー</code></pre>
+
+        <h3>機能実装の例</h3>
+        <div class="code-header"><span>プロンプト例</span></div>
+        <pre><code>エージェントチームを作成して Issue #100 を実装してください。
+4名のチーム:
+- 解析担当: Issue の要件を分析してタスクを分解
+- バックエンド担当: API エンドポイントの実装
+- フロントエンド担当: UI コンポーネントの実装
+- レビュー担当: 実装完了後にコードレビュー</code></pre>
+
+        <h3>バグ調査の例</h3>
+        <div class="code-header"><span>プロンプト例</span></div>
+        <pre><code>エージェントチームを作成してバグを調査してください。
+5つの仮説を並列で検証し、互いの理論に反証を試みるよう指示。</code></pre>
+
+        <h2>dev-issue-team コマンドとの連携</h2>
+        <p>本リポジトリには <code>/dev-issue-team</code> カスタムコマンドが用意されており、GitHub Issue の実装を Agent Teams で並列実行できます。</p>
+
+        <div class="code-header"><span>使用例</span></div>
+        <pre><code># Issue #42 を Agent Teams で実装
+/dev-issue-team #42</code></pre>
+
+        <p>このコマンドは以下を自動的に行います：</p>
+        <ul>
+          <li>Issue の内容を分析</li>
+          <li>適切なチーム構成を決定</li>
+          <li>各メンバーにタスクを割り当て</li>
+          <li>並列で実装を進行</li>
+          <li>結果を統合して PR を作成</li>
+        </ul>
+
+        <h2>チーム設定サンプル</h2>
+        <p>Hooks を使って品質ゲートを設定し、チームの品質を担保できます。</p>
+
+        <div class="code-header"><span>settings.json に追加するフック設定（品質ゲート）</span></div>
+        <pre><code>{
+  "hooks": {
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "全ての割り当てタスクは完了しましたか？未完了の場合、残りのタスクを確認して作業を続けてください。"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "このタスクの成果物は品質基準を満たしていますか？テストは通っていますか？"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+        <h2>表示モード</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>モード</th>
+              <th>操作方法</th>
+              <th>要件</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>in-process</code></td>
+              <td><code>Shift+Down</code> でメンバー切り替え</td>
+              <td>なし</td>
+            </tr>
+            <tr>
+              <td><code>tmux</code></td>
+              <td>各メンバーが独自のペインで表示</td>
+              <td>tmux / iTerm2</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>表示モードは <code>settings.json</code> で設定できます。</p>
+        <div class="code-header"><span>settings.json</span></div>
+        <pre><code>{
+  "teammateMode": "in-process"
+}</code></pre>
+
+        <h2>具体的なチーム構成例</h2>
+
+        <h3>構成例1: PR レビューチーム</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>メンバー</th>
+              <th>役割</th>
+              <th>チェック観点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>セキュリティレビュアー</td>
+              <td>セキュリティ脆弱性の検出</td>
+              <td>SQL インジェクション、XSS、認証・認可、機密情報露出</td>
+            </tr>
+            <tr>
+              <td>パフォーマンスレビュアー</td>
+              <td>パフォーマンス問題の検出</td>
+              <td>N+1 クエリ、メモリリーク、不要な再レンダリング</td>
+            </tr>
+            <tr>
+              <td>テストレビュアー</td>
+              <td>テストカバレッジの検証</td>
+              <td>テスト漏れ、エッジケース、モックの適切さ</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>構成例2: フルスタック実装チーム</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>メンバー</th>
+              <th>役割</th>
+              <th>担当領域</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>解析担当</td>
+              <td>要件分析とタスク分解</td>
+              <td>Issue 分析、設計ドキュメント</td>
+            </tr>
+            <tr>
+              <td>バックエンド担当</td>
+              <td>API 実装</td>
+              <td>エンドポイント、DB スキーマ、ビジネスロジック</td>
+            </tr>
+            <tr>
+              <td>フロントエンド担当</td>
+              <td>UI 実装</td>
+              <td>コンポーネント、スタイリング、状態管理</td>
+            </tr>
+            <tr>
+              <td>レビュー担当</td>
+              <td>品質検証</td>
+              <td>コードレビュー、テスト作成</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout tip">
+          <p><strong>ベストプラクティス:</strong></p>
+          <ul>
+            <li><strong>チームサイズは3〜5名</strong> - 多すぎるとコーディネーションオーバーヘッドが増加します</li>
+            <li><strong>チームメイト1名あたり5〜6タスク</strong> が適切な粒度です</li>
+            <li><strong>同一ファイルの並行編集は避ける</strong> - 上書きの原因になります。担当ファイルを明確に分けましょう</li>
+            <li><strong>初めてなら「コードを書かないタスク」から始める</strong> - レビューや調査など、ファイル変更を伴わないタスクが安全です</li>
+            <li><strong>品質ゲートを設定する</strong> - <code>TeammateIdle</code> や <code>TaskCompleted</code> フックで品質チェックを自動化しましょう</li>
+            <li><strong>tmux モードを活用する</strong> - 各メンバーの作業状況をリアルタイムで確認できます</li>
+          </ul>
+        </div>
+
+      </div>
+    </main>
+  </div>
+  <script src="../js/main.js"></script>
+</body>
+</html>

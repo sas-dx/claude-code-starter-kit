@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="./index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="./index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="./pages/claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="./pages/rules.html">📏 Rules</a></li>
+                <li><a href="./pages/settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="./pages/commands.html">⌨️ Commands</a></li>
+                <li><a href="./pages/skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="./pages/agents.html">🤖 Agents</a></li>
+                <li><a href="./pages/agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="./pages/hooks.html">🪝 Hooks</a></li>
+                <li><a href="./pages/mcp.html">🔌 MCP</a></li>
+                <li><a href="./pages/plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="./pages/keybindings.html">⌨️ Keybindings</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+
+                <!-- Hero セクション -->
+                <section class="hero">
+                    <h1>Claude Code Starter Kit</h1>
+                    <p class="hero-subtitle">Claude Code の主要機能を網羅したスターターキット</p>
+                    <p>Claude Code の導入を検討しているチームや個人に向けたスターターキットです。Skills、カスタムコマンド、サブエージェント、エージェントチームなど、Claude Code の主要機能をすぐに導入・使用できるテンプレートとサンプルを提供します。</p>
+                </section>
+
+                <!-- 前提条件 -->
+                <section>
+                    <h2>前提条件</h2>
+                    <ul>
+                        <li><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code CLI</a> がインストール済みであること</li>
+                        <li>Node.js 18 以上</li>
+                        <li>Git</li>
+                    </ul>
+                    <pre><code># Claude Code のインストール
+npm install -g @anthropic-ai/claude-code
+
+# インストール確認
+claude --version</code></pre>
+                </section>
+
+                <!-- はじめ方 -->
+                <section>
+                    <h2>はじめ方</h2>
+                    <p>3ステップですぐに使い始められます。</p>
+                    <ol>
+                        <li>
+                            <strong>クローン</strong> - リポジトリをクローンします
+                            <pre><code>git clone https://github.com/sas-dx/claude-code-starter-kit.git
+cd claude-code-starter-kit</code></pre>
+                        </li>
+                        <li>
+                            <strong>起動</strong> - Claude Code を起動すると CLAUDE.md が自動的に読み込まれます
+                            <pre><code>claude</code></pre>
+                        </li>
+                        <li>
+                            <strong>カスタマイズ</strong> - プロジェクトに合わせて CLAUDE.md を編集します
+                            <pre><code># 自動生成してからカスタマイズ
+claude /init</code></pre>
+                        </li>
+                    </ol>
+                    <div class="callout tip">
+                        <p><code>/scaffold-feature</code> スキルで各機能の雛形を一括生成できます。例: <code>/scaffold-feature command deploy</code></p>
+                    </div>
+                </section>
+
+                <!-- 主要機能 -->
+                <section>
+                    <h2>主要機能</h2>
+                    <div class="feature-grid">
+
+                        <a href="./pages/claude-md.html" class="feature-card">
+                            <div class="card-icon">📋</div>
+                            <h3>CLAUDE.md</h3>
+                            <p>セッション開始時に自動読み込みされるプロジェクト指示書。チーム全員が同じルールで作業でき、AI の暴走も防止します。</p>
+                        </a>
+
+                        <a href="./pages/rules.html" class="feature-card">
+                            <div class="card-icon">📏</div>
+                            <h3>Rules</h3>
+                            <p>CLAUDE.md の詳細版として機能するルールファイル。パス別ルールで特定ファイル操作時のみ適用させることも可能です。</p>
+                        </a>
+
+                        <a href="./pages/commands.html" class="feature-card">
+                            <div class="card-icon">⌨️</div>
+                            <h3>Commands</h3>
+                            <p>よく行う作業を <code>/コマンド名</code> の一言で実行。コードレビュー、Issue ベース実装、コンフリクト解決などを提供。</p>
+                        </a>
+
+                        <a href="./pages/skills.html" class="feature-card">
+                            <div class="card-icon">🎯</div>
+                            <h3>Skills</h3>
+                            <p>コマンドの上位互換。手動呼び出しに加え、Claude が状況に応じて自動的に使用。テンプレートやスクリプトの同梱にも対応。</p>
+                        </a>
+
+                        <a href="./pages/agents.html" class="feature-card">
+                            <div class="card-icon">🤖</div>
+                            <h3>Agents</h3>
+                            <p>特定タスクに特化したサブエージェント。隔離コンテキストで独立動作し、Claude が必要に応じて自動的に委譲します。</p>
+                        </a>
+
+                        <a href="./pages/agent-teams.html" class="feature-card">
+                            <div class="card-icon">👥</div>
+                            <h3>Agent Teams</h3>
+                            <p>複数の Claude Code インスタンスが並列で協調作業を行う実験的機能。共有タスクリストで自律的に協調します。</p>
+                        </a>
+
+                        <a href="./pages/hooks.html" class="feature-card">
+                            <div class="card-icon">🪝</div>
+                            <h3>Hooks</h3>
+                            <p>ツール実行前後に自動実行されるシェルスクリプト。CLAUDE.md が「指示」ならば、Hooks は「仕組みで強制する」ガードレールです。</p>
+                        </a>
+
+                        <a href="./pages/mcp.html" class="feature-card">
+                            <div class="card-icon">🔌</div>
+                            <h3>MCP</h3>
+                            <p>AI に GitHub、DB、Slack 等の外部サービスへのアクセスを提供する仕組み。Serena や Context7 を導入済み。</p>
+                        </a>
+
+                        <a href="./pages/plugins.html" class="feature-card">
+                            <div class="card-icon">🧩</div>
+                            <h3>Plugins</h3>
+                            <p>Skills・Agents・Hooks・MCP サーバー等を1つのパッケージにまとめて配布・共有できる仕組みです。</p>
+                        </a>
+
+                        <a href="./pages/settings.html" class="feature-card">
+                            <div class="card-icon">⚙️</div>
+                            <h3>Settings</h3>
+                            <p>Claude Code の動作・権限・フック・環境変数を制御する設定ファイル。優先度付きの階層構造で管理します。</p>
+                        </a>
+
+                        <a href="./pages/keybindings.html" class="feature-card">
+                            <div class="card-icon">⌨️</div>
+                            <h3>Keybindings</h3>
+                            <p>キーボードショートカットのカスタマイズ。<code>/keybindings</code> で設定ファイルを開いて編集できます。</p>
+                        </a>
+
+                    </div>
+                </section>
+
+                <!-- ディレクトリ構成 -->
+                <section>
+                    <h2>ディレクトリ構成</h2>
+                    <p><code>.claude/</code> ディレクトリに Claude Code の全設定とカスタマイズが集約されています。</p>
+                    <pre><code>claude-code-starter-kit/
+├── README.md
+├── .mcp.json                        # MCP サーバー設定（チーム共有）
+└── .claude/
+    ├── CLAUDE.md                    # プロジェクト指示書（メイン）
+    ├── README.md                    # CLAUDE.md の書き方ガイド
+    ├── settings.json                # プロジェクト設定（チーム共有）
+    ├── commands/                    # カスタムコマンド
+    ├── skills/                      # スキル
+    ├── agents/                      # サブエージェント
+    ├── rules/                       # プロジェクトルール
+    ├── hooks/                       # フックスクリプト
+    ├── mcp/                         # MCP ガイド
+    ├── agent-teams/                 # Agent Teams ガイド
+    ├── settings/                    # Settings ガイド
+    ├── keybindings/                 # Keybindings ガイド
+    └── plugins/                     # Plugins ガイド</code></pre>
+                    <p>各ディレクトリには README.md とサンプルファイルが含まれています。</p>
+                </section>
+
+                <!-- カスタマイズガイド -->
+                <section>
+                    <h2>カスタマイズガイド</h2>
+
+                    <h3>1. プロジェクトに合わせた CLAUDE.md の作成</h3>
+                    <pre><code># 自動生成してからカスタマイズ
+claude /init</code></pre>
+
+                    <h3>2. 機能の追加</h3>
+                    <p><code>/scaffold-feature</code> スキルで雛形を一括生成できます。</p>
+                    <pre><code>/scaffold-feature command deploy       # カスタムコマンドの雛形
+/scaffold-feature agent test-runner    # サブエージェントの雛形
+/scaffold-feature skill my-workflow    # スキルの雛形
+/scaffold-feature rule api-design      # ルールの雛形
+/scaffold-feature hook block-rm        # フックスクリプトの雛形</code></pre>
+
+                    <h3>3. MCP サーバーの追加</h3>
+                    <pre><code>claude mcp add --transport http --scope project &lt;name&gt; &lt;url&gt;</code></pre>
+                </section>
+
+                <!-- 一番大切なこと -->
+                <section>
+                    <h2>一番大切なこと</h2>
+                    <p>AI 駆動開発はまだ<strong>黎明期</strong>です。Claude Code をはじめとする AI ツールは日々進化しており、今後も新機能が登場し、より洗練されていくことが予想されます。</p>
+                    <p>このスターターキットも完成形ではありません。大切なのは以下のサイクルを回し続けることです。</p>
+                    <pre><code>調べる → 試す → 良かったものを共有する → プロジェクトに組み込む</code></pre>
+                    <ol>
+                        <li><strong>調べる</strong> - 時間があるときに公式ドキュメントやリリースノート、コミュニティの事例を確認する</li>
+                        <li><strong>試す</strong> - 新しい機能や方法論を実際に使ってみる。うまくいかなくても経験になる</li>
+                        <li><strong>共有する</strong> - 良かったものはチームや他の案件に横展開する。スキル・ルール・エージェントとして形式知化する</li>
+                        <li><strong>組み込む</strong> - 自分が所属するプロジェクトやリポジトリを、より AI 駆動開発に適した環境に整備する</li>
+                    </ol>
+                    <div class="callout info">
+                        <p>ツールに詳しい1人のエンジニアが全てを整備するのではなく、<strong>チーム全員が少しずつ改善を積み重ねる</strong>ことで、プロジェクト全体の開発体験が向上していきます。</p>
+                    </div>
+                </section>
+
+                <!-- 参考リンク -->
+                <section>
+                    <h2>参考リンク</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>リソース</th>
+                                <th>URL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Claude Code 公式ドキュメント</td>
+                                <td><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">https://docs.anthropic.com/en/docs/claude-code</a></td>
+                            </tr>
+                            <tr>
+                                <td>Claude Code ウェブドキュメント</td>
+                                <td><a href="https://code.claude.com/docs/en/" target="_blank" rel="noopener">https://code.claude.com/docs/en/</a></td>
+                            </tr>
+                            <tr>
+                                <td>Claude Code GitHub</td>
+                                <td><a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">https://github.com/anthropics/claude-code</a></td>
+                            </tr>
+                            <tr>
+                                <td>MCP (Model Context Protocol)</td>
+                                <td><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">https://modelcontextprotocol.io/</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <script src="./js/main.js"></script>
+</body>
+</html>

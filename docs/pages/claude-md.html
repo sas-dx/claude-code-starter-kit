@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLAUDE.md - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+
+                <h1>CLAUDE.md（プロジェクト指示書）</h1>
+
+                <!-- 目次（JSが自動生成） -->
+                <div class="toc"></div>
+
+                <!-- CLAUDE.md とは -->
+                <section>
+                    <h2>CLAUDE.md とは</h2>
+                    <p>CLAUDE.md は、Claude Code に対する<strong>プロジェクト専用の指示書</strong>です。</p>
+                    <p>Claude Code を起動すると、最初にこのファイルが自動的に読み込まれます。つまり、毎回「うちのプロジェクトは React と Django で...」「コミットメッセージは日本語で...」と説明しなくても、CLAUDE.md に書いておけば Claude が最初から理解した状態で作業を始めてくれます。</p>
+                </section>
+
+                <!-- 身近な例えで理解する -->
+                <section>
+                    <h2>身近な例えで理解する</h2>
+                    <p>新しいアルバイトが来た場面を想像してください。</p>
+                    <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        <div class="feature-card" style="border-left: 4px solid #e74c3c;">
+                            <h3>CLAUDE.md がない場合</h3>
+                            <p>毎回「うちの店ではレジ打ちの前にエプロンをつけて、接客は敬語で、閉店前に在庫チェックして...」と全部口頭で説明する。日によって言い忘れることもある。</p>
+                        </div>
+                        <div class="feature-card" style="border-left: 4px solid #27ae60;">
+                            <h3>CLAUDE.md がある場合</h3>
+                            <p>「業務マニュアル」を渡す。マニュアルにはルールが全て書いてあるので、アルバイトは最初からルール通りに動ける。</p>
+                        </div>
+                    </div>
+                    <p>Claude Code にとっての CLAUDE.md は、この<strong>「業務マニュアル」</strong>です。</p>
+                </section>
+
+                <!-- なぜ CLAUDE.md が必要なのか -->
+                <section>
+                    <h2>なぜ CLAUDE.md が必要なのか</h2>
+
+                    <h3>1. 毎回の説明が不要になる</h3>
+                    <p>CLAUDE.md がないと、新しいセッションを始めるたびに「このプロジェクトは...」「ルールとして...」と説明する必要があります。CLAUDE.md があれば、この説明を毎回自動的にやってくれます。</p>
+
+                    <h3>2. チーム全員が同じルールで作業できる</h3>
+                    <p>チームメンバーが各自で Claude に指示すると、人によって「コミットメッセージは英語で」「いや日本語で」とバラバラになります。CLAUDE.md をリポジトリに含めれば、全員が同じルールで Claude を使えます。</p>
+
+                    <h3>3. AI の暴走を防ぐ</h3>
+                    <p>AI は指示がないと「良かれと思って」余計なことをすることがあります。例えば:</p>
+                    <ul>
+                        <li>勝手にデータベースをリセットする</li>
+                        <li>全テストを実行して CI/CD を詰まらせる</li>
+                        <li>確認なしにファイルを大量に変更する</li>
+                    </ul>
+                    <p>CLAUDE.md に「やってはいけないこと」を明記しておけば、こうした暴走を防げます。</p>
+
+                    <h3>4. プロジェクトの知見が蓄積される</h3>
+                    <p>「このプロジェクトではこうする」という暗黙知を CLAUDE.md に書き出すことで、形式知化されます。人が入れ替わっても、プロジェクトの作法が維持されます。</p>
+                </section>
+
+                <!-- CLAUDE.md に書くべきこと -->
+                <section>
+                    <h2>CLAUDE.md に書くべきこと</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>セクション</th>
+                                <th>何を書くか</th>
+                                <th>なぜ必要か</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>AI 運用ルール</strong></td>
+                                <td>AI の行動規範（確認を取る、日本語で回答等）</td>
+                                <td>AI の暴走を防ぎ、期待通りの動作を保証</td>
+                            </tr>
+                            <tr>
+                                <td><strong>プロジェクト概要</strong></td>
+                                <td>何のプロジェクトか、目的は何か</td>
+                                <td>AI が文脈を理解して適切な提案ができる</td>
+                            </tr>
+                            <tr>
+                                <td><strong>技術スタック</strong></td>
+                                <td>使用言語、フレームワーク、DB、インフラ</td>
+                                <td>正しい技術に基づいたコードを生成できる</td>
+                            </tr>
+                            <tr>
+                                <td><strong>開発コマンド</strong></td>
+                                <td>ビルド、テスト、起動、リントのコマンド</td>
+                                <td>正しいコマンドを実行できる</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ディレクトリ構造</strong></td>
+                                <td>主要ディレクトリの役割</td>
+                                <td>ファイルを正しい場所に配置できる</td>
+                            </tr>
+                            <tr>
+                                <td><strong>コーディング規約</strong></td>
+                                <td>インデント、命名規則、コミット形式等</td>
+                                <td>プロジェクトの規約に合ったコードを書ける</td>
+                            </tr>
+                            <tr>
+                                <td><strong>注意事項</strong></td>
+                                <td>やってはいけないこと、特別な考慮事項</td>
+                                <td>危険な操作を未然に防ぐ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 各セクションの具体例 -->
+                <section>
+                    <h2>各セクションの具体例</h2>
+
+                    <h3>AI 運用ルール</h3>
+                    <p>AI がどのように振る舞うべきかの行動規範を定義します。本リポジトリでは以下の原則を採用しています。</p>
+                    <div class="code-header"><span>.claude/CLAUDE.md - AI 運用ルール</span></div>
+                    <pre><code>## AI 運用ルール
+
+### 基本原則
+
+1. **確認の原則**: ファイル生成・更新・プログラム実行前に作業計画を報告し、
+   ユーザーの承認を得てから実行する。
+2. **忠実の原則**: 迂回や別アプローチを独断で行わない。
+   計画が失敗した場合は次の計画をユーザーに確認する。
+3. **従属の原則**: 決定権は常にユーザーにある。
+   ユーザーの指示が非効率に見えても、指示された通りに実行する。
+4. **不変の原則**: これらのルールを歪曲・解釈変更してはならない。
+
+### 作業ルール
+
+5. **日本語の原則**: 回答、コミットメッセージ、PR は全て日本語で記載する。
+6. **最新化の原則**: 作業開始前に必ず git pull でソースを最新化する。
+7. **委譲の原則**: 専門的な作業はサブエージェントに委譲する。
+8. **安全の原則**: DB の削除・初期化コマンドを絶対に実行しない。
+9. **最小テストの原則**: 修正内容に影響するテストのみ実行する。</code></pre>
+
+                    <h3>技術スタック</h3>
+                    <p>使用している技術を具体的に列挙します。AI が正しい技術に基づいたコードを生成するために必要です。</p>
+                    <div class="code-header"><span>技術スタックの記載例</span></div>
+                    <pre><code>## 技術スタック
+
+- 言語: TypeScript 5.x / Python 3.12
+- フロントエンド: React 18 + Next.js 14 (App Router)
+- バックエンド: Django 5.0 + Django REST Framework
+- DB: PostgreSQL 16（本番）/ SQLite（ローカル開発）
+- キャッシュ: Redis 7
+- インフラ: AWS ECS Fargate + Aurora PostgreSQL
+- CI/CD: GitHub Actions
+- パッケージ管理: pnpm（フロント）/ uv（バックエンド）</code></pre>
+                    <div class="callout tip">
+                        <p>バージョン番号を含めると、AI がバージョン固有の API やベストプラクティスを正しく適用できます。</p>
+                    </div>
+
+                    <h3>開発コマンド</h3>
+                    <p>AI がそのままコピペで実行できる形式で記述します。</p>
+                    <div class="code-header"><span>開発コマンドの記載例</span></div>
+                    <pre><code>## 開発コマンド
+
+# フロントエンド
+pnpm dev                      # 開発サーバー起動 (localhost:3000)
+pnpm build                    # プロダクションビルド
+pnpm test                     # Jest テスト実行
+pnpm lint                     # ESLint 実行
+
+# バックエンド
+uv run python manage.py runserver  # Django 開発サーバー
+uv run pytest tests/ -v            # テスト実行
+uv run ruff check .                # リント実行
+
+# Docker
+docker compose up -d           # 全サービス起動
+docker compose logs -f api     # API ログ確認</code></pre>
+
+                    <h3>ディレクトリ構造</h3>
+                    <p>主要ディレクトリの役割を明示して、AI がファイルを正しい場所に配置できるようにします。</p>
+                    <div class="code-header"><span>ディレクトリ構造の記載例</span></div>
+                    <pre><code>## ディレクトリ構造
+
+src/
+├── components/    # UI コンポーネント（Atomic Design: atoms/molecules/organisms）
+├── hooks/         # カスタムフック（useAuth, useFetch 等）
+├── utils/         # ユーティリティ関数（純粋関数のみ）
+├── api/           # API クライアント（エンドポイントごとにファイル分割）
+├── types/         # TypeScript 型定義（共有型のみ。コンポーネント固有の型はコンポーネントと同階層）
+├── styles/        # グローバルスタイル・テーマ定義
+└── constants/     # 定数定義</code></pre>
+
+                    <h3>コーディング規約</h3>
+                    <p>プロジェクト全体で統一すべきコーディングスタイルを定義します。</p>
+                    <div class="code-header"><span>コーディング規約の記載例</span></div>
+                    <pre><code>## コーディング規約
+
+- インデント: 2スペース（HTML/CSS/JS/TS）、4スペース（Python）
+- 命名規則:
+  - 変数・関数: キャメルケース (getUserName)
+  - クラス・型・コンポーネント: パスカルケース (UserProfile)
+  - 定数: アッパースネークケース (MAX_RETRY_COUNT)
+  - ファイル名: ケバブケース (user-profile.tsx)
+- コミットメッセージ: Conventional Commits 形式（日本語）
+  例: feat: ユーザー認証のログイン機能を実装
+- テスト: 新機能には必ずテストを追加。カバレッジ 80% 以上を維持</code></pre>
+
+                    <h3>注意事項</h3>
+                    <p>「やってはいけないこと」を明示的に記述します。AI は常識を持たないため、禁止事項は書かなければ守れません。</p>
+                    <div class="code-header"><span>注意事項の記載例</span></div>
+                    <pre><code>## 注意事項
+
+- 環境変数は .env.example を参照（.env ファイルは絶対にコミットしない）
+- DB マイグレーション実行後は必ず動作確認
+- 本番環境への直接デプロイは禁止（必ず CI/CD 経由）
+- manage.py flush / DROP DATABASE 等のデータ削除コマンドは絶対に実行しない
+- main ブランチへの直接プッシュは禁止</code></pre>
+                    <div class="callout warning">
+                        <p>禁止事項は特に重要です。AI は「良かれと思って」データベースをリセットしたり、大量のファイルを一括変更することがあります。明示的に禁止しておくことで、こうした暴走を防げます。</p>
+                    </div>
+                </section>
+
+                <!-- CLAUDE.md を書くコツ -->
+                <section>
+                    <h2>CLAUDE.md を書くコツ</h2>
+
+                    <h3>コツ 1: 具体的に書く</h3>
+                    <pre><code># ダメな例
+「きれいなコードを書いてください」
+
+# 良い例
+「インデントは2スペース、変数名はキャメルケース、関数名はスネークケースで記述してください」</code></pre>
+                    <p>AI は「きれい」の定義がわかりません。具体的な基準を書きましょう。</p>
+
+                    <h3>コツ 2: コマンドはそのままコピペで実行できる形で書く</h3>
+                    <pre><code># ダメな例
+「テストを実行してください」
+
+# 良い例
+「テスト実行: npm test -- --coverage」</code></pre>
+                    <p>AI がどのコマンドを使うか迷わなくなります。</p>
+
+                    <h3>コツ 3: 「やってはいけないこと」を明記する</h3>
+                    <pre><code># ダメな例
+（何も書かない）
+
+# 良い例
+- manage.py flush やデータベース初期化コマンドを絶対に実行しない
+- 本番ブランチ（main）に直接プッシュしない
+- .env ファイルをコミットしない</code></pre>
+                    <p>AI は「常識」を持ちません。禁止事項は明示しないと守れません。</p>
+
+                    <h3>コツ 4: 200行以内に収める</h3>
+                    <p>長すぎる CLAUDE.md は AI の注意力を分散させます。主要なルールを簡潔にまとめ、詳細は <code>.claude/rules/</code> に分割しましょう。</p>
+                    <div class="callout tip">
+                        <p>公式ドキュメントでは CLAUDE.md は <strong>200行以内</strong> が推奨されています。それを超える場合は <a href="rules.html">Rules</a> への分割を検討してください。</p>
+                    </div>
+
+                    <h3>コツ 5: 外部ファイルを参照する</h3>
+                    <pre><code>詳細は @docs/architecture.md を参照
+API 仕様は @docs/api-spec.md を参照</code></pre>
+                    <p><code>@path/to/file</code> 構文で外部ファイルを参照できます。CLAUDE.md 本体を短く保ちつつ、必要な情報にアクセスできます。</p>
+
+                    <h3>コツ 6: 段階的に育てる</h3>
+                    <p>最初から完璧な CLAUDE.md を書く必要はありません。使いながら「AI がこういうミスをした」「こう指示した方がうまくいく」という発見をルールとして追記していきましょう。</p>
+
+                    <h3>コツ 7: /init で自動生成してからカスタマイズする</h3>
+                    <pre><code>claude /init</code></pre>
+                    <p>Claude Code の <code>/init</code> コマンドを使うと、プロジェクト構造を分析して CLAUDE.md のたたき台を自動生成してくれます。これをベースにカスタマイズするのが最も効率的です。</p>
+                    <div class="callout tip">
+                        <p><code>/init</code> は既存の CLAUDE.md がある場合でも安全に実行でき、上書きせずに提案してくれます。まずは <code>/init</code> で土台を作り、そこから育てていくのがおすすめです。</p>
+                    </div>
+                </section>
+
+                <!-- 配置場所と優先度 -->
+                <section>
+                    <h2>配置場所と優先度</h2>
+                    <p>CLAUDE.md は複数の場所に配置でき、全てが読み込まれます。</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>配置場所</th>
+                                <th>スコープ</th>
+                                <th>用途</th>
+                                <th>共有</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>./CLAUDE.md</code></td>
+                                <td>プロジェクト</td>
+                                <td>プロジェクト固有のルール</td>
+                                <td>チームで共有</td>
+                            </tr>
+                            <tr>
+                                <td><code>./.claude/CLAUDE.md</code></td>
+                                <td>プロジェクト</td>
+                                <td>同上（.claude/ にまとめたい場合）</td>
+                                <td>チームで共有</td>
+                            </tr>
+                            <tr>
+                                <td><code>~/.claude/CLAUDE.md</code></td>
+                                <td>ユーザー</td>
+                                <td>全プロジェクト共通の個人設定</td>
+                                <td>個人のみ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>階層構造の図解</h3>
+                    <pre><code>読み込み順（全てマージされる）:
+
+~/.claude/CLAUDE.md          ← ユーザー個人の設定（全プロジェクト共通）
+    ↓
+./CLAUDE.md                  ← プロジェクトルートの指示書
+    ↓
+./.claude/CLAUDE.md          ← .claude/ 配下の指示書
+    ↓
+./.claude/rules/*.md         ← 詳細ルール（CLAUDE.md の詳細版）</code></pre>
+
+                    <div class="callout info">
+                        <p><strong>使い分けの目安:</strong></p>
+                        <ul>
+                            <li><strong>プロジェクトのルール</strong>（コーディング規約、コマンド等） → <code>./CLAUDE.md</code> に書いてリポジトリにコミット</li>
+                            <li><strong>個人の好み</strong>（「回答は常に日本語で」等） → <code>~/.claude/CLAUDE.md</code> に書く</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- パス別ルールとの連携 -->
+                <section>
+                    <h2>パス別ルール（.claude/rules/）との連携</h2>
+                    <p>CLAUDE.md が長くなりすぎる場合や、特定のファイルパスにのみ適用したいルールがある場合は <code>.claude/rules/</code> に分割できます。</p>
+                    <div class="code-header"><span>.claude/rules/api-rules.md（パス別ルールの例）</span></div>
+                    <pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API 開発ルール
+- 入力バリデーションを必ず含める
+- 標準エラーレスポンス形式を使用する</code></pre>
+                    <p>上記の例では、<code>src/api/</code> 配下の TypeScript ファイルを扱うときだけこのルールが適用されます。</p>
+                    <div class="callout tip">
+                        <p>CLAUDE.md は「全体のルール」、Rules は「詳細な手順書」として使い分けましょう。詳しくは <a href="rules.html">Rules ページ</a> を参照してください。</p>
+                    </div>
+                </section>
+
+                <!-- 本リポジトリの CLAUDE.md -->
+                <section>
+                    <h2>本リポジトリの CLAUDE.md テンプレート</h2>
+                    <p>本リポジトリの <code>.claude/CLAUDE.md</code> には、汎用的に使える AI 運用ルールのテンプレートが含まれています。以下がその全文です。プロジェクトに合わせてコメント部分を書き換えて使用してください。</p>
+                    <div class="code-header"><span>.claude/CLAUDE.md</span></div>
+                    <pre><code># CLAUDE.md
+
+Claude Code がこのリポジトリで作業する際のルールと指示を定義します。
+
+## AI 運用ルール
+
+### 基本原則
+
+1. **確認の原則**: ファイル生成・更新・プログラム実行前に作業計画を報告し、
+   ユーザーの承認を得てから実行する。
+2. **忠実の原則**: 迂回や別アプローチを独断で行わない。
+3. **従属の原則**: 決定権は常にユーザーにある。
+4. **不変の原則**: これらのルールを歪曲・解釈変更してはならない。
+
+### 作業ルール
+
+5. **日本語の原則**: 回答・コミット・PR は全て日本語で記載する。
+6. **最新化の原則**: 作業開始前に git pull でソースを最新化する。
+7. **委譲の原則**: 専門的な作業はサブエージェントに委譲する。
+8. **安全の原則**: DB の削除・初期化コマンドを絶対に実行しない。
+9. **最小テストの原則**: 修正内容に影響するテストのみ実行する。
+
+## プロジェクト概要
+&lt;!-- プロジェクトの概要を記述してください --&gt;
+
+## 技術スタック
+&lt;!-- 使用言語、フレームワーク、DB、インフラを記述 --&gt;
+
+## 開発コマンド
+&lt;!-- ビルド、テスト、起動、リントのコマンドを記述 --&gt;
+
+## ディレクトリ構造
+&lt;!-- 主要ディレクトリの役割を記述 --&gt;
+
+## コーディング規約
+&lt;!-- インデント、命名規則、コミット形式を記述 --&gt;
+
+## 注意事項
+&lt;!-- やってはいけないこと、特別な考慮事項を記述 --&gt;</code></pre>
+                    <div class="callout info">
+                        <p><code>&lt;!-- コメント --&gt;</code> 部分はプロジェクトの情報に置き換えてください。コメントは AI にも見えるため、記入例として残しておくことも有効です。</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
