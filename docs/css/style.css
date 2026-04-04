@@ -564,6 +564,20 @@ tr:hover td {
   margin-bottom: 3rem;
 }
 
+.hero.hero-compact {
+  padding: 2rem 2rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.hero.hero-compact h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero.hero-compact .hero-subtitle {
+  margin-bottom: 0;
+}
+
 [data-theme="dark"] .hero {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
 }
