@@ -619,6 +619,7 @@ tr:hover td {
 .toc a {
   color: var(--text-secondary);
   font-size: 0.9rem;
+  font-weight: 700;
   transition: color 0.2s;
 }
 
