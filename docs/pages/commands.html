@@ -262,6 +262,35 @@ flowchart TD
                 <pre><code>/dev-issue-team #42
 /dev-issue-team #123</code></pre>
 
+<div class="diagram-wrapper">
+  <div class="mermaid">
+flowchart TD
+    CMD(["/dev-issue-team #42"])
+    CMD --> P1
+
+    subgraph P1["Phase 1: 解析"]
+        A["analyzer<br/>Issue 解析・実装調査"]
+    end
+
+    subgraph P2["Phase 2: 実装"]
+        B["developer<br/>コード実装・テスト作成"]
+    end
+
+    subgraph P3["Phase 3: レビュー・Git"]
+        C["reviewer<br/>テスト実行・レビュー・PR 作成"]
+    end
+
+    P1 -->|"調査結果を共有"| P2
+    P2 -->|"実装完了を報告"| P3
+
+    style CMD fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style P1 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style P2 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style P3 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+  </div>
+  <div class="diagram-caption">/dev-issue-team の3フェーズ実行フロー</div>
+</div>
+
                 <h3>/fix-pr-review - レビュー指摘対応</h3>
                 <p>PR のレビューコメントを全て取得し、指摘事項を修正。修正後に PR へ対応完了コメントを投稿します。特定のコメントを引数で指定することも可能です。</p>
                 <pre><code>/fix-pr-review #456

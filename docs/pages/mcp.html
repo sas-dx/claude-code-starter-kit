@@ -206,6 +206,32 @@ flowchart TD
           </tbody>
         </table>
 
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+flowchart TD
+    START(["Claude Code 起動"])
+    LOAD[".mcp.json を読み込み"]
+    PARSE["mcpServers を解析"]
+    CHECK{"接続方式？"}
+    STDIO["stdio: コマンド実行<br/>子プロセスとして起動"]
+    HTTP["HTTP: URL に接続<br/>SSE でストリーミング"]
+    READY(["MCP サーバー利用可能"])
+
+    START --> LOAD --> PARSE --> CHECK
+    CHECK -->|"command 指定"| STDIO --> READY
+    CHECK -->|"url 指定"| HTTP --> READY
+
+    style START fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style LOAD fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style PARSE fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style CHECK fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style STDIO fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style HTTP fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style READY fill:#ecfdf5,stroke:#10b981,color:#1e293b
+          </div>
+          <div class="diagram-caption">MCP サーバーの接続フロー — stdio / HTTP の2方式</div>
+        </div>
+
         <h2>.mcp.json の設定方法</h2>
         <p>MCP サーバーの設定はプロジェクトルートの <code>.mcp.json</code> に定義します。Claude Code はプロジェクトルート直下の <code>.mcp.json</code> のみを認識するため、このファイルは移動できません。</p>
 

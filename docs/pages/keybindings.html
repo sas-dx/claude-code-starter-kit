@@ -397,6 +397,22 @@
           <p><strong>コードバインドのメリット:</strong> 単一キーのショートカットでは足りない場合や、論理的なグループ化をしたい場合に有効です。例えば <code>Ctrl+K</code> をプレフィックスとして、<code>Ctrl+K Ctrl+S</code> で送信、<code>Ctrl+K Ctrl+E</code> でエディタ、のようにグループ化できます。</p>
         </div>
 
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+sequenceDiagram
+    participant U as ユーザー
+    participant S as システム
+
+    U->>S: Ctrl+K を押下
+    Note over S: リーダーキー受付<br/>次のキー入力を待機
+    U->>S: Ctrl+S を押下
+    S->>S: Chord バインド判定
+    S->>U: アクション実行（例: 保存）
+    Note over U,S: 一定時間キー入力がなければ<br/>Chord はキャンセル
+          </div>
+          <div class="diagram-caption">コード（Chord）バインドの入力シーケンス</div>
+        </div>
+
         <h2>割り当て解除（null）</h2>
         <p>既存のキーバインドを無効化するには、アクションに <code>null</code> を指定します。</p>
         <pre><code>{

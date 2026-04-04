@@ -330,6 +330,41 @@ flowchart LR
           </tbody>
         </table>
 
+<div class="diagram-wrapper">
+  <div class="mermaid">
+flowchart TD
+    EVENT(["フックイベント発生<br/>（例: PreToolUse）"])
+    HAS{"matcher が<br/>設定されている？"}
+    MATCH{"ツール名が<br/>正規表現にマッチ？"}
+    EXEC["フック実行"]
+    SKIP["スキップ"]
+    EXIT{"終了コード"}
+    OK["0: 正常続行<br/>stdout をコンテキストに注入"]
+    BLOCK["2: ツール実行をブロック<br/>stderr をエラー表示"]
+    WARN["その他: 警告して続行"]
+
+    EVENT --> HAS
+    HAS -->|"なし"| EXEC
+    HAS -->|"あり"| MATCH
+    MATCH -->|"マッチ"| EXEC
+    MATCH -->|"不一致"| SKIP
+    EXEC --> EXIT
+    EXIT -->|"0"| OK
+    EXIT -->|"2"| BLOCK
+    EXIT -->|"その他"| WARN
+
+    style EVENT fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style HAS fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style MATCH fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style EXEC fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style EXIT fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style OK fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style BLOCK fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style WARN fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+  </div>
+  <div class="diagram-caption">フックのマッチャー判定と終了コードによる処理分岐</div>
+</div>
+
         <h2>終了コードの意味</h2>
         <p>フックスクリプトの終了コードで動作を制御します。</p>
         <table>

@@ -109,6 +109,33 @@
           <p><strong>推奨フロー:</strong> まず <code>.claude/</code> で試して、共有したくなったら Plugin に変換するのが推奨の流れです。</p>
         </div>
 
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+flowchart TD
+    START(["新しい機能を作りたい"])
+    Q1{"このプロジェクト<br/>専用？"}
+    CLAUDE[".claude/ に直接配置<br/>Skills / Agents / Rules"]
+    Q2{"他プロジェクトにも<br/>展開したい？"}
+    PLUGIN["Plugin 化して配布<br/>plugin.json でパッケージング"]
+    KEEP[".claude/ のまま運用"]
+
+    START --> Q1
+    Q1 -->|"Yes"| CLAUDE
+    Q1 -->|"No"| PLUGIN
+    CLAUDE --> Q2
+    Q2 -->|"Yes"| PLUGIN
+    Q2 -->|"No"| KEEP
+
+    style START fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style Q1 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style Q2 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style CLAUDE fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style PLUGIN fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style KEEP fill:#f8fafc,stroke:#64748b,color:#1e293b
+          </div>
+          <div class="diagram-caption">.claude/ で試作 → 良ければ Plugin 化の判断フロー</div>
+        </div>
+
         <h3>2. 名前空間で衝突を防ぐ</h3>
         <p>複数のプラグインが同じ名前のスキルを持っていても、<code>/plugin-a:deploy</code> と <code>/plugin-b:deploy</code> のように名前空間で区別されるため衝突しません。</p>
 
@@ -284,6 +311,26 @@ echo "レビューの指示内容..." &gt; my-plugin/commands/review.md
 # エージェントを追加
 mkdir -p my-plugin/agents
 echo "セキュリティレビューの指示..." &gt; my-plugin/agents/security-reviewer.md</code></pre>
+
+        <div class="diagram-wrapper">
+          <div class="mermaid">
+flowchart LR
+    S1["1. ディレクトリ作成<br/>plugin.json 配置"]
+    S2["2. Skills/Agents<br/>追加"]
+    S3["3. ローカルテスト<br/>--plugin-dir"]
+    S4["4. npm publish<br/>または Git 共有"]
+    S5["5. claude plugin add<br/>で導入"]
+
+    S1 --> S2 --> S3 --> S4 --> S5
+
+    style S1 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style S2 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+    style S3 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style S4 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style S5 fill:#ecfdf5,stroke:#10b981,color:#1e293b
+          </div>
+          <div class="diagram-caption">プラグインのライフサイクル — 作成からチーム配布まで</div>
+        </div>
 
         <h2>.claude/ からの変換手順</h2>
         <p>既に <code>.claude/</code> に Skills や Hooks がある場合、以下の手順で Plugin に変換できます。</p>
