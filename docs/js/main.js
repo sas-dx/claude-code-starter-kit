@@ -116,16 +116,23 @@
   }
 
   /* ------------------------------------------------------------------------
-     3. ページ内検索 (Ctrl+K / Cmd+K でフォーカス)
-     - main-content 内のテキストをハイライト
+     3. サイト全文検索 (Ctrl+K / Cmd+K でフォーカス)
+     - search-index.json を遅延読み込み
+     - 全ページのタイトル・本文を横断検索
+     - ドロップダウンで結果表示、クリックでページ遷移
      ------------------------------------------------------------------------ */
+
+  var searchIndex = null; // 遅延読み込みされるインデックス
+  var searchDropdown = null; // 検索結果ドロップダウン要素
 
   function initSearch() {
     var searchInput = document.querySelector('.search-input');
     if (!searchInput) return;
 
-    var mainContent = document.querySelector('.main-content');
-    if (!mainContent) return;
+    // ドロップダウン要素を作成
+    searchDropdown = document.createElement('div');
+    searchDropdown.className = 'search-dropdown';
+    searchInput.parentElement.appendChild(searchDropdown);
 
     // Ctrl+K / Cmd+K でフォーカス
     document.addEventListener('keydown', function (e) {
@@ -133,96 +140,203 @@
         e.preventDefault();
         searchInput.focus();
       }
-      // Escape でフォーカス解除 & ハイライトクリア
-      if (e.key === 'Escape' && document.activeElement === searchInput) {
+      if (e.key === 'Escape') {
         searchInput.value = '';
-        clearHighlights(mainContent);
+        hideSearchDropdown();
         searchInput.blur();
       }
     });
 
-    // 入力イベントでリアルタイムハイライト
+    // 入力イベントで全文検索
     var debounceTimer = null;
     searchInput.addEventListener('input', function () {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(function () {
         var query = searchInput.value.trim();
-        clearHighlights(mainContent);
         if (query.length >= 2) {
-          highlightText(mainContent, query);
+          performSearch(query);
+        } else {
+          hideSearchDropdown();
         }
       }, 300);
     });
-  }
 
-  /** 指定要素内のテキストノードを検索してハイライト */
-  function highlightText(root, query) {
-    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
-    var nodesToHighlight = [];
-    var lowerQuery = query.toLowerCase();
+    // フォーカスが外れたらドロップダウンを閉じる（少し遅延させてクリックを拾う）
+    searchInput.addEventListener('blur', function () {
+      setTimeout(hideSearchDropdown, 200);
+    });
 
-    // まずマッチするテキストノードを収集（DOM 変更前に完了させる）
-    while (walker.nextNode()) {
-      var node = walker.currentNode;
-      // pre, code, script, style 内はスキップ
-      var parent = node.parentElement;
-      if (parent && (parent.closest('pre') || parent.closest('code') ||
-          parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE')) {
-        continue;
+    // フォーカス時に入力値があれば再検索
+    searchInput.addEventListener('focus', function () {
+      var query = searchInput.value.trim();
+      if (query.length >= 2) {
+        performSearch(query);
       }
-      if (node.nodeValue.toLowerCase().indexOf(lowerQuery) !== -1) {
-        nodesToHighlight.push(node);
-      }
-    }
+    });
 
-    // 収集したノードにハイライトを適用
-    nodesToHighlight.forEach(function (textNode) {
-      var text = textNode.nodeValue;
-      var lowerText = text.toLowerCase();
-      var index = lowerText.indexOf(lowerQuery);
-      if (index === -1) return;
+    // キーボードナビゲーション（上下キーで結果を選択、Enter で遷移）
+    searchInput.addEventListener('keydown', function (e) {
+      if (!searchDropdown || searchDropdown.style.display === 'none') return;
+      var items = searchDropdown.querySelectorAll('.search-result-item');
+      var activeItem = searchDropdown.querySelector('.search-result-item.active');
+      var activeIndex = -1;
 
-      var fragment = document.createDocumentFragment();
-      var lastIndex = 0;
+      items.forEach(function (item, i) {
+        if (item === activeItem) activeIndex = i;
+      });
 
-      while (index !== -1) {
-        // マッチ前のテキスト
-        if (index > lastIndex) {
-          fragment.appendChild(document.createTextNode(text.substring(lastIndex, index)));
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        var next = activeIndex + 1 < items.length ? activeIndex + 1 : 0;
+        items.forEach(function (item) { item.classList.remove('active'); });
+        items[next].classList.add('active');
+        items[next].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        var prev = activeIndex - 1 >= 0 ? activeIndex - 1 : items.length - 1;
+        items.forEach(function (item) { item.classList.remove('active'); });
+        items[prev].classList.add('active');
+        items[prev].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (activeItem) {
+          window.location.href = activeItem.getAttribute('data-url');
+        } else if (items.length > 0) {
+          window.location.href = items[0].getAttribute('data-url');
         }
-        // ハイライト付きのマッチテキスト
-        var mark = document.createElement('mark');
-        mark.className = 'search-highlight';
-        mark.textContent = text.substring(index, index + query.length);
-        fragment.appendChild(mark);
-
-        lastIndex = index + query.length;
-        index = lowerText.indexOf(lowerQuery, lastIndex);
       }
-
-      // 残りのテキスト
-      if (lastIndex < text.length) {
-        fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
-      }
-
-      textNode.parentNode.replaceChild(fragment, textNode);
     });
-
-    // 最初のハイライトにスクロール
-    var firstMatch = root.querySelector('mark.search-highlight');
-    if (firstMatch) {
-      firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
   }
 
-  /** ハイライト（mark要素）を全て除去して元のテキストに戻す */
-  function clearHighlights(root) {
-    var marks = root.querySelectorAll('mark.search-highlight');
-    marks.forEach(function (mark) {
-      var parent = mark.parentNode;
-      parent.replaceChild(document.createTextNode(mark.textContent), mark);
-      parent.normalize(); // 隣接するテキストノードを結合
+  /** 検索インデックスを読み込んで全文検索を実行 */
+  function performSearch(query) {
+    if (searchIndex) {
+      showSearchResults(query);
+      return;
+    }
+    // インデックスを遅延読み込み
+    var basePath = getBasePath();
+    fetch(basePath + 'search-index.json')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        searchIndex = data;
+        showSearchResults(query);
+      })
+      .catch(function () {
+        console.error('検索インデックスの読み込みに失敗しました');
+      });
+  }
+
+  /** index.html からの相対パスか pages/ からの相対パスかを判定 */
+  function getBasePath() {
+    var path = window.location.pathname;
+    if (path.indexOf('/pages/') !== -1) {
+      return '../';
+    }
+    return './';
+  }
+
+  /** 検索結果をドロップダウンに表示 */
+  function showSearchResults(query) {
+    if (!searchIndex || !searchDropdown) return;
+
+    var lowerQuery = query.toLowerCase();
+    var results = [];
+
+    searchIndex.forEach(function (page) {
+      var titleMatch = page.title.toLowerCase().indexOf(lowerQuery) !== -1;
+      var contentMatch = page.content.toLowerCase().indexOf(lowerQuery) !== -1;
+
+      if (titleMatch || contentMatch) {
+        // スコア計算: タイトル一致は高スコア、本文は出現回数で加算
+        var score = 0;
+        if (titleMatch) score += 100;
+        var contentLower = page.content.toLowerCase();
+        var pos = contentLower.indexOf(lowerQuery);
+        while (pos !== -1) {
+          score += 1;
+          pos = contentLower.indexOf(lowerQuery, pos + 1);
+        }
+
+        // マッチ箇所周辺のテキスト抽出（抜粋）
+        var excerpt = '';
+        var idx = contentLower.indexOf(lowerQuery);
+        if (idx !== -1) {
+          var start = Math.max(0, idx - 40);
+          var end = Math.min(page.content.length, idx + query.length + 80);
+          excerpt = (start > 0 ? '...' : '') +
+                    page.content.substring(start, end) +
+                    (end < page.content.length ? '...' : '');
+        }
+
+        results.push({
+          title: page.title,
+          url: page.url,
+          description: page.description,
+          excerpt: excerpt,
+          score: score
+        });
+      }
     });
+
+    // スコア順にソート
+    results.sort(function (a, b) { return b.score - a.score; });
+
+    // 最大10件表示
+    results = results.slice(0, 10);
+
+    if (results.length === 0) {
+      searchDropdown.innerHTML = '<div class="search-no-results">「' + escapeHtml(query) + '」に一致する結果はありません</div>';
+      searchDropdown.style.display = 'block';
+      return;
+    }
+
+    var basePath = getBasePath();
+    var html = results.map(function (r) {
+      var highlightedTitle = highlightMatch(r.title, query);
+      var highlightedExcerpt = highlightMatch(r.excerpt, query);
+      return '<a class="search-result-item" data-url="' + basePath + r.url + '" href="' + basePath + r.url + '">' +
+             '<div class="search-result-title">' + highlightedTitle + '</div>' +
+             '<div class="search-result-excerpt">' + highlightedExcerpt + '</div>' +
+             '</a>';
+    }).join('');
+
+    searchDropdown.innerHTML = html;
+    searchDropdown.style.display = 'block';
+  }
+
+  /** テキスト中のクエリ文字列をハイライト表示（HTML化） */
+  function highlightMatch(text, query) {
+    if (!text) return '';
+    var escaped = escapeHtml(text);
+    var lowerText = escaped.toLowerCase();
+    var lowerQuery = query.toLowerCase();
+    var result = '';
+    var lastIndex = 0;
+    var idx = lowerText.indexOf(lowerQuery);
+
+    while (idx !== -1) {
+      result += escaped.substring(lastIndex, idx);
+      result += '<mark>' + escaped.substring(idx, idx + query.length) + '</mark>';
+      lastIndex = idx + query.length;
+      idx = lowerText.indexOf(lowerQuery, lastIndex);
+    }
+    result += escaped.substring(lastIndex);
+    return result;
+  }
+
+  /** HTML エスケープ */
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+  }
+
+  /** ドロップダウンを非表示にする */
+  function hideSearchDropdown() {
+    if (searchDropdown) {
+      searchDropdown.style.display = 'none';
+    }
   }
 
   /* ------------------------------------------------------------------------
