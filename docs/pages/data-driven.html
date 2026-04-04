@@ -106,49 +106,57 @@
 
                 <div class="diagram-wrapper">
                   <div class="mermaid">
-flowchart LR
-subgraph sources["データソース"]
-direction TB
+flowchart TD
+subgraph row1[" "]
+direction LR
+subgraph sources["1. データソース"]
 S1["Shopify<br/>注文・顧客"]
-S2["Google Analytics<br/>行動ログ"]
-S3["在庫管理DB<br/>在庫・仕入"]
-S4["広告プラットフォーム<br/>広告費・CV"]
+S2["GA4<br/>行動ログ"]
+S3["在庫DB<br/>在庫・仕入"]
+S4["広告PF<br/>広告費・CV"]
 end
-subgraph collect["収集"]
-direction TB
+subgraph collect["2. 収集"]
 C1["Kafka / Pub/Sub<br/>ストリーミング"]
 C2["Airbyte / Fivetran<br/>バッチ取込"]
 end
-subgraph store["蓄積"]
-direction TB
-D1["BigQuery / Snowflake<br/>Raw Layer"]
+subgraph store["3. 蓄積"]
+D1["BigQuery<br/>Snowflake<br/>Raw Layer"]
 end
-subgraph transform["変換"]
-direction TB
-T1["dbt<br/>Staging Layer"]
-T2["dbt<br/>Intermediate Layer"]
-T3["dbt<br/>Mart Layer"]
 end
-subgraph analyze["分析・可視化"]
-direction TB
+
+subgraph row2[" "]
+direction LR
+subgraph transform["4. 変換（dbt）"]
+T1["Staging<br/>クレンジング"]
+T2["Intermediate<br/>ビジネスロジック"]
+T3["Mart<br/>集計テーブル"]
+T1 --> T2 --> T3
+end
+subgraph analyze["5. 分析・可視化"]
 A1["Looker / Metabase<br/>ダッシュボード"]
 A2["Jupyter / Python<br/>アドホック分析"]
 A3["Claude Code<br/>AI分析支援"]
 end
-subgraph decide["意思決定"]
-direction TB
+subgraph decide["6. 意思決定"]
 D2["経営会議<br/>KPIレビュー"]
 D3["施策実行<br/>マーケ・在庫最適化"]
 end
-sources --> collect --> store --> transform --> analyze --> decide
+end
+
+sources --> collect --> store
+store --> transform
+transform --> analyze --> decide
+
 style sources fill:#fef3c7,stroke:#f59e0b,color:#1e293b
 style collect fill:#e0e7ff,stroke:#6366f1,color:#1e293b
 style store fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
 style transform fill:#ecfdf5,stroke:#10b981,color:#1e293b
 style analyze fill:#fce7f3,stroke:#ec4899,color:#1e293b
 style decide fill:#f5f3ff,stroke:#8b5cf6,color:#1e293b
+style row1 fill:none,stroke:none
+style row2 fill:none,stroke:none
                   </div>
-                  <div class="diagram-caption">図1: EC事業データパイプライン全体像 -- データソースから意思決定までの6段階フロー</div>
+                  <div class="diagram-caption">図1: EC事業データパイプライン全体像 — データソースから意思決定までの6段階フロー</div>
                 </div>
 
                 <!-- ============================================================
