@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>はじめに - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">はじめに</li>
+                <li><a href="getting-started.html" class="active">🚀 導入ガイド</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></li>
+                <li><a href="marketing.html">📢 AI駆動マーケティング基盤</a></li>
+                <li><a href="sales.html">💼 AI駆動セールス基盤</a></li>
+                <li><a href="data-driven.html">📊 AI駆動データドリブン基盤</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>はじめに（導入ガイド）</h1>
+                <p>このページでは、Claude Code を<strong>ゼロからセットアップして使い始めるまでの全手順</strong>を、新入社員でも迷わないレベルの詳しさで解説します。各ステップで「なぜこの手順が必要か」を補足し、エラーが出た場合の対処法もあわせて掲載しています。</p>
+
+                <!-- ============================================================
+                     セクション1: Claude Code とは
+                     ============================================================ -->
+
+                <h2 id="what-is-claude-code">Claude Code とは</h2>
+
+                <div class="callout info">
+                  <strong>Claude Code の概要:</strong>
+                  <ul>
+                    <li>Claude Code は Anthropic が提供する <strong>AI コーディングアシスタントの CLI ツール</strong>です</li>
+                    <li>ターミナルから起動し、対話形式でコードの生成・編集・レビュー・テスト実行などを行います</li>
+                    <li>プロジェクトのファイルを直接読み書きでき、Git 操作やコマンド実行も可能です</li>
+                    <li>VS Code や JetBrains IDE の拡張機能としても利用できます</li>
+                  </ul>
+                </div>
+
+                <h3 id="traditional-vs-ai">従来の開発との違い</h3>
+
+                <p>Claude Code を使った開発は、従来の開発とは根本的にワークフローが異なります。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card" style="border-left: 4px solid #e74c3c;">
+                    <h4>従来の開発</h4>
+                    <p>開発者がエディタを開き、コードを1行ずつ手で書く。ドキュメントやStack Overflowを検索しながら進める。テストも手動で書き、レビューも人間が目視で行う。</p>
+                  </div>
+                  <div class="feature-card" style="border-left: 4px solid #27ae60;">
+                    <h4>Claude Code を使った開発</h4>
+                    <p>「この関数にバリデーションを追加して」と日本語で指示するだけで、AI がコードを生成・編集する。人間は設計判断とレビューに集中できる。テスト作成やリファクタリングも AI に任せられる。</p>
+                  </div>
+                </div>
+
+                <p>Claude Code がどのような位置づけのツールなのか、全体像を図で確認しましょう。開発者がターミナルや IDE から Claude Code を起動すると、AI がコード生成、レビュー、Git 操作、外部ツール連携といった幅広い作業を代行してくれます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+USER["開発者"] --> CLAUDE["Claude Code<br/>(CLI / IDE)"]
+CLAUDE --> CODE["コード生成・編集"]
+CLAUDE --> REVIEW["レビュー・テスト"]
+CLAUDE --> GIT["Git 操作"]
+CLAUDE --> TOOLS["外部ツール連携<br/>(MCP)"]
+                  </div>
+                </div>
+
+                <p>このように、Claude Code は単なるコード補完ツールではなく、<strong>開発ワークフロー全体をサポートするパートナー</strong>です。ここからは、このツールを使い始めるための手順を一つずつ進めていきましょう。</p>
+
+                <h3 id="what-you-can-do">Claude Code でできること</h3>
+
+                <p>具体的にどのようなことができるのか、代表的なユースケースを紹介します。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ユースケース</th>
+                      <th>具体例</th>
+                      <th>従来の方法</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>コード生成</strong></td>
+                      <td>「ユーザー登録の API エンドポイントを作成して」と指示するだけで、ルーティング・バリデーション・DB 操作を含むコードを生成</td>
+                      <td>ドキュメントを読みながら手動で実装</td>
+                    </tr>
+                    <tr>
+                      <td><strong>バグ修正</strong></td>
+                      <td>エラーメッセージを貼り付けて「この原因を調べて修正して」と依頼</td>
+                      <td>スタックトレースを読み解き、デバッガで追跡</td>
+                    </tr>
+                    <tr>
+                      <td><strong>コードレビュー</strong></td>
+                      <td>「PR #42 のコードをレビューして」で、セキュリティ・パフォーマンス・規約準拠を自動チェック</td>
+                      <td>レビュアーが1行ずつ目視確認</td>
+                    </tr>
+                    <tr>
+                      <td><strong>テスト作成</strong></td>
+                      <td>「この関数のユニットテストを書いて」で、正常系・異常系のテストケースを自動生成</td>
+                      <td>テストフレームワークのドキュメントを見ながら手動作成</td>
+                    </tr>
+                    <tr>
+                      <td><strong>リファクタリング</strong></td>
+                      <td>「この関数を小さな関数に分割して」で、責務分離されたコードに変換</td>
+                      <td>設計を考えながら慎重に手動変更</td>
+                    </tr>
+                    <tr>
+                      <td><strong>ドキュメント生成</strong></td>
+                      <td>「この API の仕様書を Markdown で書いて」で、自動的にドキュメントを生成</td>
+                      <td>コードを読みながら手動で文書化</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     セクション2: 前提条件の確認
+                     ============================================================ -->
+
+                <h2 id="prerequisites">前提条件の確認</h2>
+
+                <div class="callout info">
+                  <strong>このステップが必要な理由:</strong> Claude Code は Node.js 上で動作するツールです。また、プロジェクト管理に Git を使用します。まず、これらがインストールされているか確認しましょう。前提条件が揃っていないと、後続のインストール手順でエラーが発生します。
+                </div>
+
+                <!-- 2.1 Node.js -->
+                <h3 id="check-nodejs">2.1 Node.js の確認</h3>
+
+                <p>Node.js は JavaScript をサーバーサイドで動かすための実行環境です。Claude Code は Node.js のパッケージマネージャー（npm）を通じてインストールするため、Node.js が必須です。</p>
+
+                <p>以下のコマンドをターミナルで実行して、Node.js がインストールされているか確認します。</p>
+
+                <pre><code># このコマンドは Node.js のバージョンを表示します
+node --version
+# v18.0.0 以上が表示されれば OK</code></pre>
+
+                <div class="callout warning">
+                  <strong><code>command not found</code> と表示された場合:</strong> Node.js がインストールされていません。以下の手順でインストールしてください。
+                  <ul>
+                    <li><strong>公式サイトからダウンロード（全 OS 共通・推奨）:</strong> <a href="https://nodejs.org/" target="_blank" rel="noopener">https://nodejs.org/</a> から <strong>LTS 版</strong>（長期サポート版）をダウンロードしてインストールします。LTS 版は安定性が高く、企業利用に適しています。</li>
+                    <li><strong>macOS（Homebrew を利用）:</strong>
+                      <pre><code># Homebrew がインストール済みであれば、以下のコマンドで Node.js をインストールできます
+brew install node</code></pre>
+                    </li>
+                    <li><strong>Windows:</strong> 公式サイトからインストーラー（.msi）をダウンロードし、画面の指示に従ってインストールします。インストール完了後、ターミナル（PowerShell やコマンドプロンプト）を再起動してください。</li>
+                    <li><strong>Ubuntu / WSL:</strong>
+                      <pre><code># NodeSource リポジトリから Node.js 20.x をインストールします
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs</code></pre>
+                    </li>
+                  </ul>
+                  <p>インストール後、もう一度 <code>node --version</code> を実行して、バージョンが表示されることを確認してください。</p>
+                </div>
+
+                <!-- 2.2 npm -->
+                <h3 id="check-npm">2.2 npm の確認</h3>
+
+                <p>npm（Node Package Manager）は Node.js のパッケージ管理ツールです。Claude Code を含む世界中の JavaScript パッケージをインストール・管理できます。</p>
+
+                <pre><code># このコマンドは npm のバージョンを表示します
+npm --version
+# 9.0.0 以上が表示されれば OK</code></pre>
+
+                <div class="callout tip">
+                  <strong>ヒント:</strong> npm は Node.js に同梱されています。Node.js をインストールすれば自動的にインストールされます。npm だけが見つからないという状況は通常発生しませんが、もし見つからない場合は Node.js のインストールが正常に完了していない可能性があります。Node.js を再インストールしてください。
+                </div>
+
+                <!-- 2.3 Git -->
+                <h3 id="check-git">2.3 Git の確認</h3>
+
+                <p>Git はバージョン管理システムです。Claude Code はプロジェクトの変更履歴を Git で管理し、ブランチ作成やコミットなどの操作も行います。</p>
+
+                <pre><code># このコマンドは Git のバージョンを表示します
+git --version
+# git version 2.x.x が表示されれば OK</code></pre>
+
+                <div class="callout warning">
+                  <strong><code>command not found</code> と表示された場合:</strong> Git がインストールされていません。以下の手順でインストールしてください。
+                  <ul>
+                    <li><strong>macOS:</strong>
+                      <pre><code># Xcode コマンドラインツールをインストールすると Git も含まれます
+xcode-select --install
+
+# または Homebrew を利用
+brew install git</code></pre>
+                    </li>
+                    <li><strong>Windows:</strong> <a href="https://git-scm.com/" target="_blank" rel="noopener">https://git-scm.com/</a> から Git for Windows をダウンロードしてインストールします。インストール時の設定は基本的にデフォルトのままで問題ありません。</li>
+                    <li><strong>Ubuntu / WSL:</strong>
+                      <pre><code># apt パッケージマネージャーで Git をインストールします
+sudo apt-get update
+sudo apt-get install -y git</code></pre>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 2.4 確認まとめ -->
+                <h3 id="check-summary">2.4 まとめて確認</h3>
+
+                <p>以下のコマンドを実行して、3つのツールが全てインストールされていることを一度に確認できます。</p>
+
+                <pre><code># 3つのバージョンを一度に確認するコマンドです
+# &amp;&amp; は「前のコマンドが成功したら次を実行する」という意味です
+node --version &amp;&amp; npm --version &amp;&amp; git --version</code></pre>
+
+                <p>3行のバージョン番号が全て表示されれば、前提条件はクリアです。次のステップに進みましょう。</p>
+
+                <!-- ============================================================
+                     セクション3: Claude Code のインストール
+                     ============================================================ -->
+
+                <h2 id="install">Claude Code のインストール</h2>
+
+                <div class="callout info">
+                  <strong>なぜ npm でインストールするのか:</strong> Claude Code は npm パッケージとして配布されています。<code>-g</code> フラグをつけることで、どのディレクトリからでも <code>claude</code> コマンドが使えるようになります。npm のグローバルインストールは「システム全体で使えるコマンド」を追加する標準的な方法です。
+                </div>
+
+                <p>以下のコマンドを実行して、Claude Code をインストールします。</p>
+
+                <pre><code># Claude Code をグローバルインストールします
+npm install -g @anthropic-ai/claude-code</code></pre>
+
+                <p>このコマンドの各部分の意味は以下の通りです。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>部分</th>
+                      <th>意味</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>npm install</code></td>
+                      <td>npm パッケージをインストールするコマンドです</td>
+                    </tr>
+                    <tr>
+                      <td><code>-g</code></td>
+                      <td>グローバルインストールを意味します。このフラグがないとカレントディレクトリにしかインストールされません</td>
+                    </tr>
+                    <tr>
+                      <td><code>@anthropic-ai/claude-code</code></td>
+                      <td>Claude Code のパッケージ名です。<code>@anthropic-ai</code> は Anthropic 社の npm スコープ（名前空間）です</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="install-verify">インストールの確認</h3>
+
+                <p>インストールが完了したら、以下のコマンドで正しくインストールされたか確認します。</p>
+
+                <pre><code># Claude Code のバージョンを表示します
+claude --version</code></pre>
+
+                <p>バージョン番号が表示されれば、インストール成功です。</p>
+
+                <div class="callout warning">
+                  <strong><code>EACCES: permission denied</code> エラーが出た場合:</strong> npm のグローバルインストールに管理者権限が必要なことがあります。以下のいずれかの方法で解決できます。
+                  <ul>
+                    <li><strong>方法 1: sudo を付けて実行する（手軽）</strong>
+                      <pre><code># 管理者権限で実行します（パスワードの入力を求められます）
+sudo npm install -g @anthropic-ai/claude-code</code></pre>
+                    </li>
+                    <li><strong>方法 2: npm のグローバルディレクトリを変更する（推奨）</strong>
+                      <pre><code># ホームディレクトリに npm グローバル用のディレクトリを作成します
+mkdir -p ~/.npm-global
+
+# npm のグローバルディレクトリを変更します
+npm config set prefix '~/.npm-global'
+
+# PATH に追加します（~/.bashrc または ~/.zshrc に追記）
+echo 'export PATH=~/.npm-global/bin:$PATH' &gt;&gt; ~/.bashrc
+source ~/.bashrc
+
+# 再度インストールを実行します
+npm install -g @anthropic-ai/claude-code</code></pre>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="callout warning">
+                  <strong><code>command not found: claude</code> と表示された場合:</strong> npm のグローバルバイナリへのパスが通っていない可能性があります。以下の手順で確認・修正してください。
+                  <ol>
+                    <li>npm のグローバルバイナリのパスを確認します:
+                      <pre><code># このコマンドは npm グローバルインストール先のパスを表示します
+npm config get prefix</code></pre>
+                    </li>
+                    <li>表示されたパスに <code>/bin</code> を追加して、シェルの設定ファイルに追記します:
+                      <pre><code># 例: npm config get prefix が /usr/local と表示された場合
+# ~/.bashrc（Bash の場合）または ~/.zshrc（Zsh の場合）に以下を追記
+export PATH="/usr/local/bin:$PATH"
+
+# 設定を反映します
+source ~/.bashrc   # Bash の場合
+source ~/.zshrc    # Zsh の場合</code></pre>
+                    </li>
+                    <li>ターミナルを再起動してから <code>claude --version</code> を再度実行します。</li>
+                  </ol>
+                </div>
+
+                <!-- ============================================================
+                     セクション4: 初回起動とログイン
+                     ============================================================ -->
+
+                <h2 id="first-launch">初回起動とログイン</h2>
+
+                <p>Claude Code をインストールしたら、次はツールを起動して認証を行います。初回起動時にアカウント認証が求められ、認証が完了すると Claude Code が使えるようになります。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+START(["claude コマンド実行"])
+CHECK{"アカウント認証<br/>済み？"}
+LOGIN["ブラウザでログイン<br/>Anthropic アカウント"]
+READY(["Claude Code 使用可能"])
+START --> CHECK
+CHECK -->|"未認証"| LOGIN --> READY
+CHECK -->|"認証済み"| READY
+                  </div>
+                </div>
+
+                <!-- 4.1 起動 -->
+                <h3 id="launch-claude">4.1 Claude Code の起動</h3>
+
+                <p>任意のディレクトリ（プロジェクトフォルダが望ましい）でターミナルを開き、以下のコマンドを実行します。</p>
+
+                <pre><code># Claude Code を起動します
+# プロジェクトのルートディレクトリで実行するのがおすすめです
+claude</code></pre>
+
+                <div class="callout info">
+                  <strong>初回起動時の動作:</strong> 初回起動時はブラウザが自動で開き、Anthropic アカウントへのログインを求められます。アカウントをまだ持っていない場合は、画面の指示に従って新規作成してください。2回目以降の起動では、認証情報が保持されているため自動的にログインされます。
+                </div>
+
+                <!-- 4.2 認証方法 -->
+                <h3 id="authentication">4.2 認証方法</h3>
+
+                <p>Claude Code には 3 つの認証方法があります。状況に応じて最適な方法を選択してください。</p>
+
+                <h4>方法 1: ブラウザ認証（推奨）</h4>
+                <p>最も簡単な方法です。初回起動時にブラウザが自動で開くので、画面の指示に従ってログインするだけです。</p>
+
+                <pre><code># ブラウザ認証（自動）
+# ターミナルで claude を実行すると、ブラウザが自動的に開きます
+claude
+# → ブラウザが開くのでログインしてください
+# → ログイン完了後、ターミナルに戻ると使用可能になっています</code></pre>
+
+                <h4>方法 2: API キーで認証</h4>
+                <p>CI/CD 環境やサーバーなど、ブラウザが使えない環境では API キーを使います。<a href="https://console.anthropic.com/" target="_blank" rel="noopener">Anthropic Console</a> で API キーを発行してください。</p>
+
+                <pre><code># 環境変数に API キーを設定してから起動します
+export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxx"
+claude</code></pre>
+
+                <h4>方法 3: 起動時に API キーを直接渡す</h4>
+                <p>一時的に使用する場合や、テスト目的で使用する場合に便利です。</p>
+
+                <pre><code># 起動時にキーを渡します
+claude --api-key "sk-ant-xxxxxxxxxxxxx"</code></pre>
+
+                <div class="callout tip">
+                  <strong>API キーを毎回入力したくない場合:</strong> シェルの設定ファイルに環境変数を追記しておくと、ターミナル起動時に自動で読み込まれます。
+                  <pre><code># ~/.bashrc（Bash の場合）または ~/.zshrc（Zsh の場合）に追記
+export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxx"
+
+# 設定を反映します
+source ~/.bashrc</code></pre>
+                </div>
+
+                <div class="callout danger">
+                  <strong>API キーは秘密情報です。</strong> 絶対に以下の行為をしないでください。
+                  <ul>
+                    <li>Git リポジトリにコミットする（<code>.env</code> ファイルに書いて <code>.gitignore</code> で除外するのは OK）</li>
+                    <li>Slack やチャットで共有する</li>
+                    <li>ソースコードにハードコーディングする</li>
+                    <li>公開リポジトリの Issue やコメントに記載する</li>
+                  </ul>
+                  <p>万が一漏洩した場合は、<a href="https://console.anthropic.com/" target="_blank" rel="noopener">Anthropic Console</a> から即座にキーを無効化し、新しいキーを発行してください。</p>
+                </div>
+
+                <!-- 4.3 初回起動の画面説明 -->
+                <h3 id="first-screen">4.3 初回起動の画面説明</h3>
+
+                <p>認証が完了すると、ターミナルに Claude Code の対話画面が表示されます。主な要素は以下の通りです。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>画面要素</th>
+                      <th>説明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>プロンプト（入力欄）</strong></td>
+                      <td><code>&gt;</code> マークが表示されている箇所です。ここに質問や指示を入力します</td>
+                    </tr>
+                    <tr>
+                      <td><strong>モデル表示</strong></td>
+                      <td>現在使用している AI モデル名が表示されます</td>
+                    </tr>
+                    <tr>
+                      <td><strong>プロジェクト情報</strong></td>
+                      <td>カレントディレクトリに CLAUDE.md がある場合、自動的に読み込まれた旨が表示されます</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout tip">
+                  <strong>困ったら <code>/help</code>:</strong> 対話画面で <code>/help</code> と入力すると、利用可能なコマンドや使い方のヘルプが表示されます。操作に迷ったらまず <code>/help</code> を試してください。
+                </div>
+
+                <!-- ============================================================
+                     セクション5: 基本操作
+                     ============================================================ -->
+
+                <h2 id="basic-usage">基本操作</h2>
+
+                <p>Claude Code が起動したら、さっそく基本的な操作を試してみましょう。Claude Code は自然言語（日本語 OK）で指示を出すだけで、さまざまな作業を実行できます。</p>
+
+                <!-- 5.1 質問する -->
+                <h3 id="ask-question">5.1 質問する</h3>
+
+                <p>最もシンプルな使い方です。コードについて質問すると、Claude が回答してくれます。</p>
+
+                <pre><code>&gt; この関数は何をしていますか？
+&gt; このエラーメッセージの原因を教えてください
+&gt; React の useEffect フックの使い方を説明してください</code></pre>
+
+                <div class="callout tip">
+                  <strong>ヒント:</strong> 日本語でも英語でも、どちらでも質問できます。プロジェクトの CLAUDE.md で「回答は日本語で」と指定しておけば、常に日本語で回答してくれます。
+                </div>
+
+                <!-- 5.2 ファイルを読む・編集する -->
+                <h3 id="read-edit-files">5.2 ファイルを読む・編集する</h3>
+
+                <p>Claude Code はプロジェクト内のファイルを直接読み書きできます。ファイルパスを指定して指示するだけです。</p>
+
+                <pre><code># ファイルの内容を確認する
+&gt; src/index.ts を読んで内容を教えてください
+
+# ファイルを編集する
+&gt; src/utils.ts の calculateTotal 関数にエラーハンドリングを追加してください
+
+# 新しいファイルを作成する
+&gt; src/helpers/validation.ts にメールアドレスのバリデーション関数を作成してください</code></pre>
+
+                <div class="callout info">
+                  <strong>ファイル編集の安全性:</strong> Claude Code がファイルを編集する前に、変更内容の差分（diff）が表示されます。内容を確認してから承認することで、意図しない変更を防ぐことができます。
+                </div>
+
+                <!-- 5.3 コマンドを実行する -->
+                <h3 id="run-commands">5.3 コマンドを実行する</h3>
+
+                <p>テストの実行やビルドなど、ターミナルコマンドの実行も Claude Code に任せられます。</p>
+
+                <pre><code># テストを実行する
+&gt; npm test を実行してください
+
+# ビルドする
+&gt; npm run build を実行してください
+
+# lint を実行する
+&gt; eslint で src/ 配下をチェックしてください</code></pre>
+
+                <div class="callout warning">
+                  <strong>コマンド実行の承認:</strong> Claude Code がシステムコマンドを実行する際には、事前に確認プロンプトが表示されます。内容を確認してから承認してください。安全でないコマンド（データ削除など）は自動では実行されません。Settings で自動承認するコマンドを設定することも可能です。
+                </div>
+
+                <!-- 5.4 Git 操作 -->
+                <h3 id="git-operations">5.4 Git 操作</h3>
+
+                <p>Claude Code は Git 操作もサポートしています。ブランチの作成、コミット、差分の確認などを自然言語で指示できます。</p>
+
+                <pre><code># 変更の確認
+&gt; git diff を見せてください
+
+# コミット
+&gt; 現在の変更を「ログイン機能のバリデーションを追加」というメッセージでコミットして
+
+# ブランチ作成
+&gt; feature/user-auth というブランチを作成して切り替えて
+
+# 差分の要約
+&gt; main ブランチとの差分を要約してください</code></pre>
+
+                <div class="callout info">
+                  <strong>CLAUDE.md との連携:</strong> スターターキットの CLAUDE.md には「コミットメッセージは日本語で記述」「本番ブランチに直接プッシュしない」といったルールが定義されています。Claude Code はこれらのルールに従って Git 操作を行うため、チーム全体で統一されたワークフローを維持できます。
+                </div>
+
+                <!-- 5.5 スラッシュコマンド -->
+                <h3 id="slash-commands">5.5 スラッシュコマンド</h3>
+
+                <p>Claude Code にはスラッシュ（<code>/</code>）で始まる組み込みコマンドがあります。よく使う操作を素早く実行できます。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>コマンド</th>
+                      <th>説明</th>
+                      <th>使用場面</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>/help</code></td>
+                      <td>ヘルプを表示します</td>
+                      <td>操作に迷ったとき</td>
+                    </tr>
+                    <tr>
+                      <td><code>/clear</code></td>
+                      <td>会話履歴をクリアします</td>
+                      <td>新しい話題に切り替えるとき</td>
+                    </tr>
+                    <tr>
+                      <td><code>/init</code></td>
+                      <td>CLAUDE.md を自動生成します</td>
+                      <td>プロジェクトの初期設定</td>
+                    </tr>
+                    <tr>
+                      <td><code>/model</code></td>
+                      <td>使用モデルを切り替えます</td>
+                      <td>モデルを変更したいとき</td>
+                    </tr>
+                    <tr>
+                      <td><code>/cost</code></td>
+                      <td>現在のセッションのコストを表示します</td>
+                      <td>利用料金を確認したいとき</td>
+                    </tr>
+                    <tr>
+                      <td><code>/compact</code></td>
+                      <td>会話を要約してコンテキストを圧縮します</td>
+                      <td>長い会話でトークンを節約したいとき</td>
+                    </tr>
+                    <tr>
+                      <td><code>/doctor</code></td>
+                      <td>インストール状態を診断します</td>
+                      <td>動作に問題があるとき</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout tip">
+                  <strong>ヒント:</strong> <code>/</code> を入力するだけで、利用可能なコマンドの一覧が表示されます。カスタムコマンドが設定されていれば、それも一覧に表示されます。
+                </div>
+
+                <!-- 5.6 終了方法 -->
+                <h3 id="exit">5.6 終了方法</h3>
+
+                <p>Claude Code を終了するには、以下のいずれかの方法を使います。</p>
+
+                <pre><code># 方法 1: スラッシュコマンドで終了
+/exit
+
+# 方法 2: キーボードショートカットで終了
+# Ctrl+C を押す（2回押す場合もあります）
+
+# 方法 3: 自然言語で終了
+&gt; 終了してください</code></pre>
+
+                <!-- ============================================================
+                     セクション6: スターターキットの使い方
+                     ============================================================ -->
+
+                <h2 id="starter-kit">スターターキットの使い方</h2>
+
+                <p>Claude Code Starter Kit は、チームですぐに Claude Code を使い始められるテンプレート集です。CLAUDE.md やルール、カスタムコマンドなどがあらかじめ整備されており、<strong>クローンして起動するだけ</strong>で使えます。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TD
+S1["1. リポジトリをクローン"]
+S2["2. ディレクトリに移動"]
+S3["3. Claude Code を起動"]
+S4["4. CLAUDE.md が自動読み込み"]
+S5["5. 各機能がすぐに使える"]
+S1 --> S2 --> S3 --> S4 --> S5
+                  </div>
+                </div>
+
+                <h3 id="clone-and-start">クローンから起動まで</h3>
+
+                <pre><code># 1. リポジトリをクローンします
+# このコマンドは GitHub からスターターキットのソースコード一式をダウンロードします
+git clone https://github.com/sas-dx/claude-code-starter-kit.git
+
+# 2. クローンしたディレクトリに移動します
+cd claude-code-starter-kit
+
+# 3. Claude Code を起動します
+# .claude/CLAUDE.md が自動的に読み込まれ、ルールが適用されます
+claude</code></pre>
+
+                <div class="callout info">
+                  <strong>自動で適用される設定:</strong> <code>.claude/CLAUDE.md</code> が自動的に読み込まれ、プロジェクトのルール（コミットメッセージは日本語、DB 削除禁止など）が適用されます。何も設定しなくても、チーム全員が同じルールで作業できる状態になります。さらに <code>.claude/rules/</code> 配下のルールファイルや <code>.claude/settings.json</code> の設定も自動で反映されます。
+                </div>
+
+                <h3 id="directory-structure">ディレクトリ構成</h3>
+
+                <p>スターターキットの <code>.claude/</code> ディレクトリには、以下のような構成でファイルが配置されています。各ディレクトリの役割を理解しておくと、カスタマイズがスムーズに進みます。</p>
+
+                <div class="code-header"><span>.claude/ ディレクトリ構成</span></div>
+                <pre><code>.claude/
+├── CLAUDE.md          # プロジェクト指示書（最も重要な設定ファイル）
+├── settings.json      # 権限・環境の設定
+├── rules/             # トピック別のルールファイル
+│   ├── coding-standards.md   # コーディング規約
+│   ├── git-workflow.md       # Git ワークフロー
+│   ├── security.md           # セキュリティルール
+│   ├── testing.md            # テストルール
+│   └── review-process.md     # コードレビュールール
+├── commands/          # カスタムスラッシュコマンド
+│   ├── code-review.md        # /code-review コマンド
+│   ├── dev-issue.md          # /dev-issue コマンド
+│   └── ...
+├── agents/            # サブエージェント定義
+│   ├── code-reviewer.md      # コードレビュー専門エージェント
+│   └── ...
+└── skills/            # スキル定義
+    └── ...            # 専門知識の形式知化</code></pre>
+
+                <div class="callout tip">
+                  <strong>どこから手をつけるべきか:</strong> まずは <code>CLAUDE.md</code> を自分のプロジェクトに合わせて編集してください。次に <code>rules/</code> 配下のルールをプロジェクトのコーディング規約に合わせます。カスタムコマンドやエージェントは必要に応じて追加・修正してください。
+                </div>
+
+                <h3 id="try-features">起動後に試せること</h3>
+
+                <p>スターターキットには、すぐに試せるカスタムコマンドやサブエージェントが含まれています。</p>
+
+                <pre><code># カスタムコマンドを試す
+/code-review #1          # PR やコードのレビューを実行します
+/explain-code src/app.ts  # 指定したファイルのコードを解説します
+/dev-issue #42            # GitHub Issue に基づいて実装を行います
+
+# CLAUDE.md を自分のプロジェクト用にカスタマイズ
+/init                     # 現在のプロジェクトに合わせて CLAUDE.md を自動生成します</code></pre>
+
+                <div class="callout tip">
+                  <strong>自分のプロジェクトに適用するには:</strong> スターターキットの <code>.claude/</code> ディレクトリを自分のプロジェクトにコピーし、<code>CLAUDE.md</code> の内容をプロジェクトに合わせて編集するだけで、同じ仕組みを導入できます。
+                </div>
+
+                <h3 id="apply-to-project">既存プロジェクトへの導入手順</h3>
+
+                <p>スターターキットを参考に、既存のプロジェクトに Claude Code の設定を導入する手順です。</p>
+
+                <pre><code># 1. 自分のプロジェクトのルートディレクトリに移動
+cd /path/to/your-project
+
+# 2. スターターキットの .claude ディレクトリをコピー
+cp -r /path/to/claude-code-starter-kit/.claude .
+
+# 3. CLAUDE.md をプロジェクトに合わせて編集
+#    技術スタック、開発コマンド、ディレクトリ構造を自分のプロジェクトの情報に書き換えます
+vi .claude/CLAUDE.md
+
+# 4. .claude ディレクトリを Git に追加（チーム共有のため）
+git add .claude/
+git commit -m "Claude Code の設定ファイルを追加"
+
+# 5. Claude Code を起動して動作確認
+claude</code></pre>
+
+                <div class="callout warning">
+                  <strong><code>settings.local.json</code> は Git にコミットしないでください。</strong> <code>.claude/settings.local.json</code> には個人のトークンや環境固有の設定が含まれることがあります。<code>.gitignore</code> に <code>.claude/settings.local.json</code> を追加しておくことを推奨します。
+                </div>
+
+                <!-- ============================================================
+                     セクション7: IDE 連携（VS Code / JetBrains）
+                     ============================================================ -->
+
+                <h2 id="ide-integration">IDE 連携（VS Code / JetBrains）</h2>
+
+                <p>Claude Code はターミナル（CLI）から使うだけでなく、普段使っている IDE（統合開発環境）の拡張機能としても利用できます。CLI と IDE 拡張は同じ設定ファイルを共有するため、<strong>どちらから使っても同じルールが適用されます</strong>。</p>
+
+                <!-- 7.1 VS Code -->
+                <h3 id="vscode">7.1 VS Code</h3>
+
+                <p>VS Code で Claude Code を使うには、拡張機能をインストールします。</p>
+
+                <h4>方法 1: コマンドラインからインストール</h4>
+                <pre><code># このコマンドは VS Code の拡張機能をターミナルからインストールします
+code --install-extension anthropic.claude-code</code></pre>
+
+                <h4>方法 2: VS Code のマーケットプレイスからインストール</h4>
+                <ol>
+                  <li>VS Code を開きます</li>
+                  <li>左サイドバーの拡張機能アイコン（四角が4つ並んだマーク）をクリックします</li>
+                  <li>検索バーに「<strong>Claude Code</strong>」と入力します</li>
+                  <li>Anthropic が提供する拡張機能を見つけて「インストール」をクリックします</li>
+                </ol>
+
+                <div class="callout warning">
+                  <strong><code>code</code> コマンドが見つからない場合:</strong> VS Code を開き、コマンドパレット（<code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code>）で「Shell Command: Install 'code' command in PATH」を実行してください。これにより、ターミナルから <code>code</code> コマンドが使えるようになります。
+                </div>
+
+                <!-- 7.2 JetBrains -->
+                <h3 id="jetbrains">7.2 JetBrains（IntelliJ, WebStorm 等）</h3>
+
+                <p>JetBrains 系の IDE（IntelliJ IDEA, WebStorm, PyCharm, PhpStorm 等）でも Claude Code を使用できます。</p>
+
+                <ol>
+                  <li>IDE を開きます</li>
+                  <li><strong>Settings</strong>（<code>Ctrl+Alt+S</code> / <code>Cmd+,</code>）を開きます</li>
+                  <li><strong>Plugins</strong> > <strong>Marketplace</strong> に移動します</li>
+                  <li>「<strong>Claude Code</strong>」で検索し、インストールします</li>
+                  <li>IDE を再起動します</li>
+                </ol>
+
+                <div class="callout tip">
+                  <strong>CLI と IDE 拡張の設定共有:</strong> CLI と IDE 拡張は同じ <code>.claude/CLAUDE.md</code>、<code>.claude/rules/</code>、<code>.claude/settings.json</code> を参照します。CLI で設定した内容は IDE 拡張にもそのまま反映されるため、設定を二重管理する必要はありません。
+                </div>
+
+                <!-- ============================================================
+                     セクション8: よくあるトラブルと対処法
+                     ============================================================ -->
+
+                <h2 id="troubleshooting">よくあるトラブルと対処法</h2>
+
+                <p>導入時によく遭遇するトラブルとその対処法をまとめました。問題が発生した場合は、まずこの一覧を確認してください。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>症状</th>
+                      <th>原因</th>
+                      <th>対処法</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>command not found: claude</code></td>
+                      <td>npm のグローバルバイナリへのパスが通っていない</td>
+                      <td><code>npm config get prefix</code> でパスを確認し、<code>PATH</code> 環境変数に <code>（表示されたパス）/bin</code> を追加してください</td>
+                    </tr>
+                    <tr>
+                      <td><code>EACCES: permission denied</code></td>
+                      <td>npm のグローバルインストールに権限が不足している</td>
+                      <td><code>sudo</code> を付けて再実行するか、npm のグローバルディレクトリをホームディレクトリ配下に変更してください（<a href="#install">インストール</a>セクション参照）</td>
+                    </tr>
+                    <tr>
+                      <td><code>Error: API key not found</code></td>
+                      <td>認証が完了していない、または API キーが設定されていない</td>
+                      <td><code>claude</code> を再起動してブラウザ認証を行うか、<code>ANTHROPIC_API_KEY</code> 環境変数を設定してください</td>
+                    </tr>
+                    <tr>
+                      <td><code>Error: Rate limit exceeded</code></td>
+                      <td>API の利用上限に達した</td>
+                      <td>しばらく待ってからリトライしてください。頻発する場合は <a href="https://console.anthropic.com/" target="_blank" rel="noopener">Anthropic Console</a> でプランを確認してください</td>
+                    </tr>
+                    <tr>
+                      <td>ブラウザが開かない</td>
+                      <td>ヘッドレス環境（SSH接続先、Docker コンテナ等）で実行している</td>
+                      <td><code>claude --api-key "sk-ant-xxx"</code> で API キーを直接指定して認証してください</td>
+                    </tr>
+                    <tr>
+                      <td>日本語が文字化けする</td>
+                      <td>ターミナルの文字コードが UTF-8 になっていない</td>
+                      <td>ターミナルの設定で文字コードを <strong>UTF-8</strong> に変更してください。Windows の場合は <code>chcp 65001</code> を実行してからお試しください</td>
+                    </tr>
+                    <tr>
+                      <td>CLAUDE.md が読み込まれない</td>
+                      <td>ファイルの配置場所が間違っている</td>
+                      <td>プロジェクトルート直下の <code>CLAUDE.md</code>、または <code>.claude/CLAUDE.md</code> に配置してください。Claude Code はこの 2 箇所を自動的に探索します</td>
+                    </tr>
+                    <tr>
+                      <td>Node.js のバージョンが古い</td>
+                      <td>v18 未満の Node.js がインストールされている</td>
+                      <td><a href="https://nodejs.org/" target="_blank" rel="noopener">Node.js 公式サイト</a>から LTS 版をダウンロードして上書きインストールしてください</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout tip">
+                  <strong>それでも解決しない場合:</strong> <code>claude /doctor</code> コマンドを実行すると、インストール状態の診断が行われます。問題の特定に役立ちます。また、<a href="https://github.com/anthropics/claude-code/issues" target="_blank" rel="noopener">Claude Code の GitHub Issues</a> で同様の問題が報告されていないか検索してみてください。
+                </div>
+
+                <!-- ============================================================
+                     セクション9: 次のステップ
+                     ============================================================ -->
+
+                <h2 id="next-steps">次のステップ</h2>
+
+                <p>Claude Code の導入が完了しました。ここからは、チームの開発ワークフローに合わせて Claude Code をカスタマイズしていきましょう。以下のページで各機能の詳細を学べます。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4><a href="claude-md.html">📋 CLAUDE.md</a></h4>
+                    <p>プロジェクト指示書の書き方を学びます。Claude Code に「どのプロジェクトで、どんなルールで作業するか」を伝えるための最も重要な設定ファイルです。まずはここから始めましょう。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4><a href="rules.html">📏 Rules</a></h4>
+                    <p>コーディング規約やセキュリティルールを定義する方法を学びます。CLAUDE.md を補完し、トピック別・パス別にルールを管理できます。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4><a href="commands.html">⌨️ Commands</a></h4>
+                    <p>カスタムスラッシュコマンドの作り方を学びます。コードレビューや Issue 対応など、よく使う操作を <code>/コマンド名</code> の一言で実行できるようになります。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></h4>
+                    <p>Claude Code の全機能を組み合わせた実践ガイドです。実際のプロジェクトでどう活用するか、基幹システムリプレイスを題材に解説しています。</p>
+                  </div>
+                </div>
+
+                <div class="callout info">
+                  <strong>おすすめの学習順序:</strong> まず <a href="claude-md.html">CLAUDE.md</a> でプロジェクト指示書の書き方を学び、次に <a href="rules.html">Rules</a> でルール管理を理解し、最後に <a href="commands.html">Commands</a> で作業の自動化に進むのがスムーズです。全体像を先に把握したい場合は <a href="architecture.html">AI駆動開発アーキテクチャ</a> から読み始めるのも有効です。
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
