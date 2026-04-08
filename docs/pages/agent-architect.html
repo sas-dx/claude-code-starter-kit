@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エージェントアーキテクト入門 - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">はじめに</li>
+                <li><a href="getting-started.html">🚀 導入ガイド</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="agent-architect.html" class="active">🧠 エージェントアーキテクト入門</a></li>
+                <li><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></li>
+                <li><a href="marketing.html">📢 AI駆動マーケティング基盤</a></li>
+                <li><a href="sales.html">💼 AI駆動セールス基盤</a></li>
+                <li><a href="data-driven.html">📊 AI駆動データドリブン基盤</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>AIエージェントアーキテクト入門</h1>
+                <p>AI駆動開発で成果を出すには、「AIに何を指示するか」だけでなく<strong>「AIが最大限の力を発揮できる環境をどう設計するか」</strong>が鍵です。このページでは、AIエージェントをアーキテクトする上で意識すべき<strong>5つの観点</strong>を解説します。</p>
+
+                <!-- ============================================================
+                     セクション1: なぜ5つの観点が必要なのか
+                     ============================================================ -->
+
+                <h2 id="why-five-perspectives">なぜ「5つの観点」が必要なのか</h2>
+
+                <p>Claude Code をインストールして対話するだけでも AI の恩恵は得られます。しかし、プロジェクトが大規模化しチームで運用するにつれ、以下の課題が顕在化します。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card" style="border-left: 4px solid #e74c3c;">
+                    <h4>設計なしで AI を使い続けると...</h4>
+                    <ul style="margin: 0; padding-left: 1.2em;">
+                      <li>トークン（記憶）が膨れ上がり、回答精度が低下する</li>
+                      <li>AI が対応できるタスクの範囲が限られたまま</li>
+                      <li>最新のドキュメントや社内情報にアクセスできない</li>
+                      <li>同じミスが何度も繰り返される</li>
+                      <li>メンバーごとに AI の品質がバラバラ</li>
+                    </ul>
+                  </div>
+                  <div class="feature-card" style="border-left: 4px solid #27ae60;">
+                    <h4>5つの観点で設計すると...</h4>
+                    <ul style="margin: 0; padding-left: 1.2em;">
+                      <li>必要な情報だけ効率的にAIに渡せる</li>
+                      <li>レビュー・テスト・セキュリティチェックまで AI が自律的に対応</li>
+                      <li>外部の最新情報をリアルタイムに参照できる</li>
+                      <li>失敗から学び、AI の出力品質が使うほど向上する</li>
+                      <li>チーム全員が同じ品質で作業できる</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- ============================================================
+                     セクション2: 5つの観点の全体像
+                     ============================================================ -->
+
+                <h2 id="overview">5つの観点の全体像</h2>
+
+                <p>5つの観点は独立した要素ではなく、土台から順に積み上げる構造です。観点1の最適化が観点2〜4の効果を高め、観点5で全体をチームに展開します。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TB
+    P5["<b>観点 5: チーム展開</b><br/>①〜④をチーム全体に展開し<br/>均一な品質を担保する"]
+    P4["<b>観点 4: 継続学習</b><br/>計画→実行→レビュー→学習の<br/>サイクルで AI を成長させる"]
+    P3["<b>観点 3: 外部ソース</b><br/>MCP や CLI で外の世界の<br/>最新情報を読み込ませる"]
+    P2["<b>観点 2: 範囲拡張 &amp; 品質</b><br/>レビュー・テスト・ゲートウェイで<br/>対応範囲を広げ品質を担保"]
+    P1["<b>観点 1: トークン最適化</b><br/>記憶を効率的に使い<br/>回答精度を最大化する"]
+
+    P1 --> P2 --> P3 --> P4 --> P5
+
+    style P1 fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style P2 fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style P3 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style P4 fill:#fce7f3,stroke:#ec4899,color:#1e293b
+    style P5 fill:#f3e8ff,stroke:#a855f7,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">5つの観点の積み上げ構造</div>
+                </div>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>観点</th>
+                      <th>一言で</th>
+                      <th>主な Claude Code 機能</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>1</strong></td>
+                      <td>トークン消費の最適化</td>
+                      <td>記憶を効率的に使う</td>
+                      <td>Rules (paths)、Agents、Skills</td>
+                    </tr>
+                    <tr>
+                      <td><strong>2</strong></td>
+                      <td>対応範囲の拡張と品質向上</td>
+                      <td>できることを増やし、質を担保する</td>
+                      <td>Agents、Skills、Commands、Hooks</td>
+                    </tr>
+                    <tr>
+                      <td><strong>3</strong></td>
+                      <td>外部ソースの読み込み</td>
+                      <td>外の世界とつなげる</td>
+                      <td>MCP、Skills + CLI ツール</td>
+                    </tr>
+                    <tr>
+                      <td><strong>4</strong></td>
+                      <td>継続学習の仕組み</td>
+                      <td>学んで成長させる</td>
+                      <td>CLAUDE.md、Rules、Skills、Agents</td>
+                    </tr>
+                    <tr>
+                      <td><strong>5</strong></td>
+                      <td>チーム全体への展開</td>
+                      <td>全員で同じ品質を出す</td>
+                      <td>Git、Settings、Plugins</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     観点 1: トークン消費の最適化
+                     ============================================================ -->
+
+                <h2 id="perspective-1">観点 1: トークン消費を最適化する</h2>
+
+                <div class="callout info">
+                  <strong>この観点が解決する課題:</strong> AI は会話のコンテキスト（トークン）に上限があります。プロジェクトの全ルール・全コード・全履歴を一度に読み込ませると、本当に必要な情報が埋もれて回答精度が低下します。「必要な情報を、必要なときにだけ、必要な分だけ」AI に渡す設計が重要です。
+                </div>
+
+                <h3 id="p1-rules">Rules のパス別適用でコンテキストを節約</h3>
+
+                <p>全てのルールを常時読み込むのではなく、<code>paths</code> フロントマターで対象ファイルを絞ります。</p>
+
+                <pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+# API 開発ルール
+- 全エンドポイントに入力バリデーションを実装する
+- 統一されたエラーレスポンス形式を使用する</code></pre>
+
+                <p>API ファイルを触るときだけこのルールが読み込まれ、フロントエンド作業時にはコンテキストを消費しません。</p>
+
+                <h3 id="p1-agents">サブエージェントによる隔離コンテキスト</h3>
+
+                <p>メインの会話コンテキストを汚さずに、専門作業を別のエージェントに委譲できます。各サブエージェントは独立したコンテキストで動作するため、メインエージェントのトークンを消費しません。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+    MAIN["メインエージェント<br/>（設計・指示）"]
+    R["コードレビュー<br/>エージェント"]
+    S["セキュリティチェック<br/>エージェント"]
+    T["テスト作成<br/>エージェント"]
+
+    MAIN -->|"委譲"| R
+    MAIN -->|"委譲"| S
+    MAIN -->|"委譲"| T
+    R -->|"結果のみ"| MAIN
+    S -->|"結果のみ"| MAIN
+    T -->|"結果のみ"| MAIN
+
+    style MAIN fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style R fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style S fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style T fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">サブエージェントの隔離コンテキスト</div>
+                </div>
+
+                <h3 id="p1-skills">Skills のオンデマンド読み込み</h3>
+
+                <p>Skills は呼び出されたときだけコンテキストに読み込まれます。CLAUDE.md に全ての専門知識を詰め込むのではなく、Skills に分離することで普段のトークン消費を抑えられます。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>方法</th>
+                      <th>トークン消費</th>
+                      <th>適した情報</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>CLAUDE.md に記載</td>
+                      <td>常時消費</td>
+                      <td>プロジェクト全体で常に必要な方針（数十行以内）</td>
+                    </tr>
+                    <tr>
+                      <td>Rules（パス別）</td>
+                      <td>対象ファイル操作時のみ</td>
+                      <td>特定の技術領域・ディレクトリに限定されるルール</td>
+                    </tr>
+                    <tr>
+                      <td>Skills</td>
+                      <td>呼び出し時のみ</td>
+                      <td>専門知識、手順書、テンプレート</td>
+                    </tr>
+                    <tr>
+                      <td>サブエージェント</td>
+                      <td>隔離（メインに影響なし）</td>
+                      <td>レビュー、分析などの独立タスク</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="callout tip">
+                  <strong>設計指針:</strong> 「この情報は毎回必要か？」を自問してください。YES なら CLAUDE.md、特定ファイルだけなら Rules（paths 付き）、たまにしか使わないなら Skills。この振り分けだけでトークン消費を大幅に削減できます。
+                </div>
+
+                <!-- ============================================================
+                     観点 2: 対応範囲の拡張と品質向上
+                     ============================================================ -->
+
+                <h2 id="perspective-2">観点 2: 対応範囲を拡張し品質を向上させる</h2>
+
+                <div class="callout info">
+                  <strong>この観点が解決する課題:</strong> AI に「コードを書いて」と指示するだけでは、品質のばらつきや見落としが発生します。AI が対応できる範囲を広げつつ、「書いて → チェックして → 修正して」のサイクルを自動化する仕組みが必要です。
+                </div>
+
+                <h3 id="p2-review-agents">レビュー専門サブエージェントの準備</h3>
+
+                <p>コードを書くエージェントとレビューするエージェントを分離します。人間のチーム開発と同じように、AI にも「実装者」と「レビュアー」の役割分担を設計します。</p>
+
+                <pre><code># .claude/agents/code-reviewer.md
+---
+name: code-reviewer
+description: コードの品質レビューを実施する専門エージェント
+---
+実装されたコードを以下の観点でレビューしてください:
+- ロジックの正確性
+- セキュリティ脆弱性（SQLインジェクション、XSS 等）
+- パフォーマンス問題（N+1 クエリ、メモリリーク等）
+- コーディング規約準拠（.claude/rules/ 参照）
+
+指摘には 🔴 Critical / 🟡 Warning / 🔵 Suggestion のレベルを付与してください。</code></pre>
+
+                <h3 id="p2-skills-commands">レビュー用 Skills・カスタムコマンドの準備</h3>
+
+                <p>定型的なレビュー手順を Skills やカスタムコマンドとして形式知化します。誰が実行しても同じ品質のレビューが行われます。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card">
+                    <h4>Commands（手動実行）</h4>
+                    <pre style="margin: 0.5rem 0;"><code>/code-review #42
+/fix-pr-review #42
+/security-check</code></pre>
+                    <p>ユーザーが明示的に呼び出す定型作業。PR レビュー、セキュリティチェックなど。</p>
+                  </div>
+                  <div class="feature-card">
+                    <h4>Skills（自動 + 手動）</h4>
+                    <pre style="margin: 0.5rem 0;"><code>/simplify
+/explain-code src/app.ts</code></pre>
+                    <p>手動呼び出しに加え、Claude が状況に応じて自動的に使用。コード簡素化、解説など。</p>
+                  </div>
+                </div>
+
+                <h3 id="p2-hooks">Hooks によるゲートウェイ整備</h3>
+
+                <p>CLAUDE.md やルールは「指示」ですが、Hooks は<strong>「仕組みで強制する」ガードレール</strong>です。AI がコードを書いた後、コミット前に自動で品質チェックを実行します。</p>
+
+                <pre><code>// .claude/settings.json（hooks セクション）
+{
+  "hooks": {
+    "PreCommit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint && npm run test:affected"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+    CODE["AI がコード生成"]
+    REVIEW["サブエージェントが<br/>レビュー"]
+    HOOKS["Hooks が<br/>リント・テスト実行"]
+    COMMIT["コミット"]
+    BLOCK["❌ ブロック<br/>→ 修正へ"]
+
+    CODE --> REVIEW --> HOOKS
+    HOOKS -->|"成功"| COMMIT
+    HOOKS -->|"失敗"| BLOCK --> CODE
+
+    style CODE fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style REVIEW fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style HOOKS fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style COMMIT fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style BLOCK fill:#fee2e2,stroke:#ef4444,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">多層的な品質保証フロー</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>設計指針:</strong> 品質保証は「指示」と「仕組み」の二段構え。ルールやサブエージェントの指示で 80% をカバーし、Hooks で残り 20% の「うっかりミス」を機械的にブロックします。
+                </div>
+
+                <!-- ============================================================
+                     観点 3: 外部ソースの読み込み
+                     ============================================================ -->
+
+                <h2 id="perspective-3">観点 3: 外部ソースを読み込ませる</h2>
+
+                <div class="callout info">
+                  <strong>この観点が解決する課題:</strong> AI の学習データには鮮度の限界があります。最新のライブラリドキュメント、社内 DB の現在のスキーマ、外部サービスの状態などは、AI 単体ではアクセスできません。AI に「外の世界への窓」を提供する仕組みが必要です。
+                </div>
+
+                <h3 id="p3-mcp">MCP（Model Context Protocol）による外部連携</h3>
+
+                <p>MCP は AI に外部サービスへのアクセスを提供する標準プロトコルです。<code>.mcp.json</code> に設定するだけで、AI が GitHub、DB、ドキュメントサイト等を直接参照できるようになります。</p>
+
+                <pre><code>// .mcp.json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "..." }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://..."]
+    }
+  }
+}</code></pre>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>MCP サーバー</th>
+                      <th>AI ができるようになること</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>GitHub</td>
+                      <td>Issue / PR の読み書き、コードの検索</td>
+                    </tr>
+                    <tr>
+                      <td>Context7</td>
+                      <td>最新のライブラリドキュメントの参照</td>
+                    </tr>
+                    <tr>
+                      <td>PostgreSQL</td>
+                      <td>DB スキーマの確認、クエリの実行</td>
+                    </tr>
+                    <tr>
+                      <td>Slack</td>
+                      <td>チャンネルの閲覧、メッセージの送信</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="p3-cli-skills">CLI ツール + Skills による外部情報取得</h3>
+
+                <p>MCP サーバーが存在しないツールでも、CLI コマンドをインストールし Skills から実行させることで AI の対応範囲を拡張できます。</p>
+
+                <pre><code># .claude/skills/aws-check/SKILL.md
+---
+name: aws-check
+description: AWS リソースの状態を確認するスキル
+---
+以下のコマンドを実行して AWS リソースの状態を確認してください:
+
+```bash
+# ECS サービスの一覧
+aws ecs list-services --cluster production
+
+# RDS インスタンスの状態
+aws rds describe-db-instances --query 'DBInstances[].{ID:DBInstanceIdentifier,Status:DBInstanceStatus}'
+
+# 直近のデプロイ状況
+aws ecs describe-services --cluster production --services api-service
+```
+
+結果を要約し、異常がある場合は警告してください。</code></pre>
+
+                <div class="callout tip">
+                  <strong>設計指針:</strong> まず MCP サーバーの有無を確認し、あれば MCP で接続。なければ CLI ツールを Skills でラップして AI に実行させます。どちらの場合も、AI が自律的に外部情報を取得できる状態を目指します。
+                </div>
+
+                <!-- ============================================================
+                     観点 4: 継続学習の仕組み
+                     ============================================================ -->
+
+                <h2 id="perspective-4">観点 4: 継続学習させる仕組みを作る</h2>
+
+                <div class="callout info">
+                  <strong>この観点が解決する課題:</strong> AI は会話が終わると学んだことを忘れます。同じバグ、同じ質問、同じミスが何度も繰り返されるのは、学びが蓄積されないためです。「計画 → 実行 → レビュー → 学習」のサイクルで AI の知識を永続化する仕組みが必要です。
+                </div>
+
+                <h3 id="p4-cycle">学習サイクル</h3>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart LR
+    PLAN["📋 計画<br/>Issue 分析<br/>設計方針決定"]
+    EXEC["⚡ 実行<br/>コード生成<br/>テスト作成"]
+    REVIEW["🔍 レビュー<br/>品質チェック<br/>問題の発見"]
+    LEARN["📝 学習<br/>CLAUDE.md 更新<br/>Rules / Skills 追加"]
+
+    PLAN --> EXEC --> REVIEW --> LEARN --> PLAN
+
+    style PLAN fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style EXEC fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style REVIEW fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style LEARN fill:#fce7f3,stroke:#ec4899,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">計画 → 実行 → レビュー → 学習の継続サイクル</div>
+                </div>
+
+                <h3 id="p4-where">学習の永続化先</h3>
+
+                <p>レビューで発見した知見を、適切な場所に永続化します。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>学んだこと</th>
+                      <th>永続化先</th>
+                      <th>具体例</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>プロジェクト全体の方針</td>
+                      <td><strong>CLAUDE.md</strong></td>
+                      <td>「API レスポンスは必ず envelope 形式で返す」</td>
+                    </tr>
+                    <tr>
+                      <td>特定領域のルール</td>
+                      <td><strong>Rules</strong></td>
+                      <td>「DB マイグレーションは必ず down も書く」</td>
+                    </tr>
+                    <tr>
+                      <td>繰り返す作業手順</td>
+                      <td><strong>Skills / Commands</strong></td>
+                      <td>「リリース前チェックリスト」をコマンド化</td>
+                    </tr>
+                    <tr>
+                      <td>専門的な判断基準</td>
+                      <td><strong>Agents</strong></td>
+                      <td>パフォーマンスレビューの基準値をエージェントに組み込む</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3 id="p4-example">実践例: レビューから学習への流れ</h3>
+
+                <div class="callout warning">
+                  <strong>具体的なシナリオ:</strong>
+                  <ol style="margin-bottom: 0;">
+                    <li>コードレビューで「Prisma の findMany でリレーション取得時に N+1 クエリが発生している」と指摘</li>
+                    <li>AI が <code>include</code> を使った実装に修正</li>
+                    <li><strong>学習</strong>: <code>.claude/rules/database.md</code> に「Prisma の findMany でリレーションを取得する際は include を使用し、ループ内での個別取得を禁止する」を追記</li>
+                    <li>次回以降、AI がコード生成時にこのルールを自動適用 → 同じ問題が再発しない</li>
+                  </ol>
+                </div>
+
+                <div class="callout tip">
+                  <strong>設計指針:</strong> 「このミスは二度目か？」と感じたら、それは学習を永続化すべきサインです。一度のミスは修正で十分ですが、繰り返すパターンは仕組みで防ぎましょう。CLAUDE.md への1行の追記が、チーム全体の品質を永続的に引き上げます。
+                </div>
+
+                <!-- ============================================================
+                     観点 5: チーム全体への展開
+                     ============================================================ -->
+
+                <h2 id="perspective-5">観点 5: チーム全体へ展開する</h2>
+
+                <div class="callout info">
+                  <strong>この観点が解決する課題:</strong> 一人のエンジニアが観点1〜4を整備しても、チームの他メンバーが活用しなければ効果は限定的です。観点1〜4の成果物を Git リポジトリで一元管理し、チーム全員が自動的に同じ設定・ルール・ツールを使える仕組みを構築します。
+                </div>
+
+                <h3 id="p5-git">Git で共有される設定ファイル群</h3>
+
+                <p>観点1〜4で作成した成果物は全て <code>.claude/</code> ディレクトリと <code>.mcp.json</code> に集約されます。Git にコミットするだけでチーム全員に配布されます。</p>
+
+                <pre><code>.claude/
+├── CLAUDE.md          ← 観点4: 学習結果の蓄積先
+├── rules/             ← 観点1: パス別トークン最適化 + 観点4: ルール蓄積
+│   ├── security.md
+│   ├── database.md        （paths: "src/db/**/*"）
+│   └── api.md             （paths: "src/api/**/*"）
+├── settings.json      ← 観点2: Hooks による品質ゲート
+├── commands/          ← 観点2: レビュー・作業の標準化
+│   ├── code-review.md
+│   └── dev-issue.md
+├── agents/            ← 観点1,2: 隔離コンテキスト + レビュー専門
+│   ├── code-reviewer.md
+│   └── security-reviewer.md
+└── skills/            ← 観点1,3: オンデマンド知識 + 外部ツール
+    ├── explain-code/
+    └── aws-check/
+.mcp.json              ← 観点3: 外部ソース連携</code></pre>
+
+                <h3 id="p5-onboarding">ゼロコンフィグ・オンボーディング</h3>
+
+                <p>新メンバーは以下の3ステップだけで、シニアエンジニアと全く同じ AI 環境を手に入れます。</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                  <div class="feature-card" style="text-align: center;">
+                    <h4>Step 1</h4>
+                    <pre style="margin: 0.5rem 0;"><code>git clone &amp;&amp; cd project</code></pre>
+                    <p>CLAUDE.md + Rules が自動適用</p>
+                  </div>
+                  <div class="feature-card" style="text-align: center;">
+                    <h4>Step 2</h4>
+                    <pre style="margin: 0.5rem 0;"><code>claude</code></pre>
+                    <p>プロジェクト規約を即座に理解</p>
+                  </div>
+                  <div class="feature-card" style="text-align: center;">
+                    <h4>Step 3</h4>
+                    <pre style="margin: 0.5rem 0;"><code>/dev-issue #42</code></pre>
+                    <p>シニアと同じ手順・品質で作業開始</p>
+                  </div>
+                </div>
+
+                <h3 id="p5-plugins">Plugins による複数プロジェクトへの横展開</h3>
+
+                <p>社内の複数プロジェクトで共通のルール・エージェント・スキルがある場合、Plugins としてパッケージ化することで一括配布・アップデートが可能です。</p>
+
+                <div class="diagram-wrapper">
+                  <div class="mermaid">
+flowchart TB
+    PLG["共通 Plugin パッケージ<br/>（セキュリティルール、レビューエージェント等）"]
+    PJ1["プロジェクト A"]
+    PJ2["プロジェクト B"]
+    PJ3["プロジェクト C"]
+
+    PLG -->|"導入"| PJ1
+    PLG -->|"導入"| PJ2
+    PLG -->|"導入"| PJ3
+
+    style PLG fill:#f3e8ff,stroke:#a855f7,color:#1e293b
+    style PJ1 fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style PJ2 fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style PJ3 fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+                  </div>
+                  <div class="diagram-caption">Plugins による横展開</div>
+                </div>
+
+                <div class="callout tip">
+                  <strong>設計指針:</strong> チーム展開の本質は「1人の天才が全てを設定する」ことではなく、「チーム全員が少しずつ改善を重ねる文化を作る」ことです。CLAUDE.md や Rules への改善 PR は、コードの PR と同じくらい価値があります。
+                </div>
+
+                <!-- ============================================================
+                     成熟度モデル
+                     ============================================================ -->
+
+                <h2 id="maturity-model">5つの観点の成熟度モデル</h2>
+
+                <p>5つの観点は一度に全て導入する必要はありません。現在のチームの状況に応じて段階的に導入してください。</p>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Level</th>
+                      <th>状態</th>
+                      <th>対応する観点</th>
+                      <th>主な成果物</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Lv.0</strong></td>
+                      <td>素の Claude Code（設定なし）</td>
+                      <td>--</td>
+                      <td>なし</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Lv.1</strong></td>
+                      <td>基本設計の導入</td>
+                      <td>観点 1</td>
+                      <td>CLAUDE.md + Rules（パス別含む）</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Lv.2</strong></td>
+                      <td>品質保証の自動化</td>
+                      <td>観点 1 + 2</td>
+                      <td>Commands + Skills + Agents + Hooks</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Lv.3</strong></td>
+                      <td>外部連携の確立</td>
+                      <td>観点 1 + 2 + 3</td>
+                      <td>MCP 設定 + CLI Skills</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Lv.4</strong></td>
+                      <td>継続学習サイクルの運用</td>
+                      <td>観点 1 + 2 + 3 + 4</td>
+                      <td>学習ワークフロー + 定期的な設定更新</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Lv.5</strong></td>
+                      <td>チーム全体での運用・横展開</td>
+                      <td>観点 1 〜 5</td>
+                      <td>Plugins + オンボーディング手順 + 改善文化</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- ============================================================
+                     次のステップ
+                     ============================================================ -->
+
+                <h2 id="next-steps">次のステップ</h2>
+
+                <p>5つの観点を理解したら、具体的な実装例で手を動かしましょう。以下のページでは、これらの観点を実際のプロジェクトにどう適用するかを設定ファイル全文付きで解説しています。</p>
+
+                <div class="feature-grid">
+                  <a href="architecture.html" class="feature-card">
+                    <div class="card-icon">🏗️</div>
+                    <h4>AI駆動開発アーキテクチャ</h4>
+                    <p>基幹システムリプレイスを題材に、5つの観点を全て組み込んだグランドデザインを解説。設定ファイル全文付き。</p>
+                  </a>
+                  <a href="claude-md.html" class="feature-card">
+                    <div class="card-icon">📋</div>
+                    <h4>CLAUDE.md</h4>
+                    <p>観点1（トークン最適化）と観点4（継続学習）の中核。プロジェクト指示書の設計方法を詳しく解説。</p>
+                  </a>
+                  <a href="agents.html" class="feature-card">
+                    <div class="card-icon">🤖</div>
+                    <h4>Agents</h4>
+                    <p>観点1（隔離コンテキスト）と観点2（レビュー専門化）の実現手段。サブエージェントの設計方法を解説。</p>
+                  </a>
+                  <a href="mcp.html" class="feature-card">
+                    <div class="card-icon">🔌</div>
+                    <h4>MCP</h4>
+                    <p>観点3（外部ソース読み込み）の中核機能。外部サービスとの接続方法を解説。</p>
+                  </a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
