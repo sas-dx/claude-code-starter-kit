@@ -655,19 +655,33 @@ flowchart TB
 
                 <p><strong>パターン C: パイプライン型の詳細</strong></p>
 
-<pre><code>Stage 1: 実装（直列）
-  → コード生成 Skill
+                <div class="diagram-wrapper">
+                    <div class="mermaid">
+flowchart TB
+    S1["<b>Stage 1: 実装（直列）</b><br/>コード生成 Skill"]
+    S2A["<b>セキュリティ</b><br/>エージェント"]
+    S2B["<b>パフォーマンス</b><br/>エージェント"]
+    S2C["<b>テスト</b><br/>エージェント"]
+    S2M["<b>結果統合</b>"]
+    S3["<b>Stage 3: 修正（直列）</b><br/>指摘事項の自動修正 Skill"]
+    S4["<b>Stage 4: 仕上げ（直列）</b><br/>PR 作成 Skill"]
 
-Stage 2: レビュー（並列）
-  → セキュリティエージェント ─┐
-  → パフォーマンスエージェント ─┼→ 結果統合
-  → テストエージェント ────────┘
+    S1 -->|"Stage 2: レビュー（並列）"| S2A & S2B & S2C
+    S2A --> S2M
+    S2B --> S2M
+    S2C --> S2M
+    S2M --> S3 --> S4
 
-Stage 3: 修正（直列）
-  → 指摘事項の自動修正 Skill
-
-Stage 4: 仕上げ（直列）
-  → PR 作成 Skill</code></pre>
+    style S1 fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style S2A fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style S2B fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style S2C fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style S2M fill:#f3e8ff,stroke:#a855f7,color:#1e293b
+    style S3 fill:#e0e7ff,stroke:#6366f1,color:#1e293b
+    style S4 fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+                    </div>
+                    <div class="diagram-caption">パターン C: パイプライン型 — 直列と並列を組み合わせた段階的処理</div>
+                </div>
 
                 <p><strong>Stage 1 の Command 定義例</strong></p>
                 <pre><code class="language-markdown"># 包括開発コマンド
@@ -974,33 +988,47 @@ process.exit(0);</code></pre>
 
                 <h3 id="62-ワークフロー例">6.2 ワークフロー例</h3>
 
-<pre><code>開発者が /dev-issue #42 を実行
-  │
-  ▼
-Stage 1: Issue 分析
-  → Issue #42 の内容を解析し、実装計画を立てる
-  │
-  ▼
-Stage 2: 実装
-  → コード生成 Skill が実装
-  → [Hook] PostToolUse: 自動フォーマット
-  → [Hook] PostToolUse: 秘密情報スキャン
-  │
-  ▼
-Stage 3: 並列レビュー（Agent Teams）
-  → セキュリティレビュー ──┐
-  → パフォーマンスレビュー ─┼→ 結果統合
-  → テストカバレッジ ──────┘
-  │
-  ▼
-Stage 4: 指摘修正
-  → Critical / Warning の指摘を自動修正
-  → [Hook] PostToolUse: 自動フォーマット
-  │
-  ▼
-Stage 5: PR 作成
-  → ブランチ作成 → コミット → Push → PR 作成
-  → [Hook] PreToolUse: 保護ブランチチェック</code></pre>
+                <div class="diagram-wrapper">
+                    <div class="mermaid">
+flowchart TB
+    Start["<b>開発者が /dev-issue #42 を実行</b>"]
+    S1["<b>Stage 1: Issue 分析</b><br/>Issue #42 の内容を解析し<br/>実装計画を立てる"]
+    S2["<b>Stage 2: 実装</b><br/>コード生成 Skill が実装"]
+    H2A["🪝 PostToolUse<br/>自動フォーマット"]
+    H2B["🪝 PostToolUse<br/>秘密情報スキャン"]
+    R1["<b>セキュリティ</b><br/>レビュー"]
+    R2["<b>パフォーマンス</b><br/>レビュー"]
+    R3["<b>テスト</b><br/>カバレッジ"]
+    Merge["<b>結果統合</b>"]
+    S4["<b>Stage 4: 指摘修正</b><br/>Critical / Warning を自動修正"]
+    H4["🪝 PostToolUse<br/>自動フォーマット"]
+    S5["<b>Stage 5: PR 作成</b><br/>ブランチ作成 → コミット → Push → PR"]
+    H5["🪝 PreToolUse<br/>保護ブランチチェック"]
+
+    Start --> S1 --> S2
+    S2 --> H2A & H2B
+    H2A & H2B -->|"Stage 3: 並列レビュー"| R1 & R2 & R3
+    R1 --> Merge
+    R2 --> Merge
+    R3 --> Merge
+    Merge --> S4 --> H4 --> S5 --> H5
+
+    style Start fill:#f0f9ff,stroke:#3b82f6,color:#1e293b
+    style S1 fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style S2 fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style H2A fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style H2B fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style R1 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style R2 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style R3 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style Merge fill:#f3e8ff,stroke:#a855f7,color:#1e293b
+    style S4 fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style H4 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style S5 fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style H5 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+                    </div>
+                    <div class="diagram-caption">SIer受託開発ワークフロー — /dev-issue 実行から PR 作成まで（赤: Hook による決定的制御）</div>
+                </div>
 
                 <p>このワークフローでは、開発者は <code>/dev-issue #42</code> と入力するだけで、実装からPR作成まで一貫して実行される。各ステージで Hook による決定的制御が自動的に適用されるため、品質のバラつきが抑えられる。</p>
 
