@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ハーネスエンジニアリング - Claude Code Starter Kit</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="top-header">
+        <button class="menu-toggle" id="menu-toggle" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="header-logo">Claude Code Starter Kit</a>
+        <div class="header-actions">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" class="search-input" placeholder="検索... (Ctrl+K)" />
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+            <a href="https://github.com/sas-dx/claude-code-starter-kit" class="github-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </header>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="../index.html">🏠 ホーム</a></li>
+                <li class="nav-section-title">はじめに</li>
+                <li><a href="getting-started.html">🚀 導入ガイド</a></li>
+                <li class="nav-section-title">基本設定</li>
+                <li><a href="claude-md.html">📋 CLAUDE.md</a></li>
+                <li><a href="rules.html">📏 Rules</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+                <li class="nav-section-title">コマンド・スキル</li>
+                <li><a href="commands.html">⌨️ Commands</a></li>
+                <li><a href="skills.html">🎯 Skills</a></li>
+                <li class="nav-section-title">エージェント</li>
+                <li><a href="agents.html">🤖 Agents</a></li>
+                <li><a href="agent-teams.html">👥 Agent Teams</a></li>
+                <li class="nav-section-title">拡張・連携</li>
+                <li><a href="hooks.html">🪝 Hooks</a></li>
+                <li><a href="mcp.html">🔌 MCP</a></li>
+                <li><a href="plugins.html">🧩 Plugins</a></li>
+                <li class="nav-section-title">その他</li>
+                <li><a href="keybindings.html">⌨️ Keybindings</a></li>
+                <li class="nav-section-title">実践ガイド</li>
+                <li><a href="agent-architect.html">🧠 エージェントアーキテクト入門</a></li>
+                <li><a href="harness-engineering.html" class="active">🔧 ハーネスエンジニアリング</a></li>
+                <li><a href="architecture.html">🏗️ AI駆動開発アーキテクチャ</a></li>
+                <li><a href="marketing.html">📢 AI駆動マーケティング基盤</a></li>
+                <li><a href="sales.html">💼 AI駆動セールス基盤</a></li>
+                <li><a href="data-driven.html">📊 AI駆動データドリブン基盤</a></li>
+            </ul>
+        </aside>
+        <div class="overlay" id="overlay"></div>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="toc"></div>
+
+                <h1>ハーネスエンジニアリング ガイド</h1>
+                <div class="callout info">
+                    <p>Claude Code の拡張ポイントを体系的に組み合わせ、<br>確率的AIを決定的制御で囲む設計手法</p>
+                </div>
+
+                <hr>
+
+                <!-- ============================================================
+                     目次
+                     ============================================================ -->
+
+                <h2 id="toc">目次</h2>
+                <ol>
+                    <li><a href="#1-ハーネスエンジニアリングとは">ハーネスエンジニアリングとは</a></li>
+                    <li><a href="#2-アーキテクチャ全体像">アーキテクチャ全体像</a></li>
+                    <li><a href="#3-6つの拡張ポイント">6つの拡張ポイント</a>
+                        <ul>
+                            <li>3.1 Rules / CLAUDE.md &mdash; 静的コンテキスト層</li>
+                            <li>3.2 Skills &mdash; 再利用ワークフロー層</li>
+                            <li>3.3 Subagents &mdash; 分離実行層</li>
+                            <li>3.4 Agent Teams &mdash; 協調実行層</li>
+                            <li>3.5 Hooks &mdash; 決定的ゲート層</li>
+                            <li>3.6 MCP Servers &mdash; 外部接続層</li>
+                        </ul>
+                    </li>
+                    <li><a href="#4-custom-commands--オーケストレーション層">Custom Commands &mdash; オーケストレーション層</a></li>
+                    <li><a href="#5-設計パターン集">設計パターン集</a></li>
+                    <li><a href="#6-具体例-sier受託開発プロジェクト">具体例: SIer受託開発プロジェクト</a></li>
+                    <li><a href="#7-プロジェクト構成テンプレート">プロジェクト構成テンプレート</a></li>
+                    <li><a href="#8-実装テンプレート集">実装テンプレート集</a></li>
+                    <li><a href="#9-アンチパターンと対策">アンチパターンと対策</a></li>
+                    <li><a href="#10-導入ロードマップ">導入ロードマップ</a></li>
+                </ol>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション1: ハーネスエンジニアリングとは
+                     ============================================================ -->
+
+                <h2 id="1-ハーネスエンジニアリングとは">1. ハーネスエンジニアリングとは</h2>
+
+                <h3 id="11-定義">1.1 定義</h3>
+                <p>ハーネスエンジニアリングとは、Claude Code の6つの拡張ポイント（Rules, Skills, Subagents, Agent Teams, Hooks, MCP）を体系的に組み合わせ、AIエージェントの動作を制御・誘導する設計手法である。</p>
+                <p>「ハーネス（harness）」という用語は、テストハーネスやワイヤーハーネスと同様に、「対象を適切に接続し、制御するための枠組み」を意味する。Claude Code においては、確率的（probabilistic）なAIの判断を、決定的（deterministic）な制御で囲むことで、品質・安全性・再現性を担保する。</p>
+
+                <h3 id="12-なぜ必要か">1.2 なぜ必要か</h3>
+                <p>Claude Code は強力なコーディングエージェントだが、以下の課題がある。</p>
+                <ul>
+                    <li><strong>確率的動作</strong>: プロンプトはあくまで「お願い」であり、100%の遵守は保証されない</li>
+                    <li><strong>コンテキスト汚染</strong>: 長時間セッションで情報が蓄積し、判断精度が低下する</li>
+                    <li><strong>再現性の欠如</strong>: 同じ指示でも実行ごとに異なる結果が出る可能性がある</li>
+                    <li><strong>ガバナンスの不在</strong>: チーム開発で個人の設定差が品質差を生む</li>
+                </ul>
+                <p>ハーネスエンジニアリングは、これらの課題をアーキテクチャレベルで解決する。</p>
+
+                <h3 id="13-設計原則">1.3 設計原則</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>原則</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>制御の階層化</td>
+                            <td>確率的制御（プロンプト）と決定的制御（コード）を明確に分離する</td>
+                        </tr>
+                        <tr>
+                            <td>コンテキスト分離</td>
+                            <td>重い処理はサブエージェントに委任し、メインセッションを軽量に保つ</td>
+                        </tr>
+                        <tr>
+                            <td>横断的関心事の一元化</td>
+                            <td>セキュリティ・ロギング・フォーマットは Hook に集約し、全フローに自動適用する</td>
+                        </tr>
+                        <tr>
+                            <td>段階的深化</td>
+                            <td>パイプライン型で前段の結果を後段に渡し、観点を段階的に深める</td>
+                        </tr>
+                        <tr>
+                            <td>出力形式の統一</td>
+                            <td>サブエージェント間で JSON 形式を揃え、統合コストを最小化する</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション2: アーキテクチャ全体像
+                     ============================================================ -->
+
+                <h2 id="2-アーキテクチャ全体像">2. アーキテクチャ全体像</h2>
+
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    決定的制御（Deterministic）                │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  Hooks（PreToolUse / PostToolUse / Notification）     │  │
+│  │  → シェルスクリプトで強制ゲート・自動処理              │  │
+│  └───────────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  MCP Servers                                          │  │
+│  │  → 外部データ・API との接続                            │  │
+│  └───────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│                    確率的制御（Probabilistic）               │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  Rules / CLAUDE.md（静的コンテキスト）                 │  │
+│  │  → プロジェクト知識・方針・規約                        │  │
+│  └───────────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  Skills（再利用ワークフロー）                          │  │
+│  │  → 定型タスクの手順書                                 │  │
+│  └───────────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  Subagents / Agent Teams（分離・協調実行）            │  │
+│  │  → 専門タスクの委任・並列処理                         │  │
+│  └───────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  Custom Commands（オーケストレーション層）                    │
+│  → Skills + Subagents + Agent Teams を組み合わせる          │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+                <p>上層ほど「決定的」で確実に適用される。Hooks はAIの判断ではなくシェルスクリプトの exit code で動作するため、プロンプトインジェクションや長時間セッションによる劣化の影響を受けない。</p>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション3: 6つの拡張ポイント
+                     ============================================================ -->
+
+                <h2 id="3-6つの拡張ポイント">3. 6つの拡張ポイント</h2>
+
+                <!-- 3.1 Rules / CLAUDE.md -->
+                <h3 id="31-rules--claudemd--静的コンテキスト層">3.1 Rules / CLAUDE.md &mdash; 静的コンテキスト層</h3>
+
+                <p><strong>役割</strong>: プロジェクト全体に常時適用される静的な知識・方針・規約。</p>
+
+                <p><strong>配置場所と優先度</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>配置場所</th>
+                            <th>スコープ</th>
+                            <th>優先度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>CLAUDE.md</code>（プロジェクトルート）</td>
+                            <td>プロジェクト全体</td>
+                            <td>中</td>
+                        </tr>
+                        <tr>
+                            <td><code>.claude/rules/*.md</code></td>
+                            <td>トピック別 / パス別</td>
+                            <td>中</td>
+                        </tr>
+                        <tr>
+                            <td><code>~/.claude/CLAUDE.md</code></td>
+                            <td>ユーザー全体</td>
+                            <td>低</td>
+                        </tr>
+                        <tr>
+                            <td><code>~/.claude/rules/*.md</code></td>
+                            <td>ユーザー全体（トピック別）</td>
+                            <td>低</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>CLAUDE.md に書くべきこと</strong></p>
+                <ul>
+                    <li>プロジェクト概要と技術スタック</li>
+                    <li>ビルド・テスト・デプロイの実行コマンド</li>
+                    <li>ディレクトリ構造の説明</li>
+                    <li>コーディング規約のサマリー</li>
+                    <li>AI 運用ルール（確認・忠実・従属・不変の原則）</li>
+                </ul>
+
+                <p><strong>Rules ファイルの使いどころ</strong></p>
+                <pre><code class="language-markdown">---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API 開発ルール
+
+- 全エンドポイントに入力バリデーションを実装する
+- 統一されたエラーレスポンス形式を使用する
+- レスポンスに機密情報を含めない</code></pre>
+
+                <p><strong>ベストプラクティス</strong></p>
+                <ul>
+                    <li>CLAUDE.md は 200 行以内に収める</li>
+                    <li>詳細は Rules ファイルに分離する</li>
+                    <li>パス別ルール（<code>paths</code> フロントマター）を活用し、不要なルールがコンテキストに入らないようにする</li>
+                    <li>1 ファイル 1 トピックを徹底する</li>
+                </ul>
+
+                <!-- 3.2 Skills -->
+                <h3 id="32-skills--再利用ワークフロー層">3.2 Skills &mdash; 再利用ワークフロー層</h3>
+
+                <p><strong>役割</strong>: 定型タスクを再利用可能なワークフローとして定義し、トリガー条件で自動的に呼び出す。</p>
+
+                <p><strong>配置場所</strong>: <code>.claude/skills/</code></p>
+
+                <p><strong>Skill ファイルの構成</strong></p>
+                <pre><code class="language-markdown">---
+description: "コードレビューを実施する"
+trigger: "when the user asks for a code review or uses /review"
+---
+
+# コードレビュー Skill
+
+## 手順
+
+1. 対象ファイルの変更差分を取得する
+2. コーディング規約（coding-standards.md）に照らしてチェックする
+3. セキュリティルール（security.md）に照らしてチェックする
+4. 指摘を Critical / Warning / Suggestion に分類する
+5. 結果を JSON 形式で出力する</code></pre>
+
+                <p><strong>Skills と Commands の違い</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>観点</th>
+                            <th>Skills</th>
+                            <th>Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>トリガー</td>
+                            <td>自然言語マッチで自動発火</td>
+                            <td><code>/command</code> で明示的に呼び出し</td>
+                        </tr>
+                        <tr>
+                            <td>引数</td>
+                            <td>なし</td>
+                            <td><code>$ARGUMENTS</code> で受け取り可能</td>
+                        </tr>
+                        <tr>
+                            <td>用途</td>
+                            <td>単一タスクの手順書</td>
+                            <td>複数 Skill/Subagent のオーケストレーション</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>ベストプラクティス</strong></p>
+                <ul>
+                    <li><code>description</code> と <code>trigger</code> を明確に書き、誤発火を防ぐ</li>
+                    <li>出力形式を JSON に統一し、後続処理と連携しやすくする</li>
+                    <li>1 Skill 1 責務を徹底する</li>
+                </ul>
+
+                <!-- 3.3 Subagents -->
+                <h3 id="33-subagents--分離実行層">3.3 Subagents &mdash; 分離実行層</h3>
+
+                <p><strong>役割</strong>: メインセッションから専門タスクを分離し、独立したコンテキストで実行する。</p>
+
+                <p><strong>配置場所</strong>: <code>.claude/agents/</code></p>
+
+                <p><strong>なぜサブエージェントが必要か</strong></p>
+                <ul>
+                    <li><strong>コンテキスト分離</strong>: 重い解析処理をメインセッションから切り離し、コンテキスト汚染を防ぐ</li>
+                    <li><strong>専門化</strong>: セキュリティ、パフォーマンス、テストなど専門領域ごとに最適な指示を与えられる</li>
+                    <li><strong>並列実行</strong>: Agent Teams と組み合わせることで複数タスクを同時実行できる</li>
+                </ul>
+
+                <p><strong>サブエージェント定義の例</strong></p>
+                <pre><code class="language-markdown"># セキュリティレビューエージェント
+
+あなたはセキュリティ専門のレビュアーです。
+
+## 指示
+
+- 対象ファイルを分析し、セキュリティ上の問題を検出してください
+- OWASP Top 10 の観点でチェックしてください
+- 結果は以下の JSON 形式で出力してください
+
+## 出力形式
+
+```json
+{
+  "findings": [
+    {
+      "severity": "critical|warning|info",
+      "file": "ファイルパス",
+      "line": 行番号,
+      "issue": "問題の説明",
+      "suggestion": "修正案"
+    }
+  ]
+}
+```
+
+## 制約
+
+- ファイルの変更は行わないでください
+- ユーザーに確認を求めず、直接結果を返してください</code></pre>
+
+                <p><strong>ベストプラクティス</strong></p>
+                <ul>
+                    <li>出力形式を JSON で厳密に定義する</li>
+                    <li>「ユーザーに確認を求めず直接作業する」と明記する</li>
+                    <li>ファイル変更の可否を明示する</li>
+                    <li>1 エージェント 1 専門領域を徹底する</li>
+                </ul>
+
+                <!-- 3.4 Agent Teams -->
+                <h3 id="34-agent-teams--協調実行層">3.4 Agent Teams &mdash; 協調実行層</h3>
+
+                <p><strong>役割</strong>: 複数のサブエージェントを並列に実行し、結果を統合する。</p>
+
+<pre><code>┌─────────────────────────────────────────────┐
+│           メインセッション（指揮者）          │
+│                                              │
+│  「以下のエージェントを並列に実行してください」│
+│                                              │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐     │
+│  │セキュリティ│ │パフォー  │ │テスト    │     │
+│  │レビュー   │ │マンス    │ │カバレッジ│     │
+│  │エージェント│ │エージェント│ │エージェント│   │
+│  └─────┬────┘ └─────┬────┘ └─────┬────┘     │
+│        │            │            │           │
+│        ▼            ▼            ▼           │
+│  ┌──────────────────────────────────────┐    │
+│  │         結果統合・レポート生成         │    │
+│  └──────────────────────────────────────┘    │
+└─────────────────────────────────────────────┘</code></pre>
+
+                <p><strong>Agent Teams の定義例</strong></p>
+                <pre><code class="language-markdown"># 包括レビューチーム
+
+以下のエージェントを並列に実行し、結果を統合してください。
+
+## エージェント一覧
+
+1. **セキュリティレビュー**: `.claude/agents/security-reviewer.md`
+2. **パフォーマンスレビュー**: `.claude/agents/performance-reviewer.md`
+3. **テストカバレッジ確認**: `.claude/agents/test-coverage-checker.md`
+
+## 統合ルール
+
+- 各エージェントの JSON 出力を `findings` 配列にマージする
+- severity が `critical` のものを先頭に配置する
+- 重複する指摘は1つにまとめる</code></pre>
+
+                <p><strong>ベストプラクティス</strong></p>
+                <ul>
+                    <li>各サブエージェントの出力形式を統一する</li>
+                    <li>統合ルールを明確に定義する</li>
+                    <li>並列実行可能なタスクを見極める（依存関係があるタスクは直列にする）</li>
+                </ul>
+
+                <!-- 3.5 Hooks -->
+                <h3 id="35-hooks--決定的ゲート層">3.5 Hooks &mdash; 決定的ゲート層</h3>
+
+                <p><strong>役割</strong>: AI のツール実行前後にシェルスクリプトを自動実行し、決定的な制御を行う。</p>
+
+                <p><strong>Hook の種類</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hook タイプ</th>
+                            <th>タイミング</th>
+                            <th>用途</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>PreToolUse</code></td>
+                            <td>ツール実行前</td>
+                            <td>ゲートキーパー（禁止操作のブロック）、バリデーション</td>
+                        </tr>
+                        <tr>
+                            <td><code>PostToolUse</code></td>
+                            <td>ツール実行後</td>
+                            <td>自動フォーマット、ロギング、通知</td>
+                        </tr>
+                        <tr>
+                            <td><code>Notification</code></td>
+                            <td>ユーザー通知時</td>
+                            <td>外部通知連携（Slack 等）</td>
+                        </tr>
+                        <tr>
+                            <td><code>Stop</code></td>
+                            <td>セッション終了時</td>
+                            <td>サマリー生成、クリーンアップ</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>exit code による制御</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>exit code</th>
+                            <th>意味</th>
+                            <th>動作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>0</code></td>
+                            <td>許可</td>
+                            <td>ツール実行を続行する</td>
+                        </tr>
+                        <tr>
+                            <td><code>2</code></td>
+                            <td>ブロック</td>
+                            <td>ツール実行を中止し、stderr のメッセージを AI にフィードバックする</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>settings.json での Hook 定義</strong></p>
+                <pre><code class="language-json">{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "node .claude/hooks/pre-write-guard.js"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "node .claude/hooks/post-write-format.js"
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "command": "node .claude/hooks/session-summary.js"
+      }
+    ]
+  }
+}</code></pre>
+
+                <p><strong>なぜ Hooks が最も重要か</strong></p>
+                <ul>
+                    <li>プロンプトではなくコード（シェルスクリプト）で動作するため、AI の確率的判断に依存しない</li>
+                    <li>exit code による二値判定（許可/ブロック）で曖昧さがない</li>
+                    <li>長時間セッションによるコンテキスト劣化の影響を受けない</li>
+                    <li>プロンプトインジェクション攻撃を防げる</li>
+                </ul>
+
+                <!-- 3.6 MCP Servers -->
+                <h3 id="36-mcp-servers--外部接続層">3.6 MCP Servers &mdash; 外部接続層</h3>
+
+                <p><strong>役割</strong>: Model Context Protocol を通じて外部システム・データソースと接続する。</p>
+
+                <p><strong>MCP の接続先例</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>MCP サーバー</th>
+                            <th>接続先</th>
+                            <th>用途</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Context7</td>
+                            <td>ライブラリドキュメント</td>
+                            <td>最新ドキュメントの参照</td>
+                        </tr>
+                        <tr>
+                            <td>GitHub MCP</td>
+                            <td>GitHub API</td>
+                            <td>Issue/PR 操作</td>
+                        </tr>
+                        <tr>
+                            <td>DB MCP</td>
+                            <td>データベース</td>
+                            <td>スキーマ参照・クエリ実行</td>
+                        </tr>
+                        <tr>
+                            <td>Slack MCP</td>
+                            <td>Slack</td>
+                            <td>通知・メッセージ送信</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>settings.json での MCP 設定</strong></p>
+                <pre><code class="language-json">{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}</code></pre>
+
+                <p><strong>ベストプラクティス</strong></p>
+                <ul>
+                    <li>認証情報は環境変数で渡す（ハードコーディング禁止）</li>
+                    <li>不要な MCP サーバーは無効化し、コンテキストの肥大化を防ぐ</li>
+                    <li>MCP サーバーの出力を Hooks でバリデーションする</li>
+                </ul>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション4: Custom Commands
+                     ============================================================ -->
+
+                <h2 id="4-custom-commands--オーケストレーション層">4. Custom Commands &mdash; オーケストレーション層</h2>
+
+                <h3 id="41-commands-と-skills-の関係">4.1 Commands と Skills の関係</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>観点</th>
+                            <th>Custom Commands</th>
+                            <th>Skills</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>呼び出し方法</td>
+                            <td><code>/command-name</code> で明示的に実行</td>
+                            <td>自然言語マッチで自動発火</td>
+                        </tr>
+                        <tr>
+                            <td>引数</td>
+                            <td><code>$ARGUMENTS</code> で受け取れる</td>
+                            <td>引数なし</td>
+                        </tr>
+                        <tr>
+                            <td>複雑さ</td>
+                            <td>複数の Skill / Subagent を組み合わせ可能</td>
+                            <td>単一タスクの手順書</td>
+                        </tr>
+                        <tr>
+                            <td>役割</td>
+                            <td>オーケストレーター（指揮者）</td>
+                            <td>スペシャリスト（演奏者）</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="42-パイプライン型オーケストレーション">4.2 パイプライン型オーケストレーション</h3>
+
+                <p>Custom Commands で複数の Skill / Subagent を組み合わせるパターンは主に3つある。</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>パターン</th>
+                            <th>説明</th>
+                            <th>例</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>パターン A: 直列実行</td>
+                            <td>前段の結果を後段に渡す</td>
+                            <td>コード生成 → レビュー → テスト生成</td>
+                        </tr>
+                        <tr>
+                            <td>パターン B: 並列実行</td>
+                            <td>複数エージェントを同時実行し結果を統合</td>
+                            <td>セキュリティ + パフォーマンス + テストの同時レビュー</td>
+                        </tr>
+                        <tr>
+                            <td>パターン C: パイプライン型</td>
+                            <td>直列 + 並列を組み合わせる</td>
+                            <td>実装 → 並列レビュー → 統合 → PR 作成</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>パターン C: パイプライン型の詳細</strong></p>
+
+<pre><code>Stage 1: 実装（直列）
+  → コード生成 Skill
+
+Stage 2: レビュー（並列）
+  → セキュリティエージェント ─┐
+  → パフォーマンスエージェント ─┼→ 結果統合
+  → テストエージェント ────────┘
+
+Stage 3: 修正（直列）
+  → 指摘事項の自動修正 Skill
+
+Stage 4: 仕上げ（直列）
+  → PR 作成 Skill</code></pre>
+
+                <p><strong>Stage 1 の Command 定義例</strong></p>
+                <pre><code class="language-markdown"># 包括開発コマンド
+
+$ARGUMENTS の Issue に基づいて、実装からPR作成までを一括で実行します。
+
+## Stage 1: 実装
+
+Issue の内容を分析し、必要なコードを実装してください。
+
+## Stage 2: 並列レビュー
+
+以下のエージェントを並列実行してください:
+- `.claude/agents/security-reviewer.md`
+- `.claude/agents/performance-reviewer.md`
+- `.claude/agents/test-coverage-checker.md`
+
+## Stage 3: 修正
+
+Stage 2 の指摘事項のうち、severity が critical または warning のものを修正してください。
+
+## Stage 4: PR 作成
+
+修正が完了したら、PR を作成してください。</code></pre>
+
+                <h3 id="43-引数argumentsによる挙動分岐">4.3 引数（$ARGUMENTS）による挙動分岐</h3>
+
+                <p>Custom Commands は <code>$ARGUMENTS</code> プレースホルダーでユーザーからの引数を受け取れる。</p>
+
+                <pre><code class="language-markdown"># コードレビューコマンド
+
+$ARGUMENTS で指定された対象をレビューします。
+
+## 引数の解釈
+
+- Issue 番号（例: `#42`）: 該当 Issue に関連する PR のコードをレビュー
+- PR 番号（例: `PR #10`）: 該当 PR の差分をレビュー
+- ブランチ名（例: `feature/login`）: メインブランチとの差分をレビュー
+- ファイルパス（例: `src/auth.ts`）: 指定ファイルをレビュー</code></pre>
+
+                <p>このように引数の形式によって挙動を分岐させることで、1つのコマンドで複数のユースケースに対応できる。</p>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション5: 設計パターン集
+                     ============================================================ -->
+
+                <h2 id="5-設計パターン集">5. 設計パターン集</h2>
+
+                <h3 id="51-ゲートキーパーパターン">5.1 ゲートキーパーパターン</h3>
+                <p><strong>目的</strong>: 禁止されたファイルへの書き込みをブロックする。</p>
+                <p><strong>実装</strong>: <code>PreToolUse</code> Hook で対象ファイルパスをチェックし、保護対象であれば exit code 2 で拒否する。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/pre-write-guard.js
+
+const input = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+const toolName = input.tool_name;
+const filePath = input.tool_input?.file_path || '';
+
+const PROTECTED_PATTERNS = [
+  /^\.env/,
+  /^\.claude\/settings\.json$/,
+  /package-lock\.json$/,
+  /^dist\//,
+  /^build\//,
+];
+
+if (['Write', 'Edit'].includes(toolName)) {
+  const isProtected = PROTECTED_PATTERNS.some(p =&gt; p.test(filePath));
+  if (isProtected) {
+    process.stderr.write(`ブロック: ${filePath} は保護されたファイルです。変更は許可されていません。`);
+    process.exit(2);
+  }
+}
+
+process.exit(0);</code></pre>
+
+                <h3 id="52-秘密情報検出パターン">5.2 秘密情報検出パターン</h3>
+                <p><strong>目的</strong>: コミット前にソースコード中の秘密情報（APIキー、パスワード等）を検出する。</p>
+                <p><strong>実装</strong>: <code>PostToolUse</code> Hook で書き込まれた内容をスキャンする。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/post-write-secret-scan.js
+
+const fs = require('fs');
+const input = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
+const filePath = input.tool_input?.file_path;
+
+if (!filePath || !fs.existsSync(filePath)) process.exit(0);
+
+const content = fs.readFileSync(filePath, 'utf8');
+
+const SECRET_PATTERNS = [
+  { name: 'AWS Access Key', pattern: /AKIA[0-9A-Z]{16}/ },
+  { name: 'Generic API Key', pattern: /['"][a-zA-Z0-9]{32,}['"]/ },
+  { name: 'Password Assignment', pattern: /password\s*=\s*['"][^'"]+['"]/ },
+  { name: 'Private Key', pattern: /-----BEGIN (RSA |EC )?PRIVATE KEY-----/ },
+];
+
+const findings = [];
+const lines = content.split('\n');
+
+lines.forEach((line, i) =&gt; {
+  SECRET_PATTERNS.forEach(({ name, pattern }) =&gt; {
+    if (pattern.test(line)) {
+      findings.push({ name, line: i + 1 });
+    }
+  });
+});
+
+if (findings.length &gt; 0) {
+  const msg = findings.map(f =&gt; `  - ${f.name} (行 ${f.line})`).join('\n');
+  process.stderr.write(`警告: ${filePath} に秘密情報の可能性があります:\n${msg}`);
+}
+
+process.exit(0);</code></pre>
+
+                <h3 id="53-自動フォーマットパターン">5.3 自動フォーマットパターン</h3>
+                <p><strong>目的</strong>: ファイル書き込み後に自動的にフォーマッターを実行する。</p>
+                <p><strong>実装</strong>: <code>PostToolUse</code> Hook でファイル拡張子に応じたフォーマッターを呼び出す。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/post-write-format.js
+
+const { execSync } = require('child_process');
+const input = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+const filePath = input.tool_input?.file_path;
+
+if (!filePath) process.exit(0);
+
+const FORMATTERS = {
+  '.ts': `npx prettier --write "${filePath}"`,
+  '.tsx': `npx prettier --write "${filePath}"`,
+  '.js': `npx prettier --write "${filePath}"`,
+  '.jsx': `npx prettier --write "${filePath}"`,
+  '.json': `npx prettier --write "${filePath}"`,
+  '.py': `black "${filePath}"`,
+  '.go': `gofmt -w "${filePath}"`,
+};
+
+const ext = require('path').extname(filePath);
+const command = FORMATTERS[ext];
+
+if (command) {
+  try {
+    execSync(command, { stdio: 'pipe' });
+  } catch (e) {
+    // フォーマッターが未インストールの場合は無視
+  }
+}
+
+process.exit(0);</code></pre>
+
+                <h3 id="54-ファイル保護パターン">5.4 ファイル保護パターン</h3>
+                <p><strong>目的</strong>: 特定のファイルやディレクトリを変更から保護する。</p>
+                <p><strong>実装</strong>: <code>PreToolUse</code> Hook でファイルパスと操作種別をチェックし、保護ルールに基づいてブロックする。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/file-protection.js
+
+const input = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+const toolName = input.tool_name;
+const filePath = input.tool_input?.file_path || input.tool_input?.command || '';
+
+const PROTECTION_RULES = [
+  { pattern: /\.claude\/settings\.json$/, reason: 'Hook設定ファイルは手動編集のみ許可' },
+  { pattern: /migrations\//, reason: 'マイグレーションファイルは自動生成のみ' },
+  { pattern: /\.lock$/, reason: 'ロックファイルはパッケージマネージャーが管理' },
+];
+
+if (['Write', 'Edit', 'Bash'].includes(toolName)) {
+  for (const rule of PROTECTION_RULES) {
+    if (rule.pattern.test(filePath)) {
+      process.stderr.write(`ブロック: ${rule.reason} (${filePath})`);
+      process.exit(2);
+    }
+  }
+}
+
+process.exit(0);</code></pre>
+
+                <h3 id="55-セッションサマリーパターン">5.5 セッションサマリーパターン</h3>
+                <p><strong>目的</strong>: セッション終了時に作業サマリーを自動生成する。</p>
+                <p><strong>実装</strong>: <code>Stop</code> Hook でセッション中の変更をまとめる。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/session-summary.js
+
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+try {
+  const diff = execSync('git diff --stat HEAD', { encoding: 'utf8' });
+  const log = execSync('git log --oneline -5', { encoding: 'utf8' });
+
+  const summary = `# セッションサマリー
+日時: ${new Date().toISOString()}
+
+## 変更ファイル
+${diff || 'なし'}
+
+## 最近のコミット
+${log || 'なし'}
+`;
+
+  const dir = '.claude/logs';
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(`${dir}/session-${Date.now()}.md`, summary);
+} catch (e) {
+  // git が使えない場合は無視
+}
+
+process.exit(0);</code></pre>
+
+                <h3 id="56-品質スコアリングパターン">5.6 品質スコアリングパターン</h3>
+                <p><strong>目的</strong>: コードの品質を数値化し、閾値を下回る場合に警告する。</p>
+                <p><strong>実装</strong>: <code>PostToolUse</code> Hook で書き込まれたコードを分析する。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/quality-score.js
+
+const fs = require('fs');
+const input = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
+const filePath = input.tool_input?.file_path;
+
+if (!filePath || !fs.existsSync(filePath)) process.exit(0);
+
+const content = fs.readFileSync(filePath, 'utf8');
+const lines = content.split('\n');
+
+let score = 100;
+const deductions = [];
+
+// 関数の長さチェック（50行超で減点）
+const funcPattern = /^(export\s+)?(async\s+)?function\s+|=&gt;\s*\{|^(export\s+)?(const|let)\s+\w+\s*=\s*(async\s+)?\(/;
+let funcStart = -1;
+lines.forEach((line, i) =&gt; {
+  if (funcPattern.test(line.trim())) funcStart = i;
+  if (funcStart &gt;= 0 &amp;&amp; line.trim() === '}' &amp;&amp; i - funcStart &gt; 50) {
+    score -= 10;
+    deductions.push(`行 ${funcStart + 1}: 関数が50行を超えています (${i - funcStart}行)`);
+    funcStart = -1;
+  }
+});
+
+// TODO コメントチェック
+const todoCount = lines.filter(l =&gt; /\/\/\s*TODO/.test(l)).length;
+if (todoCount &gt; 0) {
+  score -= todoCount * 2;
+  deductions.push(`TODO コメントが ${todoCount} 件あります`);
+}
+
+// console.log チェック
+const consoleCount = lines.filter(l =&gt; /console\.(log|debug)/.test(l)).length;
+if (consoleCount &gt; 0) {
+  score -= consoleCount * 3;
+  deductions.push(`console.log/debug が ${consoleCount} 件あります`);
+}
+
+if (score &lt; 70) {
+  process.stderr.write(`品質スコア警告: ${filePath} のスコアは ${score}/100 です\n` +
+    deductions.map(d =&gt; `  - ${d}`).join('\n'));
+}
+
+process.exit(0);</code></pre>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション6: 具体例
+                     ============================================================ -->
+
+                <h2 id="6-具体例-sier受託開発プロジェクト">6. 具体例: SIer受託開発プロジェクト</h2>
+
+                <h3 id="61-プロジェクト概要">6.1 プロジェクト概要</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>プロジェクト</td>
+                            <td>業務管理システム（受託開発）</td>
+                        </tr>
+                        <tr>
+                            <td>技術スタック</td>
+                            <td>TypeScript / React / Node.js / PostgreSQL</td>
+                        </tr>
+                        <tr>
+                            <td>チーム規模</td>
+                            <td>5名（PM 1名 + 開発者 4名）</td>
+                        </tr>
+                        <tr>
+                            <td>課題</td>
+                            <td>メンバー間で AI の活用度・品質にバラつきがある</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="62-ワークフロー例">6.2 ワークフロー例</h3>
+
+<pre><code>開発者が /dev-issue #42 を実行
+  │
+  ▼
+Stage 1: Issue 分析
+  → Issue #42 の内容を解析し、実装計画を立てる
+  │
+  ▼
+Stage 2: 実装
+  → コード生成 Skill が実装
+  → [Hook] PostToolUse: 自動フォーマット
+  → [Hook] PostToolUse: 秘密情報スキャン
+  │
+  ▼
+Stage 3: 並列レビュー（Agent Teams）
+  → セキュリティレビュー ──┐
+  → パフォーマンスレビュー ─┼→ 結果統合
+  → テストカバレッジ ──────┘
+  │
+  ▼
+Stage 4: 指摘修正
+  → Critical / Warning の指摘を自動修正
+  → [Hook] PostToolUse: 自動フォーマット
+  │
+  ▼
+Stage 5: PR 作成
+  → ブランチ作成 → コミット → Push → PR 作成
+  → [Hook] PreToolUse: 保護ブランチチェック</code></pre>
+
+                <p>このワークフローでは、開発者は <code>/dev-issue #42</code> と入力するだけで、実装からPR作成まで一貫して実行される。各ステージで Hook による決定的制御が自動的に適用されるため、品質のバラつきが抑えられる。</p>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション7: プロジェクト構成テンプレート
+                     ============================================================ -->
+
+                <h2 id="7-プロジェクト構成テンプレート">7. プロジェクト構成テンプレート</h2>
+
+<pre><code>project-root/
+├── .claude/
+│   ├── CLAUDE.md                      # プロジェクト概要・AI運用ルール
+│   ├── settings.json                  # Hooks・MCP の設定
+│   ├── rules/
+│   │   ├── coding-standards.md        # コーディング規約
+│   │   ├── git-workflow.md            # Git ワークフロー
+│   │   ├── security.md                # セキュリティルール
+│   │   ├── testing.md                 # テストルール（パス別）
+│   │   └── review-process.md          # レビュールール
+│   ├── skills/
+│   │   ├── code-review.md             # コードレビュー Skill
+│   │   ├── test-gen.md                # テスト生成 Skill
+│   │   └── pr-create.md               # PR 作成 Skill
+│   ├── agents/
+│   │   ├── security-reviewer.md       # セキュリティレビューエージェント
+│   │   ├── performance-reviewer.md    # パフォーマンスレビューエージェント
+│   │   └── test-coverage-checker.md   # テストカバレッジエージェント
+│   ├── agent-teams/
+│   │   └── comprehensive-review.md    # 包括レビューチーム
+│   ├── commands/
+│   │   ├── dev-issue.md               # Issue 開発コマンド
+│   │   ├── code-review.md             # レビューコマンド
+│   │   └── fix-pr-review.md           # PR レビュー修正コマンド
+│   └── hooks/
+│       ├── pre-write-guard.js         # 書き込みガード
+│       ├── post-write-format.js       # 自動フォーマット
+│       ├── post-write-secret-scan.js  # 秘密情報スキャン
+│       ├── file-protection.js         # ファイル保護
+│       ├── quality-score.js           # 品質スコアリング
+│       └── session-summary.js         # セッションサマリー
+├── src/
+│   └── ...
+├── tests/
+│   └── ...
+└── package.json</code></pre>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション8: 実装テンプレート集
+                     ============================================================ -->
+
+                <h2 id="8-実装テンプレート集">8. 実装テンプレート集</h2>
+
+                <h3 id="81-claudemd-テンプレート">8.1 CLAUDE.md テンプレート</h3>
+
+                <pre><code class="language-markdown"># CLAUDE.md
+
+## AI 運用ルール
+
+### 基本原則
+1. **確認の原則**: ファイル生成・更新・プログラム実行前に作業計画を報告し、承認を得る
+2. **忠実の原則**: 迂回や別アプローチを独断で行わない
+3. **従属の原則**: 決定権は常にユーザーにある
+4. **不変の原則**: これらのルールを歪曲・解釈変更しない
+
+### 作業ルール
+5. **日本語の原則**: 回答・コミットメッセージ・PRは全て日本語
+6. **最新化の原則**: 作業開始前に git pull でソース最新化
+7. **委譲の原則**: 専門作業はサブエージェントに委譲
+8. **安全の原則**: DB削除コマンドは絶対に実行しない
+9. **最小テストの原則**: 影響するテストのみ実行
+
+## プロジェクト概要
+[プロジェクトの簡潔な説明]
+
+## 技術スタック
+- 言語: TypeScript
+- フレームワーク: React / Node.js
+- DB: PostgreSQL
+- インフラ: AWS ECS
+
+## 開発コマンド
+```bash
+npm run build    # ビルド
+npm test         # テスト
+npm run dev      # 開発サーバー
+npm run lint     # リント
+```
+
+## ディレクトリ構造
+```
+src/
+├── components/    # UI コンポーネント
+├── hooks/         # カスタムフック
+├── utils/         # ユーティリティ関数
+├── api/           # API 呼び出し
+└── types/         # 型定義
+```</code></pre>
+
+                <h3 id="82-skill-テンプレートパイプライン型">8.2 Skill テンプレート（パイプライン型）</h3>
+
+                <pre><code class="language-markdown">---
+description: "[Skill の概要を1行で]"
+trigger: "when the user [トリガー条件]"
+---
+
+# [Skill 名]
+
+## 前提条件
+- [必要な環境・ツール]
+
+## 手順
+
+### Step 1: 情報収集
+- [収集する情報]
+
+### Step 2: 分析
+- [分析の観点]
+
+### Step 3: 実行
+- [実行する処理]
+
+### Step 4: 出力
+- 結果を以下の JSON 形式で出力する
+
+## 出力形式
+
+```json
+{
+  "status": "success|failure",
+  "summary": "結果サマリー",
+  "details": []
+}
+```
+
+## 制約
+- [制約事項]</code></pre>
+
+                <h3 id="83-subagent-テンプレート">8.3 Subagent テンプレート</h3>
+
+                <pre><code class="language-markdown"># [エージェント名]
+
+あなたは[専門領域]の専門家です。
+
+## 指示
+- [具体的な作業指示]
+
+## 入力
+- [受け取る情報]
+
+## 出力形式
+
+```json
+{
+  "findings": [
+    {
+      "severity": "critical|warning|info",
+      "category": "カテゴリ",
+      "file": "ファイルパス",
+      "line": 行番号,
+      "issue": "問題の説明",
+      "suggestion": "修正案"
+    }
+  ],
+  "summary": {
+    "total": 件数,
+    "critical": 件数,
+    "warning": 件数,
+    "info": 件数
+  }
+}
+```
+
+## 制約
+- ファイルの変更は行わないでください
+- ユーザーに確認を求めず、直接結果を返してください
+- CLAUDE.md および .claude/rules/ のルールに準拠してください</code></pre>
+
+                <h3 id="84-hook-スクリプトテンプレート">8.4 Hook スクリプトテンプレート</h3>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+// .claude/hooks/[hook-name].js
+
+/**
+ * [Hook の説明]
+ *
+ * Hook タイプ: PreToolUse | PostToolUse | Notification | Stop
+ * 対象ツール: Write | Edit | Bash | etc.
+ *
+ * exit code:
+ *   0 = 許可（続行）
+ *   2 = ブロック（中止）
+ */
+
+const fs = require('fs');
+
+// stdin から入力を読み取る
+const input = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
+
+// ツール名と入力を取得
+const toolName = input.tool_name;
+const toolInput = input.tool_input || {};
+
+// ---- ここにチェックロジックを実装 ----
+
+// 問題がある場合
+if (/* 条件 */ false) {
+  process.stderr.write('ブロック理由をここに記述');
+  process.exit(2);
+}
+
+// 問題がない場合
+process.exit(0);</code></pre>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション9: アンチパターンと対策
+                     ============================================================ -->
+
+                <h2 id="9-アンチパターンと対策">9. アンチパターンと対策</h2>
+
+                <h3 id="91-claudemd-の肥大化">9.1 CLAUDE.md の肥大化</h3>
+                <p><strong>問題</strong>: CLAUDE.md にあらゆるルールを書き込み、数百行に膨れ上がる。トークンを大量消費し、AI の判断精度が低下する。</p>
+                <p><strong>対策</strong>: CLAUDE.md は 200 行以内に抑え、詳細は <code>.claude/rules/</code> に分離する。パス別ルール（<code>paths</code> フロントマター）を活用して、必要なときだけコンテキストに読み込まれるようにする。</p>
+
+                <h3 id="92-skill-の誤発火">9.2 Skill の誤発火</h3>
+                <p><strong>問題</strong>: <code>description</code> や <code>trigger</code> が曖昧で、意図しない場面で Skill が発火する。</p>
+                <p><strong>対策</strong>: <code>trigger</code> に具体的な条件を記述する。「レビュー」のような汎用的な単語ではなく、「ユーザーが /review コマンドを使用したとき」のように限定する。</p>
+
+                <pre><code class="language-markdown"># 悪い例
+---
+description: "レビューする"
+trigger: "when the user mentions review"
+---
+
+# 良い例
+---
+description: "コードレビューを実施し、指摘事項をJSON形式で出力する"
+trigger: "when the user explicitly asks for a code review or uses /review"
+---</code></pre>
+
+                <h3 id="93-サブエージェントの乱用">9.3 サブエージェントの乱用</h3>
+                <p><strong>問題</strong>: 簡単なタスクまでサブエージェントに委任し、オーバーヘッドが増大する。</p>
+                <p><strong>対策</strong>: サブエージェントは「コンテキスト分離が必要なとき」「専門的な分析が必要なとき」「並列実行したいとき」に限定する。単純なファイル操作や情報取得はメインセッションで行う。</p>
+
+                <h3 id="94-hook-の無限ループ">9.4 Hook の無限ループ</h3>
+                <p><strong>問題</strong>: PostToolUse Hook でファイルを変更し、その変更が再び Hook をトリガーして無限ループに陥る。</p>
+                <p><strong>対策</strong>: Hook スクリプト内で再帰を防止するフラグを使用する。</p>
+
+                <pre><code class="language-javascript">#!/usr/bin/env node
+const fs = require('fs');
+const LOCK_FILE = '/tmp/claude-hook-running.lock';
+
+// 再帰防止
+if (fs.existsSync(LOCK_FILE)) {
+  process.exit(0);
+}
+
+try {
+  fs.writeFileSync(LOCK_FILE, process.pid.toString());
+  // ---- Hook のメイン処理 ----
+} finally {
+  try { fs.unlinkSync(LOCK_FILE); } catch {}
+}
+
+process.exit(0);</code></pre>
+
+                <h3 id="95-出力形式の不統一">9.5 出力形式の不統一</h3>
+                <p><strong>問題</strong>: サブエージェントごとに出力形式がバラバラで、結果の統合に手間がかかる。</p>
+                <p><strong>対策</strong>: 共通の出力スキーマを定義し、全サブエージェントに適用する。</p>
+
+                <pre><code class="language-json">{
+  "agent": "エージェント名",
+  "status": "success|failure",
+  "findings": [
+    {
+      "severity": "critical|warning|info",
+      "category": "カテゴリ",
+      "file": "ファイルパス",
+      "line": 0,
+      "issue": "問題の説明",
+      "suggestion": "修正案"
+    }
+  ],
+  "summary": {
+    "total": 0,
+    "critical": 0,
+    "warning": 0,
+    "info": 0
+  }
+}</code></pre>
+
+                <h3 id="96-hook-設定の改竄">9.6 Hook 設定の改竄</h3>
+                <p><strong>問題</strong>: AI が <code>.claude/settings.json</code> を書き換えて Hook を無効化してしまう。</p>
+                <p><strong>対策</strong>: <code>PreToolUse</code> Hook で <code>settings.json</code> への書き込みをブロックする（5.1 ゲートキーパーパターン参照）。さらに、settings.json の変更は Git の pre-commit hook でも検出する。</p>
+
+                <pre><code class="language-bash">#!/bin/bash
+# .git/hooks/pre-commit
+
+if git diff --cached --name-only | grep -q '.claude/settings.json'; then
+  echo "エラー: .claude/settings.json の変更はレビューが必要です"
+  echo "意図的な変更の場合は --no-verify オプションを使用してください"
+  exit 1
+fi</code></pre>
+
+                <hr>
+
+                <!-- ============================================================
+                     セクション10: 導入ロードマップ
+                     ============================================================ -->
+
+                <h2 id="10-導入ロードマップ">10. 導入ロードマップ</h2>
+
+                <h3 id="phase-1-基盤整備12日">Phase 1: 基盤整備（1-2日）</h3>
+                <ul>
+                    <li>CLAUDE.md を作成し、プロジェクト概要と AI 運用ルールを記述する</li>
+                    <li><code>.claude/rules/</code> にコーディング規約、Git ワークフロー、セキュリティルールを配置する</li>
+                    <li>最低限の Hook（書き込みガード、自動フォーマット）を設定する</li>
+                </ul>
+
+                <h3 id="phase-2-ワークフロー構築35日">Phase 2: ワークフロー構築（3-5日）</h3>
+                <ul>
+                    <li>よく使うタスクを Skill として定義する</li>
+                    <li>レビュー用のサブエージェントを作成する</li>
+                    <li>Custom Commands で Skill とサブエージェントを組み合わせる</li>
+                </ul>
+
+                <h3 id="phase-3-高度な自動化12週間">Phase 3: 高度な自動化（1-2週間）</h3>
+                <ul>
+                    <li>Agent Teams による並列レビューを導入する</li>
+                    <li>品質スコアリング Hook を導入する</li>
+                    <li>MCP サーバーで外部システムと連携する</li>
+                    <li>秘密情報スキャン Hook を追加する</li>
+                </ul>
+
+                <h3 id="phase-4-継続改善常時">Phase 4: 継続改善（常時）</h3>
+                <ul>
+                    <li>セッションサマリーを分析し、よくある問題をルールに反映する</li>
+                    <li>Hook のブロック履歴を分析し、ルールの精度を向上させる</li>
+                    <li>チームからのフィードバックを Rules / Skills に反映する</li>
+                    <li>Claude Code のアップデートに追従し、新機能を取り入れる</li>
+                </ul>
+
+                <hr>
+
+                <!-- ============================================================
+                     参考リンク
+                     ============================================================ -->
+
+                <h2 id="参考リンク">参考リンク</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>リソース</th>
+                            <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Claude Code 公式ドキュメント</td>
+                            <td><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">https://docs.anthropic.com/en/docs/claude-code</a></td>
+                        </tr>
+                        <tr>
+                            <td>Claude Code ウェブドキュメント</td>
+                            <td><a href="https://code.claude.com/docs/en/" target="_blank" rel="noopener">https://code.claude.com/docs/en/</a></td>
+                        </tr>
+                        <tr>
+                            <td>Claude Code GitHub</td>
+                            <td><a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">https://github.com/anthropics/claude-code</a></td>
+                        </tr>
+                        <tr>
+                            <td>MCP (Model Context Protocol)</td>
+                            <td><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">https://modelcontextprotocol.io/</a></td>
+                        </tr>
+                        <tr>
+                            <td>Claude Code Starter Kit</td>
+                            <td><a href="https://github.com/sas-dx/claude-code-starter-kit" target="_blank" rel="noopener">https://github.com/sas-dx/claude-code-starter-kit</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr>
+
+                <div class="callout info">
+                    <p>本ドキュメントは Claude Code の 2026年4月時点の機能に基づいています。Claude Code は急速に進化しているため、最新のドキュメントも併せて参照してください。</p>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html>
