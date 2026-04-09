@@ -155,34 +155,35 @@
 
                 <h2 id="2-アーキテクチャ全体像">2. アーキテクチャ全体像</h2>
 
-<pre><code>┌─────────────────────────────────────────────────────────────┐
-│                    決定的制御（Deterministic）                │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  Hooks（PreToolUse / PostToolUse / Notification）     │  │
-│  │  → シェルスクリプトで強制ゲート・自動処理              │  │
-│  └───────────────────────────────────────────────────────┘  │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  MCP Servers                                          │  │
-│  │  → 外部データ・API との接続                            │  │
-│  └───────────────────────────────────────────────────────┘  │
-├─────────────────────────────────────────────────────────────┤
-│                    確率的制御（Probabilistic）               │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  Rules / CLAUDE.md（静的コンテキスト）                 │  │
-│  │  → プロジェクト知識・方針・規約                        │  │
-│  └───────────────────────────────────────────────────────┘  │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  Skills（再利用ワークフロー）                          │  │
-│  │  → 定型タスクの手順書                                 │  │
-│  └───────────────────────────────────────────────────────┘  │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  Subagents / Agent Teams（分離・協調実行）            │  │
-│  │  → 専門タスクの委任・並列処理                         │  │
-│  └───────────────────────────────────────────────────────┘  │
-├─────────────────────────────────────────────────────────────┤
-│  Custom Commands（オーケストレーション層）                    │
-│  → Skills + Subagents + Agent Teams を組み合わせる          │
-└─────────────────────────────────────────────────────────────┘</code></pre>
+                <div class="diagram-wrapper">
+                    <div class="mermaid">
+flowchart TB
+    L1["<b>Layer 1: Rules / CLAUDE.md</b><br/>静的コンテキスト（常時ロード）"]
+    L2A["<b>Layer 2: Skills</b><br/>再利用ワークフロー"]
+    L2B["<b>Layer 2: Commands</b><br/>ユーザー起点起動"]
+    L3A["<b>Layer 3: Subagents /<br/>Agent Teams</b><br/>分離・協調実行"]
+    L3B["<b>Layer 3: MCP Servers</b><br/>外部接続"]
+    L4["<b>Layer 4: Hooks（21 lifecycle events）</b><br/>決定的ゲート — exit code でブロック/許可"]
+    L5["<b>Tool Execution</b><br/>Bash, Read, Write, Edit, Grep"]
+    L6["<b>File System / Git / External Services</b>"]
+
+    L1 --> L2A & L2B
+    L2A --> L3A
+    L2B --> L3B
+    L3A & L3B --> L4
+    L4 --> L5 --> L6
+
+    style L1 fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style L2A fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style L2B fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style L3A fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style L3B fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style L4 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style L5 fill:#f3e8ff,stroke:#a855f7,color:#1e293b
+    style L6 fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+                    </div>
+                    <div class="diagram-caption">Harness Architecture — 上層ほど決定的、Hooks が決定的ゲートとして全レイヤーを横断</div>
+                </div>
 
                 <p>上層ほど「決定的」で確実に適用される。Hooks はAIの判断ではなくシェルスクリプトの exit code で動作するため、プロンプトインジェクションや長時間セッションによる劣化の影響を受けない。</p>
 
