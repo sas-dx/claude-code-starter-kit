@@ -379,22 +379,28 @@ trigger: "when the user asks for a code review or uses /review"
 
                 <p><strong>役割</strong>: 複数のサブエージェントを並列に実行し、結果を統合する。</p>
 
-<pre><code>┌─────────────────────────────────────────────┐
-│           メインセッション（指揮者）          │
-│                                              │
-│  「以下のエージェントを並列に実行してください」│
-│                                              │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐     │
-│  │セキュリティ│ │パフォー  │ │テスト    │     │
-│  │レビュー   │ │マンス    │ │カバレッジ│     │
-│  │エージェント│ │エージェント│ │エージェント│   │
-│  └─────┬────┘ └─────┬────┘ └─────┬────┘     │
-│        │            │            │           │
-│        ▼            ▼            ▼           │
-│  ┌──────────────────────────────────────┐    │
-│  │         結果統合・レポート生成         │    │
-│  └──────────────────────────────────────┘    │
-└─────────────────────────────────────────────┘</code></pre>
+                <div class="diagram-wrapper">
+                    <div class="mermaid">
+flowchart TB
+    Main["<b>メインセッション（指揮者）</b><br/>以下のエージェントを並列に実行"]
+    A1["<b>セキュリティ</b><br/>レビューエージェント"]
+    A2["<b>パフォーマンス</b><br/>エージェント"]
+    A3["<b>テストカバレッジ</b><br/>エージェント"]
+    Merge["<b>結果統合・レポート生成</b><br/>findings 配列をマージ、severity 順にソート"]
+
+    Main --> A1 & A2 & A3
+    A1 --> Merge
+    A2 --> Merge
+    A3 --> Merge
+
+    style Main fill:#dbeafe,stroke:#3b82f6,color:#1e293b
+    style A1 fill:#fee2e2,stroke:#ef4444,color:#1e293b
+    style A2 fill:#fef3c7,stroke:#f59e0b,color:#1e293b
+    style A3 fill:#dcfce7,stroke:#22c55e,color:#1e293b
+    style Merge fill:#f3e8ff,stroke:#a855f7,color:#1e293b
+                    </div>
+                    <div class="diagram-caption">Agent Teams — メインセッションが複数エージェントを並列実行し、結果を統合</div>
+                </div>
 
                 <p><strong>Agent Teams の定義例</strong></p>
                 <pre><code class="language-markdown"># 包括レビューチーム
